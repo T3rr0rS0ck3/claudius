@@ -677,8 +677,7 @@ public partial class App : Application
     /// <summary>Looks for a new release about 30 s after the start and then once a day, unless switched off.</summary>
     private void SyncUpdateChecks()
     {
-        // The Store version updates through the Store.
-        bool on = Settings.CheckForUpdates && !Updater.IsDevBuild && !AppPackage.IsPackaged;
+        bool on = Settings.CheckForUpdates && !Updater.IsDevBuild;
         if (on && !_updateTimer.IsEnabled)
         {
             _updateTimer.Interval = TimeSpan.FromSeconds(30);

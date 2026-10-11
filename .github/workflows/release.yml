@@ -42,6 +42,31 @@ jobs:
         shell: pwsh
         run: ./build.ps1 -Version ${{ steps.version.outputs.version }} -SelfContained
 
+      # Code signing via SignPath Foundation, active once the repository variable SIGNPATH_ORGANIZATION_ID is set.
+      # Each signing request waits for manual approval in SignPath.
+      - name: Upload unsigned app
+        id: unsigned-app
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-app
+          path: dist/Claudius
+          if-no-files-found: error
+
+      - name: Sign app
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: claudius
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY || 'release-signing' }}
+          artifact-configuration-slug: app
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: dist/Claudius
+
       - name: Portable zip
         shell: pwsh
         run: Compress-Archive -Path dist/Claudius/* -DestinationPath dist/Claudius-${{ steps.version.outputs.version }}-portable.zip
@@ -57,6 +82,29 @@ jobs:
           & $iscc /DAppVersion=${{ steps.version.outputs.version }} /DNumericVersion=${{ steps.version.outputs.numeric }} installer/Claudius.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Upload unsigned installer
+        id: unsigned-setup
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-setup
+          path: dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe
+          if-no-files-found: error
+
+      - name: Sign installer
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: claudius
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY || 'release-signing' }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: dist
+
       # Versions from before the rename to Claudius look for the setup under its old name.
       - name: Setup for older versions
         shell: pwsh
@@ -69,22 +117,6 @@ jobs:
           Get-ChildItem dist/Claudius-Setup-*.exe, dist/ClaudePet-Setup-*.exe, dist/Claudius-*-portable.zip |
             ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } |
             Set-Content dist/SHA256SUMS.txt -Encoding ascii
-
-      # Unsigned MSIX for the Microsoft Store (the Store signs it). Attached to the run and to the release;
-      # it can't be installed as is, only uploaded in Partner Center.
-      - name: Store package
-        if: steps.version.outputs.prerelease == 'false'
-        shell: pwsh
-        run: ./packaging/build-msix.ps1 -Version ${{ steps.version.outputs.version }}
-
-      - name: Upload Store package
-        if: steps.version.outputs.prerelease == 'false'
-        uses: actions/upload-artifact@v7
-        with:
-          # Unzipped: the download is the .msix itself, ready for Partner Center.
-          path: dist/Claudius-${{ steps.version.outputs.version }}.msix
-          archive: false
-          if-no-files-found: error
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
@@ -99,11 +131,10 @@ jobs:
 
             Alternativ: `Claudius-${{ steps.version.outputs.version }}-portable.zip` entpacken und `Claudius.exe` starten.
 
-            `Claudius-${{ steps.version.outputs.version }}.msix` ist das unsignierte Paket für den Microsoft Store und lässt sich so nicht installieren.
+            [Code signing policy](https://github.com/T3rr0rS0ck3/claudius#code-signing-policy)
           files: |
             dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe
             dist/ClaudePet-Setup-${{ steps.version.outputs.version }}.exe
             dist/Claudius-${{ steps.version.outputs.version }}-portable.zip
             dist/SHA256SUMS.txt
-            dist/Claudius-${{ steps.version.outputs.version }}.msix
 

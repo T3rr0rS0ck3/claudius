@@ -64,9 +64,6 @@ No .NET installation needed — the installer is self-contained.
 
 ## Installation
 
-The pet is coming to the **Microsoft Store** as *Claudius - KI Usage Pet* (signed by Microsoft, updated by the Store).
-Until it is listed, or if you prefer GitHub:
-
 1. Download **`Claudius-Setup-x.y.z.exe`** from the [latest release](https://github.com/T3rr0rS0ck3/claudius/releases/latest).
 2. Run it. No admin rights required (installs to `%LOCALAPPDATA%\Programs\Claudius`).
 3. Keep **"Connect to the AI assistant"** checked. This adds the pet as the assistant's `statusLine` (only if you don't have one yet).
@@ -255,9 +252,6 @@ Look at `%LOCALAPPDATA%\Claudius\log.txt`. `usage.json` there shows the last val
 Uninstall *Claudius - KI Usage Pet* via Windows Settings → Apps. This also removes the status line entry from the
 assistant and the autostart entry. Your settings stay in `%LOCALAPPDATA%\Claudius` — delete that folder for a clean slate.
 
-**Store version:** Store apps can't run anything on uninstall, so first open the pet's settings and click *Disconnect*.
-Otherwise the assistant keeps calling the removed bridge.
-
 ## Building from source
 
 Requires the .NET 8 SDK (or newer).
@@ -279,22 +273,12 @@ version, packs the Inno Setup installer and a portable zip, and publishes a GitH
 (`v1.2.3-beta`) become pre-releases. Existing tags can be rebuilt via *Actions → Release → Run workflow*.
 The release also carries the setup under its name from before the rename, which older versions look for when updating.
 
-For the **Microsoft Store**, the workflow also builds an unsigned `Claudius-1.2.3.msix` ([packaging/](packaging/)) and
-attaches it to the run and the release (it is not installable as is). Upload it in Partner Center; the Store signs it. To try the package locally
-(Developer Mode on): `.\build.ps1 -SelfContained -Version 1.2.3; .\packaging\build-msix.ps1 -Version 1.2.3 -Register`.
-Privacy policy for the listing: [PRIVACY.md](PRIVACY.md).
-
-Tagging never submits to the Store by itself. After the first submission was done by hand in Partner Center, a
-release's package can be sent to the Store with *Actions → Store → Run workflow* (enter the tag, e.g. `v1.2.3`;
-Microsoft Store CLI). It needs these in the repository (*Settings → Secrets and variables → Actions*):
-
-| Name | Kind | Value |
-|---|---|---|
-| `PARTNER_CENTER_TENANT_ID` | Secret | Tenant ID of the Entra ID app linked in Partner Center |
-| `PARTNER_CENTER_CLIENT_ID` | Secret | Client ID of that app |
-| `PARTNER_CENTER_CLIENT_SECRET` | Secret | Its client secret |
-| `PARTNER_CENTER_SELLER_ID` | Secret | Seller ID (Partner Center → Account settings) |
-| `MSSTORE_PRODUCT_ID` | Variable | Store ID of the app (e.g. `9N…`) |
+Signing ([code signing policy](#code-signing-policy)) switches on once the repository has the variable
+`SIGNPATH_ORGANIZATION_ID` and the secret `SIGNPATH_API_TOKEN` (a CI user's token). The workflow then sends the program
+files and later the setup to SignPath and waits until each request is approved there. The SignPath project needs the
+slug `claudius`, the signing policy `release-signing` (or a different one in the variable `SIGNPATH_SIGNING_POLICY`)
+and two artifact configurations: `app` (zip with `Claudius.exe`, `ClaudiusBridge.exe` and the DLLs) and `installer`
+(zip with the setup exe).
 
 ### Project structure
 
@@ -317,6 +301,19 @@ installer/            Inno Setup script
 ## Disclaimer
 
 This is an independent project. The pixel character is an original drawing.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+The setup and the program files of the GitHub releases are built from this repository by the
+[release workflow](.github/workflows/release.yml) and signed there. Every signing request is approved by hand.
+
+- Committers and reviewers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
+- Approvers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
+
+Privacy: the app sends no data to the developer or third parties. Its only network access is the optional update check
+against GitHub, see the [privacy policy](PRIVACY.md).
 
 ## License
 

@@ -64,9 +64,6 @@ Eine .NET-Installation ist nicht nötig, der Installer bringt alles mit.
 
 ## Installation
 
-Das Pet kommt in den **Microsoft Store** als *Claudius - KI Usage Pet* (von Microsoft signiert, Updates über den Store).
-Bis es dort gelistet ist, oder wenn du GitHub bevorzugst:
-
 1. **`Claudius-Setup-x.y.z.exe`** aus dem [neuesten Release](https://github.com/T3rr0rS0ck3/claudius/releases/latest) herunterladen.
 2. Ausführen. Admin-Rechte sind nicht nötig (Installation nach `%LOCALAPPDATA%\Programs\Claudius`).
 3. **„Mit dem KI-Assistenten verbinden“** angehakt lassen. Damit wird das Pet als `statusLine` im Assistenten eingetragen, aber nur, wenn noch keine existiert.
@@ -261,9 +258,6 @@ Schau in `%LOCALAPPDATA%\Claudius\log.txt`. Die Datei `usage.json` im selben Ord
 Assistenten und der Autostart entfernt. Die Einstellungen bleiben in `%LOCALAPPDATA%\Claudius`. Diesen Ordner löschen,
 wenn alles weg soll.
 
-**Store-Version:** Store-Apps können beim Deinstallieren nichts ausführen. Deshalb vorher in den Einstellungen des Pets
-auf *Trennen* klicken, sonst ruft der Assistent weiter die entfernte Bridge auf.
-
 ## Selbst bauen
 
 Benötigt das .NET 8 SDK (oder neuer).
@@ -286,21 +280,12 @@ erstellt den Inno-Setup-Installer und eine portable ZIP und veröffentlicht ein 
 Das Release enthält das Setup zusätzlich unter seinem Namen von vor der Umbenennung, nach dem ältere Versionen beim
 Update suchen.
 
-Für den **Microsoft Store** baut der Workflow zusätzlich ein unsigniertes `Claudius-1.2.3.msix` ([packaging/](packaging/))
-und hängt es an den Lauf und das Release (so nicht installierbar). Das wird im Partner Center hochgeladen, der Store signiert es. Lokal testen
-(Entwicklermodus an): `.\build.ps1 -SelfContained -Version 1.2.3; .\packaging\build-msix.ps1 -Version 1.2.3 -Register`.
-Datenschutzerklärung für den Store-Eintrag: [PRIVACY.md](PRIVACY.md).
-
-Nach der ersten, von Hand im Partner Center gemachten Einreichung kann der Workflow neue Versionen selbst einreichen
-(Microsoft Store CLI). Das passiert, sobald im Repository (*Settings → Secrets and variables → Actions*) Folgendes hinterlegt ist:
-
-| Name | Art | Wert |
-|---|---|---|
-| `PARTNER_CENTER_TENANT_ID` | Secret | Mandanten-ID der im Partner Center verknüpften Entra-ID-App |
-| `PARTNER_CENTER_CLIENT_ID` | Secret | Client-ID dieser App |
-| `PARTNER_CENTER_CLIENT_SECRET` | Secret | Ihr Client-Secret |
-| `PARTNER_CENTER_SELLER_ID` | Secret | Verkäufer-ID (Partner Center → Kontoeinstellungen) |
-| `MSSTORE_PRODUCT_ID` | Variable | Store-ID der App (z. B. `9N…`) |
+Signiert wird ([Code signing policy](#code-signing-policy)), sobald im Repository die Variable
+`SIGNPATH_ORGANIZATION_ID` und das Secret `SIGNPATH_API_TOKEN` (Token eines CI-Users) gesetzt sind. Der Workflow
+schickt dann erst die Programmdateien und später das Setup an SignPath und wartet, bis die Anfrage dort freigegeben ist.
+Das SignPath-Projekt braucht den Slug `claudius`, die Signing Policy `release-signing` (oder eine andere in der Variable
+`SIGNPATH_SIGNING_POLICY`) und zwei Artifact Configurations: `app` (ZIP mit `Claudius.exe`, `ClaudiusBridge.exe` und
+den DLLs) und `installer` (ZIP mit der Setup-exe).
 
 ### Projektstruktur
 
@@ -323,6 +308,20 @@ installer/            Inno-Setup-Skript
 ## Hinweis
 
 Unabhängiges Projekt. Der Pixel-Charakter ist eine eigene Zeichnung.
+
+## Code signing policy
+
+Kostenlose Code-Signierung durch [SignPath.io](https://about.signpath.io), Zertifikat von der [SignPath Foundation](https://signpath.org)
+(Free code signing provided by SignPath.io, certificate by SignPath Foundation).
+
+Das Setup und die Programmdateien der GitHub-Releases werden vom [Release-Workflow](.github/workflows/release.yml)
+aus diesem Repository gebaut und dort signiert. Jede Signierung wird von Hand freigegeben.
+
+- Committers and reviewers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
+- Approvers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
+
+Datenschutz: Die App sendet keine Daten an den Entwickler oder an Dritte. Ihr einziger Netzwerkzugriff ist die
+abschaltbare Update-Prüfung bei GitHub, siehe [Datenschutzerklärung](PRIVACY.md).
 
 ## Lizenz
 

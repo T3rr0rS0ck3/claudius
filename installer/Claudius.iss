@@ -23,6 +23,7 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
 AppPublisher=T3rr0rS0ck3
+AppCopyright=Copyright (c) 2026 T3rr0rS0ck3
 VersionInfoVersion={#NumericVersion}
 ; Per-user install, no admin rights required. Keep the path stable: the AI assistant's
 ; statusLine points at ClaudiusBridge.exe inside this folder.

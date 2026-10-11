@@ -115,8 +115,6 @@ public static class Strings
     public static string NightFrom => L("from", "von");
     public static string NightTo => L("to", "bis");
     public static string StartWithWindows => L("Start with Windows", "Mit Windows starten");
-    public static string AutostartBlocked => L("Switched off in Windows –", "In Windows ausgeschaltet –");
-    public static string OpenStartupSettings => L("Open startup settings", "Autostart-Einstellungen öffnen");
 
     public static string IntervalField => L("Refresh interval", "Aktualisierungsintervall");
     public static string SessionWarnField => L("Session warning thresholds", "Session-Warnschwellen");
@@ -153,9 +151,6 @@ public static class Strings
     public static string InstalledVersion(string version) => L("Installed version: ", "Installierte Version: ") + version;
     public static string DevBuildSuffix => L(" (self-built, no updates)", " (selbst gebaut, keine Updates)");
     public static string PortableSuffix => L(" (portable)", " (portabel)");
-    public static string StoreVersion(string version) => L(
-        $"Version {version} – updates come through the Microsoft Store.",
-        $"Version {version} – Updates kommen über den Microsoft Store.");
     public static string Checking => L("Checking…", "Suche…");
     public static string UpToDate => L("✔ You have the latest version.", "✔ Du hast die neueste Version.");
     public static string CheckFailed => L("Check failed: ", "Suche fehlgeschlagen: ");
