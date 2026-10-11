@@ -35,7 +35,7 @@ until the limit resets.
 - 🌙 **Night mode** — between 23:00 and 06:00 (adjustable) the pet wears a nightcap and says good night; a bed turns up on the
   taskbar and it walks over and goes to sleep in it. A click wakes it for a moment; grab it by the head to take it out (it walks
   back) or by the blanket to move it with its bed. In the morning it stretches, says good morning and the bed goes
-- 📊 **Usage overlay** — click the pet to see session and weekly usage, reset times and a forecast
+- 📊 **Usage overlay** — click the pet to see session and weekly usage, reset times and a forecast, each with a chart of the current window (the forecast dashed up to the limit; hover it for time and value)
 - 🎭 **7 moods** with their own animations, based on the higher of the two usage values
 - 💬 **Speech bubbles** when thresholds are crossed, e.g. *"90 %! 😰"* — not constantly chattering
 - 🔔 **Windows notifications** at configurable session and weekly warning thresholds
