@@ -41,6 +41,8 @@ public partial class SettingsWindow : Window
         NightModeBox.IsChecked = settings.NightMode;
         ShowTime(NightStartBox, settings.NightStart);
         ShowTime(NightEndBox, settings.NightEnd);
+        BreakBox.IsChecked = settings.BreakReminder;
+        BreakAfterBox.Text = settings.BreakAfterMinutes.ToString(CultureInfo.InvariantCulture);
         UpdatesBox.IsChecked = settings.CheckForUpdates;
         VersionText.Text = Strings.InstalledVersion(Updater.Format(Updater.CurrentVersion))
             + (Updater.IsDevBuild ? Strings.DevBuildSuffix : Updater.IsInstalled ? "" : Strings.PortableSuffix);
@@ -210,6 +212,7 @@ public partial class SettingsWindow : Window
         try
         {
             int interval = ParseInt(IntervalBox.Text, Strings.IntervalField);
+            int breakAfter = ParseInt(BreakAfterBox.Text, Strings.BreakField);
             double duration = double.Parse(BubbleDurationBox.Text.Replace(',', '.'), CultureInfo.InvariantCulture);
             var sessionWarn = ParseList(SessionWarnBox.Text, Strings.SessionWarnField);
             var weekWarn = ParseList(WeekWarnBox.Text, Strings.WeekWarnField);
@@ -259,6 +262,8 @@ public partial class SettingsWindow : Window
             _settings.NightMode = NightModeBox.IsChecked == true;
             _settings.NightStart = (string)NightStartBox.SelectedItem;
             _settings.NightEnd = (string)NightEndBox.SelectedItem;
+            _settings.BreakReminder = BreakBox.IsChecked == true;
+            _settings.BreakAfterMinutes = Math.Clamp(breakAfter, AppSettings.MinBreakAfterMinutes, AppSettings.MaxBreakAfterMinutes);
             _settings.CheckForUpdates = UpdatesBox.IsChecked == true;
             _settings.SessionMarks = SessionMarksBox.IsChecked == true;
             _settings.StartWithWindows = AutostartBox.IsChecked == true;

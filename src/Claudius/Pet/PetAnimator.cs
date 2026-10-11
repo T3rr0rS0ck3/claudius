@@ -68,6 +68,20 @@ public static class PetAnimator
             Mark: u < 6 ? Mark.Heart1 : Mark.Heart2, Blush: true);
     }
 
+    /// <summary>Length of <see cref="StretchFrame"/> in ticks.</summary>
+    public const int StretchTicks = 32;
+
+    /// <summary>
+    /// Time for a break: reaches up on tiptoe with the eyes shut and a little quiver, yawns, then relaxes with a smile.
+    /// </summary>
+    public static SpriteFrame StretchFrame(long t) => t switch
+    {
+        < 8 => new SpriteFrame(Eyes.Closed, Mouth.Small, Arms.Up, Bob: -1),
+        < 13 => new SpriteFrame(Eyes.Closed, Mouth.Small, Arms.Up, Bob: -1, Shake: t % 2 == 0 ? 1 : -1),
+        < 22 => new SpriteFrame(Eyes.Closed, Mouth.Open, Arms.Up),
+        _ => new SpriteFrame(Eyes.Happy, Mouth.Smile, Blush: true),
+    };
+
     public static SpriteFrame Frame(PetMood mood, bool working, bool cheering, long t,
         Motion motion = Motion.Idle, int direction = 1, bool listening = false, bool night = false, int sick = 0)
     {

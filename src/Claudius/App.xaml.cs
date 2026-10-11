@@ -35,6 +35,7 @@ public partial class App : Application
     private PetMood? _lastMood;
     private bool? _wasNight;
     private IReadOnlyList<HistorySample>? _reviewedHistory;
+    private readonly BreakTracker _breaks = new();
     private DateTimeOffset _reviewCheckAt;
     private DateTime _settingsWrite;
 
@@ -210,7 +211,8 @@ public partial class App : Application
         {
             if (mood > last && mood >= PetMood.Normal)
             {
-                Say(mood.ToString());
+                if (mood == PetMood.Exhausted && Settings.BreakReminder) SuggestBreak(limit: true, now);
+                else Say(mood.ToString());
             }
             else if (mood < last && last >= PetMood.Nervous && mood <= PetMood.Normal)
             {
@@ -223,6 +225,8 @@ public partial class App : Application
         _pet.SetOutfit(Settings.ModelOutfits ? Sprite.OutfitFor(_state.Snapshot?.Model) : Outfit.None);
         ApplyOccasion(initial);
         if (!initial) CheckWeekReview(now);
+        if (_breaks.Update(Working, now, TimeSpan.FromMinutes(Settings.BreakAfterMinutes)) && Settings.BreakReminder && !initial)
+            SuggestBreak(limit: false, now);
 
         var snapshot = _state.Snapshot;
         CheckWarning(true, snapshot?.FiveHour, _state.Session, Settings.SessionWarnThresholds, _sessionWarn, initial, now);
@@ -271,6 +275,17 @@ public partial class App : Application
             Say(quiet ? "WeekReviewQuiet" : "WeekReview", extra: [("{lastweek}", percent), ("{day}", day ?? "")]);
         else if (Settings.Notifications)
             ShowNotification("Claudius", Strings.LastWeek(Strings.Percent(percent), day));
+    }
+
+    /// <summary>Stretches and suggests a break: after long work without one, or when a limit is reached.</summary>
+    private void SuggestBreak(bool limit, DateTimeOffset now)
+    {
+        _pet.Stretch();
+        string hours = Strings.WorkTime(_breaks.Worked(now));
+        if (Settings.SpeechBubbles)
+            Say(limit ? "BreakLimit" : "Break", extra: [("{hours}", hours)]);
+        else if (Settings.Notifications && !limit)   // reaching the limit has its own notification
+            ShowNotification("Claudius", Strings.BreakNotification(hours));
     }
 
     private sealed class WarnState

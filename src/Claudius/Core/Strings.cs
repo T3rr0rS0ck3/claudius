@@ -112,6 +112,28 @@ public static class Strings
     public static string NightModeTip => L(
         "Between these times the pet wears a nightcap and sleeps in a bed on the taskbar (or where it is, if it does not walk around).",
         "Zwischen diesen Uhrzeiten trägt das Pet eine Schlafmütze und schläft in einem Bett auf der Taskleiste (oder wo es steht, wenn es nicht herumläuft).");
+    public static string BreakReminder => L("Break reminder: stretch and suggest a break", "Pausen-Erinnerung: strecken und eine Pause vorschlagen");
+    public static string BreakReminderTip => L(
+        "After this long of work by the AI assistant without a break, and when a limit is reached. 10 minutes without activity count as a break.",
+        "Nach so langer Arbeit des KI-Assistenten ohne Pause, und wenn ein Limit erreicht ist. 10 Minuten ohne Aktivität zählen als Pause.");
+    public static string BreakAfter => L("after", "nach");
+    public static string BreakWithoutPause => L("minutes without a break", "Minuten ohne Pause");
+    public static string BreakField => L("Break reminder", "Pausen-Erinnerung");
+    /// <summary>
+    /// "45 minutes", "1 hour", "2 hours", "1 h 40 min" (German: "45 Minuten", "1 Stunde", "1 Std. 40 Min."),
+    /// from an hour on to 5 minutes.
+    /// </summary>
+    public static string WorkTime(TimeSpan span)
+    {
+        int minutes = span.TotalMinutes < 60 ? (int)Math.Round(span.TotalMinutes) : (int)Math.Round(span.TotalMinutes / 5) * 5;
+        int h = minutes / 60, m = minutes % 60;
+        if (h == 0) return L($"{m} minutes", $"{m} Minuten");
+        if (m != 0) return L($"{h} h {m} min", $"{h} Std. {m} Min.");
+        return h == 1 ? L("1 hour", "1 Stunde") : L($"{h} hours", $"{h} Stunden");
+    }
+    public static string BreakNotification(string hours) => L(
+        $"The AI assistant has been working for {hours} without a break. Time for a little break?",
+        $"Der KI-Assistent arbeitet schon {hours} ohne Pause. Zeit für eine kleine Pause?");
     public static string NightFrom => L("from", "von");
     public static string NightTo => L("to", "bis");
     public static string StartWithWindows => L("Start with Windows", "Mit Windows starten");

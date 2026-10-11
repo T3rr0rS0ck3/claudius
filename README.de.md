@@ -41,6 +41,7 @@ Panik → schläft bis zum Reset.
 - 🔔 **Windows-Benachrichtigungen** bei einstellbaren Warnschwellen für Session und Woche
 - 📈 **Prognose**: „Limit bei aktuellem Verbrauch in 1h 42m“
 - 🗓️ **Wochenrückblick**: Nach dem Wochen-Reset fasst das Pet die letzte Woche zusammen („Letzte Woche 87 %, stärkster Tag: Dienstag“), dazu eine Zeile im Usage-Fenster
+- ☕ **Pausen-Erinnerung**: Nach 2 Stunden (in Minuten einstellbar) Arbeit des KI-Assistenten ohne Pause, und wenn ein Limit erreicht ist, streckt sich das Pet und schlägt eine Pause vor; 10 Minuten ohne Aktivität zählen als Pause
 - 🧺 **Tray-Icon** in der aktuellen Stimmung, Autostart mit Windows
 - 👻 **Geist ziehen**: einen Geist des Pets mit der linken Maustaste auf ein Explorer-Fenster ziehen und der Assistent öffnet sich in diesem Ordner
 - 📄 **Datei aufs Pet ziehen**: der Assistent öffnet sich im Ordner der Datei, mit der Datei als `@datei`
@@ -208,7 +209,7 @@ Desktop-Chat bietet keine Hooks und wird nicht unterstützt.
 ## Konfiguration
 
 Die meisten Optionen gibt es unter Rechtsklick → **Einstellungen…**: Sprache, Repo-Ordner, Konsole, Geist ziehen, Sprachchat,
-Größe, Farbe, Vordergrund, Animationen, Herumlaufen, Monitorwechsel, Mauszeiger jagen, Emotes, Modell-Outfits, saisonale Kopfbedeckung und Geburtstag, Nachtmodus und Nachtzeit, Autostart, Update-Suche, Aktualisierungsintervall, Warn- und Zustandsschwellen, Sprechblasen,
+Größe, Farbe, Vordergrund, Animationen, Herumlaufen, Monitorwechsel, Mauszeiger jagen, Emotes, Modell-Outfits, saisonale Kopfbedeckung und Geburtstag, Nachtmodus und Nachtzeit, Pausen-Erinnerung, Autostart, Update-Suche, Aktualisierungsintervall, Warn- und Zustandsschwellen, Sprechblasen,
 Benachrichtigungen und dein Name.
 
 Alles liegt in `%LOCALAPPDATA%\Claudius\settings.json`. Handänderungen werden sofort übernommen.
