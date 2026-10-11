@@ -1,0 +1,13 @@
+<Project>
+
+  <!-- File metadata of the released binaries. Code signing checks the product name against the project's. -->
+  <PropertyGroup>
+    <Product>Claudius - KI Usage Pet</Product>
+    <Company>T3rr0rS0ck3</Company>
+    <Authors>T3rr0rS0ck3</Authors>
+    <Copyright>Copyright (c) 2026 T3rr0rS0ck3</Copyright>
+    <!-- Product version is the plain tag version, without the commit hash appended. -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+</Project>

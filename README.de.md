@@ -286,6 +286,13 @@ erstellt den Inno-Setup-Installer und eine portable ZIP und veröffentlicht ein 
 Das Release enthält das Setup zusätzlich unter seinem Namen von vor der Umbenennung, nach dem ältere Versionen beim
 Update suchen.
 
+Signiert wird ([Code signing policy](#code-signing-policy)), sobald im Repository die Variable
+`SIGNPATH_ORGANIZATION_ID` und das Secret `SIGNPATH_API_TOKEN` (Token eines CI-Users) gesetzt sind. Der Workflow
+schickt dann erst die Programmdateien und später das Setup an SignPath und wartet, bis die Anfrage dort freigegeben ist.
+Das SignPath-Projekt braucht den Slug `claudius`, die Signing Policy `release-signing` (oder eine andere in der Variable
+`SIGNPATH_SIGNING_POLICY`) und zwei Artifact Configurations: `app` (ZIP mit `Claudius.exe`, `ClaudiusBridge.exe` und
+den DLLs) und `installer` (die Setup-exe).
+
 Für den **Microsoft Store** baut der Workflow zusätzlich ein unsigniertes `Claudius-1.2.3.msix` ([packaging/](packaging/))
 und hängt es an den Lauf und das Release (so nicht installierbar). Das wird im Partner Center hochgeladen, der Store signiert es. Lokal testen
 (Entwicklermodus an): `.\build.ps1 -SelfContained -Version 1.2.3; .\packaging\build-msix.ps1 -Version 1.2.3 -Register`.
@@ -323,6 +330,22 @@ installer/            Inno-Setup-Skript
 ## Hinweis
 
 Unabhängiges Projekt. Der Pixel-Charakter ist eine eigene Zeichnung.
+
+## Code signing policy
+
+Kostenlose Code-Signierung durch [SignPath.io](https://about.signpath.io), Zertifikat von der [SignPath Foundation](https://signpath.org)
+(Free code signing provided by SignPath.io, certificate by SignPath Foundation).
+
+Das Setup und die Programmdateien der GitHub-Releases werden vom [Release-Workflow](.github/workflows/release.yml)
+aus diesem Repository gebaut und dort signiert. Jede Signierung wird von Hand freigegeben.
+
+- Committers and reviewers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
+- Approvers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
+
+Datenschutz: Die App sendet keine Daten an den Entwickler oder an Dritte. Ihr einziger Netzwerkzugriff ist die
+abschaltbare Update-Prüfung bei GitHub, siehe [Datenschutzerklärung](PRIVACY.md).
+
+Die Microsoft-Store-Version signiert Microsoft.
 
 ## Lizenz
 

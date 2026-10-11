@@ -42,6 +42,31 @@ jobs:
         shell: pwsh
         run: ./build.ps1 -Version ${{ steps.version.outputs.version }} -SelfContained
 
+      # Code signing via SignPath Foundation, active once the repository variable SIGNPATH_ORGANIZATION_ID is set.
+      # Each signing request waits for manual approval in SignPath.
+      - name: Upload unsigned app
+        id: unsigned-app
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-app
+          path: dist/Claudius
+          if-no-files-found: error
+
+      - name: Sign app
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: claudius
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY || 'release-signing' }}
+          artifact-configuration-slug: app
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: dist/Claudius
+
       - name: Portable zip
         shell: pwsh
         run: Compress-Archive -Path dist/Claudius/* -DestinationPath dist/Claudius-${{ steps.version.outputs.version }}-portable.zip
@@ -56,6 +81,29 @@ jobs:
           }
           & $iscc /DAppVersion=${{ steps.version.outputs.version }} /DNumericVersion=${{ steps.version.outputs.numeric }} installer/Claudius.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload unsigned installer
+        id: unsigned-setup
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe
+          archive: false
+          if-no-files-found: error
+
+      - name: Sign installer
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: claudius
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY || 'release-signing' }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: dist
 
       # Versions from before the rename to Claudius look for the setup under its old name.
       - name: Setup for older versions
@@ -98,6 +146,8 @@ jobs:
             Im Setup kann Claudius direkt als statusLine im KI-Assistenten eingetragen werden.
 
             Alternativ: `Claudius-${{ steps.version.outputs.version }}-portable.zip` entpacken und `Claudius.exe` starten.
+
+            [Code signing policy](https://github.com/T3rr0rS0ck3/claudius#code-signing-policy)
 
             `Claudius-${{ steps.version.outputs.version }}.msix` ist das unsignierte Paket für den Microsoft Store und lässt sich so nicht installieren.
           files: |
