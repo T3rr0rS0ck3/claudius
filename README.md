@@ -278,7 +278,7 @@ Signing ([code signing policy](#code-signing-policy)) switches on once the repos
 files and later the setup to SignPath and waits until each request is approved there. The SignPath project needs the
 slug `claudius`, the signing policy `release-signing` (or a different one in the variable `SIGNPATH_SIGNING_POLICY`)
 and two artifact configurations: `app` (zip with `Claudius.exe`, `ClaudiusBridge.exe` and the DLLs) and `installer`
-(the setup exe).
+(zip with the setup exe).
 
 ### Project structure
 

@@ -87,8 +87,8 @@ jobs:
         if: vars.SIGNPATH_ORGANIZATION_ID != ''
         uses: actions/upload-artifact@v7
         with:
+          name: unsigned-setup
           path: dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe
-          archive: false
           if-no-files-found: error
 
       - name: Sign installer

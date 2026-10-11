@@ -285,7 +285,7 @@ Signiert wird ([Code signing policy](#code-signing-policy)), sobald im Repositor
 schickt dann erst die Programmdateien und später das Setup an SignPath und wartet, bis die Anfrage dort freigegeben ist.
 Das SignPath-Projekt braucht den Slug `claudius`, die Signing Policy `release-signing` (oder eine andere in der Variable
 `SIGNPATH_SIGNING_POLICY`) und zwei Artifact Configurations: `app` (ZIP mit `Claudius.exe`, `ClaudiusBridge.exe` und
-den DLLs) und `installer` (die Setup-exe).
+den DLLs) und `installer` (ZIP mit der Setup-exe).
 
 ### Projektstruktur
 
