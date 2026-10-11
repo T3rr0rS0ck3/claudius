@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -10,8 +10,8 @@
     <AssemblyName>Claudius</AssemblyName>
     <RootNamespace>Claudius</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <!-- DPI awareness is declared in app.manifest for WPF; the WinForms analyzer warning does not apply. -->
-    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+    <!-- DPI awareness is declared in app.manifest for WPF; the WinForms analyzer warning (WFO0003, formerly WFAC010) does not apply. -->
+    <NoWarn>$(NoWarn);WFAC010;WFO0003</NoWarn>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <!-- Releases pass -p:Version from the tag (build.ps1); self-built copies are 0.0.0 and skip update checks. -->
     <Version>0.0.0</Version>
@@ -38,7 +38,7 @@
   </ItemGroup>
   <Target Name="CopyBridge" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
     <ItemGroup>
-      <BridgeFiles Include="..\Claudius.Bridge\bin\$(Configuration)\net8.0\ClaudiusBridge.exe;..\Claudius.Bridge\bin\$(Configuration)\net8.0\ClaudiusBridge.dll;..\Claudius.Bridge\bin\$(Configuration)\net8.0\ClaudiusBridge.deps.json;..\Claudius.Bridge\bin\$(Configuration)\net8.0\ClaudiusBridge.runtimeconfig.json" />
+      <BridgeFiles Include="..\Claudius.Bridge\bin\$(Configuration)\net10.0\ClaudiusBridge.exe;..\Claudius.Bridge\bin\$(Configuration)\net10.0\ClaudiusBridge.dll;..\Claudius.Bridge\bin\$(Configuration)\net10.0\ClaudiusBridge.deps.json;..\Claudius.Bridge\bin\$(Configuration)\net10.0\ClaudiusBridge.runtimeconfig.json" />
     </ItemGroup>
     <Copy SourceFiles="@(BridgeFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>

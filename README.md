@@ -262,7 +262,7 @@ assistant and the autostart entry. Your settings stay in `%LOCALAPPDATA%\Claudiu
 
 ## Building from source
 
-Requires the .NET 8 SDK (or newer).
+Requires the .NET 10 SDK (or newer).
 
 ```powershell
 git clone https://github.com/T3rr0rS0ck3/claudius.git

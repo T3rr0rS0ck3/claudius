@@ -269,7 +269,7 @@ wenn alles weg soll.
 
 ## Selbst bauen
 
-Benötigt das .NET 8 SDK (oder neuer).
+Benötigt das .NET 10 SDK (oder neuer).
 
 ```powershell
 git clone https://github.com/T3rr0rS0ck3/claudius.git
