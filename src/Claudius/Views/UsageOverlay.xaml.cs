@@ -34,13 +34,15 @@ public partial class UsageOverlay : Window
             SessionReset.Text = state.SessionExpired
                 ? Strings.ResetWaiting
                 : Strings.SessionResetIn(Format.Duration(session.ResetsAtTime - now), Format.Clock(session.ResetsAtTime));
-            SetForecast(SessionForecast, settings.ShowForecast && !state.SessionExpired, history, true, session, now,
+            var eta = SetForecast(SessionForecast, settings.ShowForecast && !state.SessionExpired, history, true, session, now,
                 eta => Strings.LimitIn(Format.Duration(eta - now)));
+            SetChart(SessionChart, !state.SessionExpired, history, true, session, eta, now, Format.Clock);
         }
         else
         {
             SessionReset.Text = Strings.NoData;
             SessionForecast.Visibility = Visibility.Collapsed;
+            SessionChart.Visibility = Visibility.Collapsed;
         }
 
         // Week
@@ -50,13 +52,15 @@ public partial class UsageOverlay : Window
             WeekReset.Text = state.WeekExpired
                 ? Strings.ResetWaiting
                 : Strings.WeekResetAt(Format.DayTime(week.ResetsAtTime, now));
-            SetForecast(WeekForecast, settings.ShowForecast && !state.WeekExpired, history, false, week, now,
+            var eta = SetForecast(WeekForecast, settings.ShowForecast && !state.WeekExpired, history, false, week, now,
                 eta => Strings.LimitAt(Format.DayTime(eta, now)));
+            SetChart(WeekChart, !state.WeekExpired, history, false, week, eta, now, time => Format.DayTime(time, now));
         }
         else
         {
             WeekReset.Text = Strings.NoData;
             WeekForecast.Visibility = Visibility.Collapsed;
+            WeekChart.Visibility = Visibility.Collapsed;
         }
 
         StateText.Text = Strings.MoodLabel(state.Mood);
@@ -121,17 +125,58 @@ public partial class UsageOverlay : Window
         label.Text = Strings.Percent(percent is { } v ? Format.Percent(v) : "–");
     }
 
-    private static void SetForecast(TextBlock target, bool enabled, IReadOnlyList<HistorySample> history,
+    /// <summary>Shows when the limit will be hit, if the forecast is on and there is one; returns that time.</summary>
+    private static DateTimeOffset? SetForecast(TextBlock target, bool enabled, IReadOnlyList<HistorySample> history,
         bool session, RateWindow window, DateTimeOffset now, Func<DateTimeOffset, string> describe)
     {
         var eta = enabled ? Forecast.EstimateLimit(history, session, window, now) : null;
         if (eta == null)
         {
             target.Visibility = Visibility.Collapsed;
-            return;
+            return null;
         }
         target.Visibility = Visibility.Visible;
         target.Text = eta < window.ResetsAtTime ? Strings.Forecast(describe(eta.Value)) : Strings.ForecastLasts;
+        return eta;
+    }
+
+    /// <summary>
+    /// The current window's course from its start to its reset, with the forecast dashed up to the limit
+    /// or, if it lasts, up to the reset.
+    /// </summary>
+    private static void SetChart(UsageChart chart, bool current, IReadOnlyList<HistorySample> history, bool session,
+        RateWindow window, DateTimeOffset? eta, DateTimeOffset now, Func<DateTimeOffset, string> describeTime)
+    {
+        var end = window.ResetsAtTime;
+        var start = end - (session ? TimeSpan.FromHours(5) : TimeSpan.FromDays(7));
+        var points = new List<(DateTimeOffset Time, double Percent)>();
+        foreach (var h in history)
+        {
+            double? p = session ? h.Session : h.Week;
+            long? reset = session ? h.SessionReset : h.WeekReset;
+            // Same window, as in the forecast: resets_at may jitter slightly between responses.
+            if (p == null || reset == null || Math.Abs(reset.Value - window.ResetsAt) > 600) continue;
+            var time = DateTimeOffset.FromUnixTimeSeconds(h.Time);
+            if (time < start || time > now) continue;
+            points.Add((time, p.Value));
+        }
+        points.Sort((a, b) => a.Time.CompareTo(b.Time));
+        if (!current || points.Count == 0)
+        {
+            chart.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        (DateTimeOffset, double)? forecast = null;
+        if (eta is { } limit && limit > now)
+        {
+            double from = points[^1].Percent;
+            forecast = limit <= end
+                ? (limit, 100)
+                : (end, from + (100 - from) * ((end - now) / (limit - now)));
+        }
+        chart.Visibility = Visibility.Visible;
+        chart.SetData(points, start, end, now, forecast, describeTime);
     }
 
     private bool _closing;

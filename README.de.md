@@ -35,7 +35,7 @@ Panik → schläft bis zum Reset.
 - 🌙 **Nachtmodus**: zwischen 23 und 6 Uhr (einstellbar) trägt das Pet eine Schlafmütze und sagt gute Nacht; auf der Taskleiste
   erscheint ein Bett, es läuft hin und schläft darin. Ein Klick weckt es kurz; am Kopf gegriffen holt man es heraus (es läuft
   zurück), an der Decke gegriffen zieht man es samt Bett um. Morgens streckt es sich, sagt guten Morgen und das Bett verschwindet
-- 📊 **Usage-Fenster**: Klick aufs Pet zeigt Session- und Wochenverbrauch, Reset-Zeiten und Prognose
+- 📊 **Usage-Fenster**: Klick aufs Pet zeigt Session- und Wochenverbrauch, Reset-Zeiten und Prognose, jeweils mit einer Kurve des laufenden Zeitfensters (die Prognose gestrichelt bis zum Limit; mit der Maus darüber Uhrzeit und Wert)
 - 🎭 **7 Stimmungen** mit eigenen Animationen, abhängig vom höheren der beiden Werte
 - 💬 **Sprechblasen** beim Überschreiten von Schwellen, z. B. *„90 %! 😰“*, ohne Dauergequatsche
 - 🔔 **Windows-Benachrichtigungen** bei einstellbaren Warnschwellen für Session und Woche
