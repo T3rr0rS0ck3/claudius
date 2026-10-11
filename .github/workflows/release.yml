@@ -105,16 +105,11 @@ jobs:
           wait-for-completion-timeout-in-seconds: 3600
           output-artifact-directory: dist
 
-      # Versions from before the rename to Claudius look for the setup under its old name.
-      - name: Setup for older versions
-        shell: pwsh
-        run: Copy-Item dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe dist/ClaudePet-Setup-${{ steps.version.outputs.version }}.exe
-
       # The in-app updater checks the downloaded setup against this file.
       - name: Checksums
         shell: pwsh
         run: |
-          Get-ChildItem dist/Claudius-Setup-*.exe, dist/ClaudePet-Setup-*.exe, dist/Claudius-*-portable.zip |
+          Get-ChildItem dist/Claudius-Setup-*.exe, dist/Claudius-*-portable.zip |
             ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } |
             Set-Content dist/SHA256SUMS.txt -Encoding ascii
 
@@ -134,7 +129,6 @@ jobs:
             [Code signing policy](https://github.com/T3rr0rS0ck3/claudius#code-signing-policy)
           files: |
             dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe
-            dist/ClaudePet-Setup-${{ steps.version.outputs.version }}.exe
             dist/Claudius-${{ steps.version.outputs.version }}-portable.zip
             dist/SHA256SUMS.txt
 
