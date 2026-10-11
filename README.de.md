@@ -277,8 +277,6 @@ Mit `CLAUDIUS_DATA_DIR` lassen sich App und Bridge auf einen anderen Datenordner
 Ein Tag wie `v1.2.3` startet den [Release-Workflow](.github/workflows/release.yml). Er baut eine Self-Contained-Version,
 erstellt den Inno-Setup-Installer und eine portable ZIP und veröffentlicht ein GitHub-Release. Tags mit Suffix
 (`v1.2.3-beta`) werden Pre-Releases. Bestehende Tags lassen sich über *Actions → Release → Run workflow* neu bauen.
-Das Release enthält das Setup zusätzlich unter seinem Namen von vor der Umbenennung, nach dem ältere Versionen beim
-Update suchen.
 
 Signiert wird ([Code signing policy](#code-signing-policy)), sobald im Repository die Variable
 `SIGNPATH_ORGANIZATION_ID` und das Secret `SIGNPATH_API_TOKEN` (Token eines CI-Users) gesetzt sind. Der Workflow

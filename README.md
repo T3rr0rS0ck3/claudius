@@ -271,7 +271,6 @@ Set `CLAUDIUS_DATA_DIR` to point the app and bridge at a different data folder, 
 Pushing a tag like `v1.2.3` runs the [release workflow](.github/workflows/release.yml). It builds a self-contained
 version, packs the Inno Setup installer and a portable zip, and publishes a GitHub release. Tags with a suffix
 (`v1.2.3-beta`) become pre-releases. Existing tags can be rebuilt via *Actions → Release → Run workflow*.
-The release also carries the setup under its name from before the rename, which older versions look for when updating.
 
 Signing ([code signing policy](#code-signing-policy)) switches on once the repository has the variable
 `SIGNPATH_ORGANIZATION_ID` and the secret `SIGNPATH_API_TOKEN` (a CI user's token). The workflow then sends the program
