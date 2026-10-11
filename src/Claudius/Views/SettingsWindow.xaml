@@ -170,7 +170,7 @@
                           ToolTip="{x:Static core:Strings.BreakReminderTip}" />
                 <StackPanel Orientation="Horizontal" Margin="22,0,0,4" IsEnabled="{Binding IsChecked, ElementName=BreakBox}">
                     <TextBlock Text="{x:Static core:Strings.BreakAfter}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <ComboBox x:Name="BreakAfterBox" Width="110" />
+                    <TextBox x:Name="BreakAfterBox" Width="56" />
                     <TextBlock Text="{x:Static core:Strings.BreakWithoutPause}" VerticalAlignment="Center" Margin="6,0,0,0" />
                 </StackPanel>
                 <CheckBox x:Name="AutostartBox" Content="{x:Static core:Strings.StartWithWindows}" />

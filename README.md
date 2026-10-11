@@ -41,7 +41,7 @@ until the limit resets.
 - 🔔 **Windows notifications** at configurable session and weekly warning thresholds
 - 📈 **Forecast** — "at the current pace you'll hit the limit in 1h 42m"
 - 🗓️ **Weekly review** — after the weekly reset the pet sums up the past week ("Last week: 87%, busiest day: Tuesday"), also shown in the usage overlay
-- ☕ **Break reminder** — after 2 hours (adjustable) of work by the AI assistant without a break, and when a limit is reached, the pet stretches and suggests a break; 10 minutes without activity count as a break
+- ☕ **Break reminder** — after 2 hours (adjustable in minutes) of work by the AI assistant without a break, and when a limit is reached, the pet stretches and suggests a break; 10 minutes without activity count as a break
 - 🧺 **Tray icon** that reflects the current mood, plus autostart with Windows
 - 👻 **Ghost drag** — drag a ghost of the pet (left mouse button) onto an Explorer window to open the assistant in that folder
 - 📄 **File drop** — drag a file from Explorer onto the pet to open the assistant in its folder with the file as `@file`

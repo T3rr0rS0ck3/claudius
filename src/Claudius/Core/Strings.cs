@@ -117,13 +117,16 @@ public static class Strings
         "After this long of work by the AI assistant without a break, and when a limit is reached. 10 minutes without activity count as a break.",
         "Nach so langer Arbeit des KI-Assistenten ohne Pause, und wenn ein Limit erreicht ist. 10 Minuten ohne Aktivität zählen als Pause.");
     public static string BreakAfter => L("after", "nach");
-    public static string BreakWithoutPause => L("without a break", "ohne Pause");
-    /// <summary>"2 hours", "1.5 hours", "1 hour" (German: "2 Stunden", "1,5 Stunden", "1 Stunde").</summary>
-    public static string Hours(TimeSpan span)
+    public static string BreakWithoutPause => L("minutes without a break", "Minuten ohne Pause");
+    public static string BreakField => L("Break reminder", "Pausen-Erinnerung");
+    /// <summary>"45 minutes", "1 hour", "2 hours", "1 h 40 min" (German: "45 Minuten", "1 Stunde", "1 Std. 40 Min."), to 5 minutes.</summary>
+    public static string WorkTime(TimeSpan span)
     {
-        double hours = Math.Round(span.TotalHours * 2) / 2;
-        string number = hours.ToString("0.#", Culture);
-        return hours == 1 ? L("1 hour", "1 Stunde") : L($"{number} hours", $"{number} Stunden");
+        int minutes = (int)Math.Round(span.TotalMinutes / 5) * 5;
+        int h = minutes / 60, m = minutes % 60;
+        if (h == 0) return L($"{m} minutes", $"{m} Minuten");
+        if (m != 0) return L($"{h} h {m} min", $"{h} Std. {m} Min.");
+        return h == 1 ? L("1 hour", "1 Stunde") : L($"{h} hours", $"{h} Stunden");
     }
     public static string BreakNotification(string hours) => L(
         $"The AI assistant has been working for {hours} without a break. Time for a little break?",

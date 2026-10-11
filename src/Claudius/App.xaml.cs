@@ -281,7 +281,7 @@ public partial class App : Application
     private void SuggestBreak(bool limit, DateTimeOffset now)
     {
         _pet.Stretch();
-        string hours = Strings.Hours(_breaks.Worked(now));
+        string hours = Strings.WorkTime(_breaks.Worked(now));
         if (Settings.SpeechBubbles)
             Say(limit ? "BreakLimit" : "Break", extra: [("{hours}", hours)]);
         else if (Settings.Notifications && !limit)   // reaching the limit has its own notification

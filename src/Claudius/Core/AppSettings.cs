@@ -28,8 +28,8 @@ public sealed class AppSettings
     public const string DefaultNightStart = "23:00";
     public const string DefaultNightEnd = "06:00";
     public const int DefaultBreakAfterMinutes = 120;
-    /// <summary>The choices for <see cref="BreakAfterMinutes"/>.</summary>
-    public static readonly int[] BreakAfterChoices = [60, 90, 120, 180, 240];
+    public const int MinBreakAfterMinutes = 15;
+    public const int MaxBreakAfterMinutes = 720;
 
     /// <summary>
     /// UI language, <see cref="Strings.English"/> or <see cref="Strings.German"/>. New installs start in
@@ -255,7 +255,7 @@ public sealed class AppSettings
         if (!Occasions.TryParseTime(NightStart, out _)) NightStart = DefaultNightStart;
         if (!Occasions.TryParseTime(NightEnd, out _)) NightEnd = DefaultNightEnd;
         if (!Occasions.TryParseDay(Birthday, out _)) Birthday = null;
-        if (!BreakAfterChoices.Contains(BreakAfterMinutes)) BreakAfterMinutes = DefaultBreakAfterMinutes;
+        BreakAfterMinutes = Math.Clamp(BreakAfterMinutes, MinBreakAfterMinutes, MaxBreakAfterMinutes);
         PetColor = Sprite.TryParseColor(PetColor, out uint color) ? Sprite.ToHex(color) : DefaultPetColor;
         Language = Language == Strings.German ? Strings.German : Strings.English;
         var defaults = DefaultTexts(Language);
