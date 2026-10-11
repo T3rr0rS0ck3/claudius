@@ -478,6 +478,10 @@ public partial class PetWindow : Window
         _animationTimer.Start();
     }
 
+    /// <summary>Standing still for <see cref="Stretch"/>; on a wall or in the air it just carries on.</summary>
+    private bool Stretching => _stretchStart is { } start && !InBed && _pose.Motion is Motion.Idle or Motion.Walk or Motion.Run
+                               && (DateTime.Now - start).TotalSeconds * PetAnimator.TicksPerSecond < PetAnimator.StretchTicks;
+
     /// <summary>Stretches and yawns, e.g. to suggest a break.</summary>
     public void Stretch()
     {
@@ -545,10 +549,10 @@ public partial class PetWindow : Window
         }
         if (_stretchStart is { } stretch && !InBed && _pose.Motion is Motion.Idle or Motion.Walk or Motion.Run)
         {
-            // Like emotes, on its own clock
-            long st = (long)((DateTime.Now - stretch).TotalSeconds * PetAnimator.TicksPerSecond);
-            if (st < PetAnimator.StretchTicks)
+            // Like emotes, on its own clock; standing still meanwhile (see Walk)
+            if (Stretching)
             {
+                long st = (long)((DateTime.Now - stretch).TotalSeconds * PetAnimator.TicksPerSecond);
                 PetImage.Source = Sprite.Render(PetAnimator.StretchFrame(st) with { Sick = _sick, Outfit = _outfit, Accessory = _accessory });
                 return;
             }
@@ -716,7 +720,7 @@ public partial class PetWindow : Window
         if (_dragging || _paused) return;
 
         // Hold still under the mouse so clicks and double-clicks land on the pet; a fall or jump still finishes.
-        bool aiming = PetImage.IsMouseOver || EmoteBar.IsMouseOver || _emote != null
+        bool aiming = PetImage.IsMouseOver || EmoteBar.IsMouseOver || _emote != null || Stretching
                       || _pressPoint != null || _clickTimer.IsEnabled;
         if (aiming && !_needsPlace && _walker.Motion is not (Motion.Fall or Motion.Jump or Motion.Splat))
         {

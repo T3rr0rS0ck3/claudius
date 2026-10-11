@@ -119,10 +119,13 @@ public static class Strings
     public static string BreakAfter => L("after", "nach");
     public static string BreakWithoutPause => L("minutes without a break", "Minuten ohne Pause");
     public static string BreakField => L("Break reminder", "Pausen-Erinnerung");
-    /// <summary>"45 minutes", "1 hour", "2 hours", "1 h 40 min" (German: "45 Minuten", "1 Stunde", "1 Std. 40 Min."), to 5 minutes.</summary>
+    /// <summary>
+    /// "45 minutes", "1 hour", "2 hours", "1 h 40 min" (German: "45 Minuten", "1 Stunde", "1 Std. 40 Min."),
+    /// from an hour on to 5 minutes.
+    /// </summary>
     public static string WorkTime(TimeSpan span)
     {
-        int minutes = (int)Math.Round(span.TotalMinutes / 5) * 5;
+        int minutes = span.TotalMinutes < 60 ? (int)Math.Round(span.TotalMinutes) : (int)Math.Round(span.TotalMinutes / 5) * 5;
         int h = minutes / 60, m = minutes % 60;
         if (h == 0) return L($"{m} minutes", $"{m} Minuten");
         if (m != 0) return L($"{h} h {m} min", $"{h} Std. {m} Min.");
