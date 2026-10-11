@@ -19,6 +19,8 @@ public partial class PetWindow : Window
     private const double MinWidth_ = 260;
     /// <summary>Height of the emote buttons plus their gap to the pet.</summary>
     private const double EmoteBarArea = 34;
+    /// <summary>Room for the speech bubble next to the climbing pet: tail, widest bubble and its shadow.</summary>
+    private const double BubbleBesideArea = 262;
 
     private readonly DispatcherTimer _animationTimer = new()
     {
@@ -56,6 +58,12 @@ public partial class PetWindow : Window
     private bool _paused;
     private bool _needsPlace = true;
     private bool _petOnTop;
+    /// <summary>Window width without the room for the overlays next to the climbing pet.</summary>
+    private double _usualWidth;
+    /// <summary>The side the overlays are laid out on: next to the pet climbing a wall (-1, 1) or not (0).</summary>
+    private int _overlaySide;
+    /// <summary>Room above the climbing pet, so the upright emote buttons can be centered on it (DIPs).</summary>
+    private double _petInset;
     private bool _listening;
     private Mark _sessionMark = Mark.None;
     private Outfit _outfit = Outfit.None;
@@ -181,6 +189,7 @@ public partial class PetWindow : Window
         double tearsWidth = (Sprite.Width + 2 * Sprite.TearMargin) * settings.PetScale;
         double splatWidth = (Sprite.Width + 2 * Sprite.SplatMargin) * settings.PetScale;
         double newWidth = Math.Max(MinWidth_, Math.Max(tearsWidth, splatWidth) + 20);
+        _usualWidth = newWidth;
         double newHeight = BubbleArea + petHeight;
 
         if (initial)
@@ -233,6 +242,11 @@ public partial class PetWindow : Window
         }
         Render();
     }
+
+    /// <summary>
+    /// <see cref="Window.Left"/> at the usual window width, to be saved: the window is wider while the pet climbs.
+    /// </summary>
+    public double UsualLeft => Left + (Width - _usualWidth) / 2;
 
     public void SetMood(PetMood mood, bool working)
     {
@@ -436,9 +450,9 @@ public partial class PetWindow : Window
         if (!IsVisible || hwnd == IntPtr.Zero || !GetWindowRect(hwnd, out var rect)) return;
 
         var dpi = VisualTreeHelper.GetDpi(this);
-        double petWidth = PetImage.Width * dpi.DpiScaleX, petHeight = PetImage.Height * dpi.DpiScaleY;
+        double petWidth = PetImage.Width * dpi.DpiScaleX;
         double feetX = (rect.Left + rect.Right) / 2.0;
-        double feetY = _petOnTop ? rect.Top + petHeight : rect.Bottom;
+        double feetY = _petOnTop ? rect.Top + TopToFeet(dpi.DpiScaleY) : rect.Bottom;
         _reaper.Follow(feetX - _pose.Direction * petWidth * 0.95, feetY, -_pose.Direction, dt);
     }
 
@@ -567,21 +581,70 @@ public partial class PetWindow : Window
         LayoutOverlays();
     }
 
+    /// <summary>From the window top down to the pet's feet while the pet is at the top of the window (physical pixels).</summary>
+    private double TopToFeet(double dpiY) => (_petInset + PetImage.Height) * dpiY;
+
+    /// <summary>Climbing a screen edge: the side away from the wall (-1 left, 1 right), else 0.</summary>
+    private int ClimbSide => _petOnTop && _walking && _walker.Motion == Motion.Climb ? -_walker.Direction : 0; // Direction points at the wall
+
     /// <summary>
     /// Emote buttons right next to the pet and the speech bubble beyond them: above the pet, or below it
-    /// while the pet is at the top of the window.
+    /// while the pet is at the top of the window. Climbing a screen edge, both go to the side away from the
+    /// wall, which would cut them off; the buttons stand upright there and the window widens to make room.
     /// </summary>
     private void LayoutOverlays()
     {
         bool onTop = _petOnTop;
-        double bar = EmoteBar.Visibility == Visibility.Visible ? EmoteBarArea : 0;
+        int side = _overlaySide = ClimbSide;
+        if (_usualWidth > 0)
+        {
+            double width = side == 0
+                ? _usualWidth
+                : Math.Max(_usualWidth, PetImage.Width + 2 * (4 + EmoteBarArea + BubbleBesideArea));
+            if (width != Width)
+            {
+                double center = Left + Width / 2;
+                Width = width;
+                Left = center - width / 2;
+            }
+        }
+        // Climbing, the pet moves down from the window top so the upright buttons fit centered on it.
+        double barHeight = EmoteBar.Children.Count * EmoteBarArea;
+        _petInset = side == 0 ? 0 : Math.Max(0, (barHeight - PetImage.Height) / 2);
+        foreach (var image in new[] { PetImage, TearsImage, SplatImage, BedBackImage, BedFrontImage })
+            image.Margin = new Thickness(0, onTop ? _petInset : 0, 0, 0);
+        bool barShown = EmoteBar.Visibility == Visibility.Visible;
+        double bar = barShown && side == 0 ? EmoteBarArea : 0;
         var align = onTop ? VerticalAlignment.Top : VerticalAlignment.Bottom;
         EmoteBar.VerticalAlignment = align;
-        EmoteBar.Margin = onTop ? new Thickness(0, PetImage.Height + 4, 0, 0) : new Thickness(0, 0, 0, 4);
+        EmoteBar.Orientation = side == 0 ? Orientation.Horizontal : Orientation.Vertical;
+        foreach (var button in EmoteBar.Children.OfType<Button>())
+            button.Margin = side == 0 ? new Thickness(2, 0, 2, 0) : new Thickness(0, 2, 0, 2);
+        double beside = Width / 2 + PetImage.Width / 2 + 4;
+        EmoteBar.HorizontalAlignment = side switch
+        {
+            > 0 => HorizontalAlignment.Left, < 0 => HorizontalAlignment.Right, _ => HorizontalAlignment.Center,
+        };
+        EmoteBar.Margin = side switch
+        {
+            > 0 => new Thickness(beside, _petInset + (PetImage.Height - barHeight) / 2, 0, 0),
+            < 0 => new Thickness(0, _petInset + (PetImage.Height - barHeight) / 2, beside, 0),
+            _ => onTop ? new Thickness(0, PetImage.Height + 4, 0, 0) : new Thickness(0, 0, 0, 4),
+        };
         Bubble.VerticalAlignment = align;
-        Bubble.Margin = onTop ? new Thickness(0, PetImage.Height + 2 + bar, 0, 0) : new Thickness(0, 0, 0, 2 + bar);
-        BubbleTailUp.Visibility = onTop ? Visibility.Visible : Visibility.Collapsed;
+        Bubble.Orientation = side == 0 ? Orientation.Vertical : Orientation.Horizontal;
+        Bubble.HorizontalAlignment = EmoteBar.HorizontalAlignment;
+        double besideBar = Width / 2 + PetImage.Width / 2 + 2 + (barShown ? EmoteBarArea : 0);
+        Bubble.Margin = side switch
+        {
+            > 0 => new Thickness(besideBar, _petInset, 0, 0),
+            < 0 => new Thickness(0, _petInset, besideBar, 0),
+            _ => onTop ? new Thickness(0, PetImage.Height + 2 + bar, 0, 0) : new Thickness(0, 0, 0, 2 + bar),
+        };
+        BubbleTailUp.Visibility = onTop && side == 0 ? Visibility.Visible : Visibility.Collapsed;
         BubbleTailDown.Visibility = onTop ? Visibility.Collapsed : Visibility.Visible;
+        BubbleTailLeft.Visibility = side > 0 ? Visibility.Visible : Visibility.Collapsed;
+        BubbleTailRight.Visibility = side < 0 ? Visibility.Visible : Visibility.Collapsed;
         UpdateLayout();
     }
 
@@ -607,13 +670,14 @@ public partial class PetWindow : Window
         if (_dragging) return;
         var hwnd = new WindowInteropHelper(this).Handle;
         if (hwnd == IntPtr.Zero || !IsVisible || !GetWindowRect(hwnd, out var rect)) return;
-        double petHeight = PetImage.Height * VisualTreeHelper.GetDpi(this).DpiScaleY;
+        double dpiY = VisualTreeHelper.GetDpi(this).DpiScaleY;
+        double petHeight = PetImage.Height * dpiY;
         double feetX = (rect.Left + rect.Right) / 2.0;
-        double feetY = _petOnTop ? rect.Top + petHeight : rect.Bottom;
+        double feetY = _petOnTop ? rect.Top + TopToFeet(dpiY) : rect.Bottom;
         bool onTop = WantsPetOnTop(feetX, feetY, petHeight);
         if (onTop == _petOnTop) return;
         SetPetOnTop(onTop);
-        int y = (int)Math.Round(feetY - (onTop ? petHeight : rect.Bottom - rect.Top));
+        int y = (int)Math.Round(feetY - (onTop ? TopToFeet(dpiY) : rect.Bottom - rect.Top));
         SetWindowPos(hwnd, IntPtr.Zero, rect.Left, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
@@ -651,7 +715,7 @@ public partial class PetWindow : Window
         if (_needsPlace)
         {
             // Carried in its bed, or set down again for another reason while in it: it lands in it.
-            _walker.Place(rect.Left + width / 2, _petOnTop ? rect.Top + petHeight : rect.Bottom,
+            _walker.Place(rect.Left + width / 2, _petOnTop ? rect.Top + TopToFeet(dpi.DpiScaleY) : rect.Bottom,
                 _carryingBed || _walker.InBed && !_pulledOut);
             _pulledOut = false; // _carryingBed lasts until it has landed, so the bed falls with it
             _needsPlace = false;
@@ -673,7 +737,9 @@ public partial class PetWindow : Window
         // (transparent) speech bubble area does not stick out above the screen.
         bool petOnTop = WantsPetOnTop(_walker.X, _walker.Y, petHeight);
         if (petOnTop != _petOnTop) SetPetOnTop(petOnTop);
-        double feetToTop = petOnTop ? petHeight : height;
+        else if (ClimbSide != _overlaySide) LayoutOverlays(); // e.g. from the wall onto the top edge
+        if (GetWindowRect(hwnd, out var sized)) width = sized.Right - sized.Left; // widened or narrowed for climbing
+        double feetToTop = petOnTop ? TopToFeet(dpi.DpiScaleY) : height;
         int x = (int)Math.Round(_walker.X - width / 2), y = (int)Math.Round(_walker.Y - feetToTop);
         if (x != rect.Left || y != rect.Top)
             SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);

@@ -164,7 +164,7 @@ public partial class App : Application
         {
             try
             {
-                Settings.PositionX = _pet.Left;
+                Settings.PositionX = _pet.UsualLeft;
                 Settings.PositionY = _pet.Top;
                 Settings.Save();
             }
@@ -363,7 +363,7 @@ public partial class App : Application
     {
         Settings.WalkAround = !Settings.WalkAround;
         // Stay where it is when it stops walking.
-        Settings.PositionX = _pet.Left;
+        Settings.PositionX = _pet.UsualLeft;
         Settings.PositionY = _pet.Top;
         ApplySettings(save: true);
     }
@@ -647,7 +647,7 @@ public partial class App : Application
 
     private void SavePosition()
     {
-        Settings.PositionX = _pet.Left;
+        Settings.PositionX = _pet.UsualLeft;
         Settings.PositionY = _pet.Top;
         ApplySettings(save: true);
     }
