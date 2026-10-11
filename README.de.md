@@ -42,6 +42,7 @@ Panik → schläft bis zum Reset.
 - 📈 **Prognose**: „Limit bei aktuellem Verbrauch in 1h 42m“
 - 🧺 **Tray-Icon** in der aktuellen Stimmung, Autostart mit Windows
 - 👻 **Geist ziehen**: einen Geist des Pets mit der linken Maustaste auf ein Explorer-Fenster ziehen und der Assistent öffnet sich in diesem Ordner
+- 📄 **Datei aufs Pet ziehen**: der Assistent öffnet sich im Ordner der Datei, mit der Datei als `@datei`
 - 📂 **Projektliste**: Doppelklick aufs Pet, Projekt aus deinem Repo-Ordner wählen, der Assistent startet dort
 - 🎤 **Sprachchat** (optional): öffnet den Assistenten mit eingeschaltetem Sprachdiktat; das Pet hört zu, während du sprichst
 - ❓ **Session-Status**: ein gelbes „?“, wenn eine Session etwas fragt, eine Sprechblase, wenn sie fertig ist;
@@ -93,6 +94,7 @@ Einstellungen, stellt die Statuszeile auf die neue Bridge um und entfernt den al
 | Doppelklick aufs Pet | Projektliste: den Assistenten in einem deiner Projekte öffnen |
 | Pet mit rechter Maustaste ziehen | Verschieben (Position wird gespeichert); es strampelt beim Tragen und fällt beim Herumlaufen von dort herunter |
 | Pet auf ein Explorer-Fenster ziehen | Den Assistenten in diesem Ordner öffnen (siehe [Assistent öffnen](#assistent-öffnen)) |
+| Dateien aus dem Explorer aufs Pet ziehen | Den Assistenten in ihrem Ordner öffnen und ihm die Dateien geben (siehe [Assistent öffnen](#assistent-öffnen)) |
 | Mit der Maus übers Pet fahren | Emote-Knöpfe: füttern 🍪, streicheln ❤, spielen ⚽ und kitzeln 🪶, jeweils mit eigener Reaktion (abschaltbar) |
 | Rechtsklick aufs Pet | Menü: Usage, Assistent öffnen, Sprachchat, Hallo sagen, Vordergrund, Herumlaufen, in den Tray, KI-Assistent verbinden, Einstellungen, Beenden |
 | Linksklick aufs Tray-Icon | Usage-Fenster öffnen |
@@ -111,6 +113,11 @@ Mauszeiger, das Pet selbst bleibt stehen und schaut ihm nach. Über einem Explor
 Geist auf und winkt. Dort loslassen, und der Assistent öffnet sich in diesem Ordner (bei Windows-11-Tabs im aktiven Tab);
 der Geist schwebt davon. Loslassen woanders oder `Esc` bricht ab. Bei Ordnern ohne Dateisystempfad (z. B. *Dieser PC*)
 sagt das Pet kurz Bescheid. Lässt sich in den Einstellungen abschalten.
+
+**Datei aufs Pet ziehen.** Eine oder mehrere Dateien aus dem Explorer aufs Pet ziehen: Es reißt den Mund auf und greift
+danach. Loslassen, und der Assistent öffnet sich im Ordner der Dateien, mit `@"datei"` als erster Nachricht, liest sie
+also gleich. Ein einzelner Ordner öffnet sich wie beim Geist ziehen. Die Desktop-App nimmt keine erste Nachricht an,
+dort öffnet sich nur der Ordner.
 
 **Projektliste.** Doppelklick aufs Pet (oder Rechtsklick → *Assistent öffnen…*, auch im Tray-Menü). Oben stehen die zuletzt
 geöffneten Projekte, darunter alle Unterordner deines **Repo-Ordners** (versteckte Ordner und solche mit `.` am Anfang

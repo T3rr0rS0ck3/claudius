@@ -8,6 +8,8 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         ShowActivated="False"
+        AllowDrop="True" DragEnter="Window_DragOver" DragOver="Window_DragOver" DragLeave="Window_DragLeave"
+        Drop="Window_Drop"
         Width="260" Height="200">
     <Window.Resources>
         <Style x:Key="EmoteButton" TargetType="Button">

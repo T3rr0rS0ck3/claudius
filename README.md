@@ -42,6 +42,7 @@ until the limit resets.
 - 📈 **Forecast** — "at the current pace you'll hit the limit in 1h 42m"
 - 🧺 **Tray icon** that reflects the current mood, plus autostart with Windows
 - 👻 **Ghost drag** — drag a ghost of the pet (left mouse button) onto an Explorer window to open the assistant in that folder
+- 📄 **File drop** — drag a file from Explorer onto the pet to open the assistant in its folder with the file as `@file`
 - 📂 **Project launcher** — double-click the pet to pick a project from your repo folder and open the assistant there
 - 🎤 **Voice chat** (optional) — opens the assistant with its voice dictation switched on; the pet listens while you talk
 - ❓ **Session status** — a yellow "?" when a session asks something, a bubble when it is done;
@@ -93,6 +94,7 @@ status line at the new bridge and removes the old program folder.
 | Double-click the pet | Project list: open the assistant in one of your projects |
 | Right-drag the pet | Move it (position is remembered); it kicks its legs while carried and, when walking around, drops down from there |
 | Drag the pet onto an Explorer window | Open the assistant in that folder (see [Opening the assistant](#opening-the-assistant)) |
+| Drag files from Explorer onto the pet | Open the assistant in their folder and hand it the files (see [Opening the assistant](#opening-the-assistant)) |
 | Hover the pet | Emote buttons: feed 🍪, pat ❤, play ⚽ and tickle 🪶 it, each with its own reaction (can be turned off) |
 | Right-click the pet | Menu: usage, open assistant, voice chat, say hello, always on top, walk around, minimize to tray, connect AI assistant, settings, quit |
 | Left-click the tray icon | Open the usage overlay |
@@ -110,6 +112,10 @@ while the pet itself stays where it is. Over an Explorer window or the desktop t
 it there and the assistant opens in that folder (with Windows 11 tabs: the active tab); the ghost floats away.
 Releasing anywhere else, or pressing `Esc`, cancels. Folders without a file system path (e.g. *This PC*) get a short
 "no folder here" bubble. Can be switched off in the settings.
+
+**File drop.** Drag one or more files from Explorer onto the pet: it opens its mouth and reaches for them. Let go and
+the assistant opens in the files' folder with `@"file"` as its first message, so it reads them right away. A folder
+dropped on its own opens like the ghost drag. The desktop app does not take a first message; there only the folder opens.
 
 **Project list.** Double-click the pet (or right-click → *Open assistant…*, also in the tray menu). The list shows your
 recently opened projects first, then all subfolders of your **repo folder** (hidden folders and folders starting with
