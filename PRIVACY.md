@@ -12,7 +12,7 @@ Claudius ist ein Desktop-Haustier, das den Verbrauch deines KI-Coding-Assistente
   - ihre eigenen Einstellungen, den Verlauf und ein Log in `%LOCALAPPDATA%\Claudius` (beim Update von einer älteren Version übernimmt sie dorthin die Daten aus deren Ordner);
   - in der `settings.json` des Assistenten die statusLine und die Hooks (mit Sicherung). Diese Einträge lassen sich in den Einstellungen mit *Trennen* wieder entfernen;
   - auf Wunsch ein Farb-Theme im Theme-Ordner des Assistenten.
-- **Netzwerk:** Nur die GitHub-Version fragt beim Start und einmal am Tag bei `api.github.com` nach einer neuen Version und lädt Updates von GitHub herunter. Das lässt sich in den Einstellungen abschalten. Dabei werden keine persönlichen Daten übertragen, nur die übliche Anfrage mit der App-Version als User-Agent. Die Microsoft-Store-Version stellt keine eigenen Netzwerkverbindungen her; sie wird über den Store aktualisiert.
+- **Netzwerk:** Die App fragt beim Start und einmal am Tag bei `api.github.com` nach einer neuen Version und lädt Updates von GitHub herunter. Das lässt sich in den Einstellungen abschalten. Dabei werden keine persönlichen Daten übertragen, nur die übliche Anfrage mit der App-Version als User-Agent.
 - **Löschen:** Alle Daten liegen auf deinem Rechner. Du kannst den Ordner `%LOCALAPPDATA%\Claudius` jederzeit löschen.
 
 Fragen: [GitHub Issues](https://github.com/T3rr0rS0ck3/claudius/issues)
@@ -27,7 +27,7 @@ Claudius is a desktop pet that shows the usage of your AI coding assistant. It r
   - its own settings, history and a log in `%LOCALAPPDATA%\Claudius` (when updating from an older version, it moves that version's data there);
   - the statusLine and hooks in the assistant's `settings.json` (with a backup). *Disconnect* in the settings removes them again;
   - optionally a color theme in the assistant's themes folder.
-- **Network:** Only the GitHub version asks `api.github.com` for a new version at start and once a day, and downloads updates from GitHub. This can be switched off in the settings. No personal data is sent, only the usual request with the app version as user agent. The Microsoft Store version makes no network connections of its own; it is updated through the Store.
+- **Network:** The app asks `api.github.com` for a new version at start and once a day, and downloads updates from GitHub. This can be switched off in the settings. No personal data is sent, only the usual request with the app version as user agent.
 - **Deletion:** All data stays on your computer. You can delete the `%LOCALAPPDATA%\Claudius` folder at any time.
 
 Questions: [GitHub Issues](https://github.com/T3rr0rS0ck3/claudius/issues)

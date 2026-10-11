@@ -118,22 +118,6 @@ jobs:
             ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } |
             Set-Content dist/SHA256SUMS.txt -Encoding ascii
 
-      # Unsigned MSIX for the Microsoft Store (the Store signs it). Attached to the run and to the release;
-      # it can't be installed as is, only uploaded in Partner Center.
-      - name: Store package
-        if: steps.version.outputs.prerelease == 'false'
-        shell: pwsh
-        run: ./packaging/build-msix.ps1 -Version ${{ steps.version.outputs.version }}
-
-      - name: Upload Store package
-        if: steps.version.outputs.prerelease == 'false'
-        uses: actions/upload-artifact@v7
-        with:
-          # Unzipped: the download is the .msix itself, ready for Partner Center.
-          path: dist/Claudius-${{ steps.version.outputs.version }}.msix
-          archive: false
-          if-no-files-found: error
-
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
         with:
@@ -148,12 +132,9 @@ jobs:
             Alternativ: `Claudius-${{ steps.version.outputs.version }}-portable.zip` entpacken und `Claudius.exe` starten.
 
             [Code signing policy](https://github.com/T3rr0rS0ck3/claudius#code-signing-policy)
-
-            `Claudius-${{ steps.version.outputs.version }}.msix` ist das unsignierte Paket für den Microsoft Store und lässt sich so nicht installieren.
           files: |
             dist/Claudius-Setup-${{ steps.version.outputs.version }}.exe
             dist/ClaudePet-Setup-${{ steps.version.outputs.version }}.exe
             dist/Claudius-${{ steps.version.outputs.version }}-portable.zip
             dist/SHA256SUMS.txt
-            dist/Claudius-${{ steps.version.outputs.version }}.msix
 

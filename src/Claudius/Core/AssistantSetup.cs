@@ -12,14 +12,7 @@ public enum SetupStatus { BridgeMissing, NotConfigured, Connected, OtherStatusLi
 /// <summary>Registers ClaudiusBridge.exe as statusLine command in the assistant's user settings.</summary>
 public static class AssistantSetup
 {
-    /// <summary>
-    /// The Store version's install folder changes with every update and is closed to other programs, so
-    /// The assistant reaches its bridge through the package's app execution alias instead.
-    /// </summary>
-    public static string BridgePath => AppPackage.IsPackaged
-        ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Microsoft", "WindowsApps", BridgeName + ".exe")
-        : Path.Combine(AppContext.BaseDirectory, BridgeName + ".exe");
+    public static string BridgePath => Path.Combine(AppContext.BaseDirectory, BridgeName + ".exe");
 
     private const string BridgeName = "ClaudiusBridge";
 
@@ -99,8 +92,7 @@ public static class AssistantSetup
     }
 
     /// <summary>
-    /// Connected, but to another copy of the bridge (e.g. a portable copy before switching to the Store
-    /// version): point the statusLine at this app's bridge. Returns true if it changed anything.
+    /// Connected, but to another copy of the bridge (e.g. a portable copy before installing the setup): point the statusLine at this app's bridge. Returns true if it changed anything.
     /// </summary>
     public static bool Repoint()
     {

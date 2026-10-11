@@ -167,10 +167,6 @@
                     <ComboBox x:Name="NightEndBox" Width="72" />
                 </StackPanel>
                 <CheckBox x:Name="AutostartBox" Content="{x:Static core:Strings.StartWithWindows}" />
-                <StackPanel x:Name="AutostartBlockedPanel" Orientation="Horizontal" Margin="22,0,0,4" Visibility="Collapsed">
-                    <TextBlock Text="{x:Static core:Strings.AutostartBlocked}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <Button Content="{x:Static core:Strings.OpenStartupSettings}" Padding="10,2" Click="StartupSettings_Click" />
-                </StackPanel>
             </StackPanel>
         </GroupBox>
 
@@ -261,7 +257,7 @@
                 <TextBlock x:Name="VersionText" TextWrapping="Wrap" />
                 <CheckBox x:Name="UpdatesBox" Content="{x:Static core:Strings.AutoUpdates}" Margin="0,6,0,4"
                           ToolTip="{x:Static core:Strings.AutoUpdatesTip}" />
-                <StackPanel x:Name="UpdateButtons" Orientation="Horizontal" Margin="0,2,0,0">
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                     <Button x:Name="CheckUpdateButton" Content="{x:Static core:Strings.CheckNow}" Padding="10,3" Click="CheckUpdate_Click" />
                     <Button x:Name="InstallUpdateButton" Padding="10,3" Margin="8,0,0,0" Visibility="Collapsed"
                             Click="InstallUpdate_Click" />

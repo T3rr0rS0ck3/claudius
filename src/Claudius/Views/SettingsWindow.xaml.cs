@@ -46,15 +46,8 @@ public partial class SettingsWindow : Window
             + (Updater.IsDevBuild ? Strings.DevBuildSuffix : Updater.IsInstalled ? "" : Strings.PortableSuffix);
         CheckUpdateButton.IsEnabled = !Updater.IsDevBuild;
         ShowUpdate(app.AvailableUpdate);
-        if (AppPackage.IsPackaged)
-        {
-            VersionText.Text = Strings.StoreVersion(Updater.Format(Updater.CurrentVersion));
-            UpdatesBox.Visibility = UpdateButtons.Visibility = UpdateStatusText.Visibility = Visibility.Collapsed;
-        }
         SessionMarksBox.IsChecked = settings.SessionMarks;
         AutostartBox.IsChecked = settings.StartWithWindows;
-        // Store version: switched off under Settings → Apps → Startup, only the user can switch it on there.
-        if (Autostart.BlockedByUser) AutostartBlockedPanel.Visibility = Visibility.Visible;
         IntervalBox.Text = settings.PollIntervalSeconds.ToString(CultureInfo.InvariantCulture);
         SessionWarnBox.Text = string.Join(", ", settings.SessionWarnThresholds);
         WeekWarnBox.Text = string.Join(", ", settings.WeekWarnThresholds);
@@ -206,8 +199,6 @@ public partial class SettingsWindow : Window
         UpdateStatusText.Text = Strings.VersionAvailable(update.VersionText);
         UpdateStatusText.Visibility = Visibility.Visible;
     }
-
-    private void StartupSettings_Click(object sender, RoutedEventArgs e) => App.OpenUrl("ms-settings:startupapps");
 
     private void InstallUpdate_Click(object sender, RoutedEventArgs e) => _app.InstallUpdate(this);
 
