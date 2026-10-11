@@ -10,6 +10,12 @@ namespace Claudius.Core;
 public static class AssistantLauncher
 {
     private const int MaxRecent = 10;
+    /// <summary>
+    /// Carries the start prompt to the console, already quoted as one argument. Expanded only after the console
+    /// has parsed its command line (cmd's delayed expansion, PowerShell's <c>--%</c>), so file names with
+    /// &amp;, % or ! in them reach the assistant unchanged.
+    /// </summary>
+    private const string PromptVariable = "CLAUDIUS_PROMPT";
 
     /// <summary>Full path of the CLI, or null if the assistant is not installed.</summary>
     public static string? FindAssistant() => FindAssistant(UserEnvironment());
@@ -27,8 +33,9 @@ public static class AssistantLauncher
     /// Starts the assistant in <paramref name="folder"/> and remembers the folder as recent project.
     /// Throws <see cref="FileNotFoundException"/> if the assistant is missing. For the Desktop app it returns
     /// the short-lived <c>--desktop</c> process of the CLI, whose exit code tells whether the hand-over worked.
+    /// A <paramref name="prompt"/> is sent as the first message; the Desktop app does not take one.
     /// </summary>
-    public static Process? Launch(AppSettings settings, string folder)
+    public static Process? Launch(AppSettings settings, string folder, string? prompt = null)
     {
         if (!Directory.Exists(folder)) throw new DirectoryNotFoundException(folder);
         var env = UserEnvironment();
@@ -55,17 +62,30 @@ public static class AssistantLauncher
             },
             TerminalKind.PowerShell => new ProcessStartInfo("powershell.exe")
             {
-                ArgumentList = { "-NoExit", "-Command", "& '" + command.Replace("'", "''") + "'" },
+                ArgumentList =
+                {
+                    "-NoExit", "-Command",
+                    "& '" + command.Replace("'", "''") + "'" + (prompt != null ? $" --% %{PromptVariable}%" : ""),
+                },
             },
             // The folder goes via WorkingDirectory, never into the command line: names may contain & or ^.
-            _ => new ProcessStartInfo("cmd.exe") { Arguments = $"/k \"{command}\"" },
+            _ => new ProcessStartInfo("cmd.exe")
+            {
+                Arguments = prompt != null ? $"/v:on /s /k \"\"{command}\" !{PromptVariable}!\"" : $"/k \"{command}\"",
+            },
         };
+        if (prompt != null && terminal == TerminalKind.WindowsTerminal)
+        {
+            start.ArgumentList.Insert(start.ArgumentList.IndexOf("/k"), "/v:on");
+            start.ArgumentList.Add($"!{PromptVariable}!");
+        }
         start.WorkingDirectory = folder;
         // No shell execute, so the environment can be replaced. The pet is a GUI app without a console,
         // so cmd/PowerShell still get a console window of their own.
         start.UseShellExecute = false;
         start.Environment.Clear();
         foreach (var (name, value) in env) start.Environment[name] = value;
+        if (prompt != null) start.Environment[PromptVariable] = QuoteArgument(prompt);
 
         Process? process;
         try
@@ -82,6 +102,28 @@ public static class AssistantLauncher
         if (terminal == TerminalKind.Desktop) return process;
         process?.Dispose();
         return null;
+    }
+
+    /// <summary>
+    /// A prompt that hands <paramref name="paths"/> to the assistant as <c>@"…"</c> mentions,
+    /// relative to <paramref name="folder"/> where they are inside it.
+    /// </summary>
+    public static string MentionPrompt(string folder, IEnumerable<string> paths) =>
+        string.Join(" ", paths.Select(p => "@\"" + Path.GetRelativePath(folder, p) + "\""));
+
+    /// <summary>Quotes <paramref name="arg"/> so that a program's command-line parser gets it back as one argument.</summary>
+    private static string QuoteArgument(string arg)
+    {
+        var quoted = new System.Text.StringBuilder("\"");
+        int backslashes = 0;
+        foreach (char c in arg)
+        {
+            if (c == '\\') { backslashes++; continue; }
+            // Backslashes count only right before a quote: double them there, and escape the quote.
+            quoted.Append('\\', c == '"' ? backslashes * 2 + 1 : backslashes).Append(c);
+            backslashes = 0;
+        }
+        return quoted.Append('\\', backslashes * 2).Append('"').ToString();
     }
 
     public static string FolderName(string folder)

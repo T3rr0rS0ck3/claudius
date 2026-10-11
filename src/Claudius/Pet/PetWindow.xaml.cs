@@ -40,6 +40,8 @@ public partial class PetWindow : Window
     private Point? _rightPressPoint;
     private bool _suppressContextMenu;
     private bool _ghostDrag = true;
+    /// <summary>Files from Explorer are being dragged over the pet: it opens its mouth and reaches for them.</summary>
+    private bool _filesOver;
     private double _scale = 5;
 
     private long _tick = 1;
@@ -103,6 +105,8 @@ public partial class PetWindow : Window
     /// or the desktop at all.
     /// </summary>
     public event Action<string?, bool>? GhostDropped;
+    /// <summary>Files or folders from Explorer were dropped onto the pet.</summary>
+    public event Action<string[]>? FilesDropped;
     /// <summary>The "?" was clicked: bring that session's window to the front.</summary>
     public event Action<SessionView>? SessionClicked;
     /// <summary>The pet was dragged to a new position.</summary>
@@ -529,6 +533,7 @@ public partial class PetWindow : Window
             };
         TearsImage.Source = _sad ? Sprite.RenderTears((int)(t % 3), frame.Bob) : null;
         TearsImage.Visibility = _sad ? Visibility.Visible : Visibility.Collapsed;
+        if (_filesOver && !inBed) frame = frame with { Mouth = Mouth.Open, Arms = Arms.Up, Eyes = Eyes.Wide };
         if (_sessionMark != Mark.None) frame = frame with { Mark = _sessionMark };
         _squashShown = SquashLevel();
         bool puddle = _squashShown >= 100;
@@ -922,6 +927,32 @@ public partial class PetWindow : Window
         ghost.SetHighlight(folder != null);
         ghost.Vanish();
         if (drop) GhostDropped?.Invoke(folder, isShell);
+    }
+
+    // ---------------------------------------------------------------- files dropped from Explorer
+
+    private void Window_DragOver(object sender, DragEventArgs e)
+    {
+        bool files = e.Data.GetDataPresent(DataFormats.FileDrop);
+        e.Effects = files ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Handled = true;
+        SetFilesOver(files);
+    }
+
+    private void Window_DragLeave(object sender, DragEventArgs e) => SetFilesOver(false);
+
+    private void Window_Drop(object sender, DragEventArgs e)
+    {
+        SetFilesOver(false);
+        if (e.Data.GetData(DataFormats.FileDrop) is string[] { Length: > 0 } paths) FilesDropped?.Invoke(paths);
+        e.Handled = true;
+    }
+
+    private void SetFilesOver(bool over)
+    {
+        if (over == _filesOver) return;
+        _filesOver = over;
+        Render();
     }
 
     // ---------------------------------------------------------------- emotes

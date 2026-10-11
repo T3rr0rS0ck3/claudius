@@ -86,6 +86,7 @@ public partial class App : Application
         _pet.DoubleClicked += ShowProjectMenu;
         _pet.SessionClicked += GoToSession;
         _pet.GhostDropped += OnGhostDropped;
+        _pet.FilesDropped += OnFilesDropped;
         _pet.Moved += SavePosition;
         _pet.Emoted += emote => Say(emote == Emote.Feed && _pet.Unwell ? "FeedSick" : emote.ToString());
         _pet.PetImage.ContextMenu = BuildContextMenu();
@@ -563,11 +564,11 @@ public partial class App : Application
 
     public void LaunchAssistant(string folder) => LaunchAssistant(folder, voice: false);
 
-    private void LaunchAssistant(string folder, bool voice)
+    private void LaunchAssistant(string folder, bool voice, string? prompt = null)
     {
         try
         {
-            if (AssistantLauncher.Launch(Settings, folder) is { } desktop) _ = ReportDesktopFailure(desktop);
+            if (AssistantLauncher.Launch(Settings, folder, prompt) is { } desktop) _ = ReportDesktopFailure(desktop);
         }
         catch (DirectoryNotFoundException)
         {
@@ -605,6 +606,25 @@ public partial class App : Application
     {
         if (folder != null) LaunchAssistant(folder);
         else if (overShell) Say("NoFolder");   // e.g. "This PC"; anywhere else the drop is just a cancel
+    }
+
+    /// <summary>
+    /// A folder dropped onto the pet opens like a ghost drop. Files open in their folder and go to the
+    /// assistant as <c>@</c> mentions.
+    /// </summary>
+    private void OnFilesDropped(string[] paths)
+    {
+        if (paths is [var single] && Directory.Exists(single))
+        {
+            LaunchAssistant(single, voice: false);
+            return;
+        }
+        if (Path.GetDirectoryName(paths[0]) is not { Length: > 0 } folder)
+        {
+            Say("NoFolder");
+            return;
+        }
+        LaunchAssistant(folder, voice: false, AssistantLauncher.MentionPrompt(folder, paths));
     }
 
     private void ChooseAndLaunch(bool voice)
