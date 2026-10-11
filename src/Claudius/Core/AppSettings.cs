@@ -27,6 +27,9 @@ public sealed class AppSettings
     public const string DefaultPetColor = "#D97757";
     public const string DefaultNightStart = "23:00";
     public const string DefaultNightEnd = "06:00";
+    public const int DefaultBreakAfterMinutes = 120;
+    /// <summary>The choices for <see cref="BreakAfterMinutes"/>.</summary>
+    public static readonly int[] BreakAfterChoices = [60, 90, 120, 180, 240];
 
     /// <summary>
     /// UI language, <see cref="Strings.English"/> or <see cref="Strings.German"/>. New installs start in
@@ -58,6 +61,9 @@ public sealed class AppSettings
     public bool NightMode { get; set; } = true;
     public string NightStart { get; set; } = DefaultNightStart;
     public string NightEnd { get; set; } = DefaultNightEnd;
+    /// <summary>Stretch and suggest a break after <see cref="BreakAfterMinutes"/> of work without one, and at the limit.</summary>
+    public bool BreakReminder { get; set; } = true;
+    public int BreakAfterMinutes { get; set; } = DefaultBreakAfterMinutes;
     /// <summary>Look for new releases on GitHub at start and once a day.</summary>
     public bool CheckForUpdates { get; set; } = true;
     /// <summary>The last version the pet announced, so each update is mentioned only once.</summary>
@@ -91,7 +97,7 @@ public sealed class AppSettings
     public string UserName { get; set; } = Capitalize(Environment.UserName);
     /// <summary>
     /// Bubble texts per event in the UI language; one variant is picked at random.
-    /// Placeholders: {name}, {NAME}, {percent}, {session}, {week}, {folder}, {version}, {lastweek}, {day}.
+    /// Placeholders: {name}, {NAME}, {percent}, {session}, {week}, {folder}, {version}, {lastweek}, {day}, {hours}.
     /// </summary>
     public Dictionary<string, List<string>> Texts { get; set; } = [];
     /// <summary>Which rewordings of the default texts have been applied, see <see cref="RewordedTexts"/>.</summary>
@@ -157,6 +163,8 @@ public sealed class AppSettings
         ["Tickle"] = ["Hehehe! Stop it! 😆", "Not there, I'm ticklish!", "Hahaha… mercy!"],
         ["GoodNight"] = ["Good night, {name}… 🌙", "*yawn* Getting late."],
         ["GoodMorning"] = ["Good morning, {name}! ☀️", "*stretch* Rested and ready."],
+        ["Break"] = ["You've been at it for {hours}, {name}. Time for a little break? ☕", "*stretch* {hours} non-stop… how about a short break?"],
+        ["BreakLimit"] = ["Limit reached – perfect time for a break, {name}! ☕"],
     };
 
     private static Dictionary<string, List<string>> GermanTexts() => new()
@@ -193,6 +201,8 @@ public sealed class AppSettings
         ["Tickle"] = ["Hihihi! Aufhören! 😆", "Nicht da, da bin ich kitzlig!", "Hahaha… Gnade!"],
         ["GoodNight"] = ["Gute Nacht, {name}… 🌙", "*gähn* Schon spät."],
         ["GoodMorning"] = ["Guten Morgen, {name}! ☀️", "*streck* Ausgeschlafen."],
+        ["Break"] = ["Du bist schon {hours} dran, {name}. Zeit für eine kleine Pause? ☕", "*streck* {hours} am Stück… wie wär's mit einer kurzen Pause?"],
+        ["BreakLimit"] = ["Limit erreicht – perfekte Zeit für eine Pause, {name}! ☕"],
     };
 
     public static AppSettings Load()
@@ -245,6 +255,7 @@ public sealed class AppSettings
         if (!Occasions.TryParseTime(NightStart, out _)) NightStart = DefaultNightStart;
         if (!Occasions.TryParseTime(NightEnd, out _)) NightEnd = DefaultNightEnd;
         if (!Occasions.TryParseDay(Birthday, out _)) Birthday = null;
+        if (!BreakAfterChoices.Contains(BreakAfterMinutes)) BreakAfterMinutes = DefaultBreakAfterMinutes;
         PetColor = Sprite.TryParseColor(PetColor, out uint color) ? Sprite.ToHex(color) : DefaultPetColor;
         Language = Language == Strings.German ? Strings.German : Strings.English;
         var defaults = DefaultTexts(Language);

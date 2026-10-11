@@ -99,6 +99,8 @@ public partial class PetWindow : Window
     private int _sick;
     /// <summary>Recovering after /compact or /clear: since when and from which sick level.</summary>
     private (DateTime Start, int From)? _recovery;
+    /// <summary>Stretching for a break reminder: since when.</summary>
+    private DateTime? _stretchStart;
     /// <summary>The grim reaper floating behind the pet while a context window is at the top sick level.</summary>
     private ReaperWindow? _reaper;
     // Leaving the pet towards the emote buttons (or back) must not hide them on the way.
@@ -476,6 +478,14 @@ public partial class PetWindow : Window
         _animationTimer.Start();
     }
 
+    /// <summary>Stretches and yawns, e.g. to suggest a break.</summary>
+    public void Stretch()
+    {
+        _stretchStart = DateTime.Now;
+        _animationTimer.Start();
+        Render();
+    }
+
     private void RenderReaper() => _reaper?.Render(_animations ? _tick : 1);
 
     /// <summary>The user is dictating to the assistant: stand still and listen.</summary>
@@ -531,6 +541,18 @@ public partial class PetWindow : Window
                 return;
             }
             _recovery = null;
+            if (!_animations) _animationTimer.Stop();
+        }
+        if (_stretchStart is { } stretch && !InBed && _pose.Motion is Motion.Idle or Motion.Walk or Motion.Run)
+        {
+            // Like emotes, on its own clock
+            long st = (long)((DateTime.Now - stretch).TotalSeconds * PetAnimator.TicksPerSecond);
+            if (st < PetAnimator.StretchTicks)
+            {
+                PetImage.Source = Sprite.Render(PetAnimator.StretchFrame(st) with { Sick = _sick, Outfit = _outfit, Accessory = _accessory });
+                return;
+            }
+            _stretchStart = null;
             if (!_animations) _animationTimer.Stop();
         }
         bool cheering = DateTime.Now < _cheerUntil;

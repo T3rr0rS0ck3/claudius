@@ -41,6 +41,12 @@ public partial class SettingsWindow : Window
         NightModeBox.IsChecked = settings.NightMode;
         ShowTime(NightStartBox, settings.NightStart);
         ShowTime(NightEndBox, settings.NightEnd);
+        BreakBox.IsChecked = settings.BreakReminder;
+        BreakAfterBox.ItemsSource = AppSettings.BreakAfterChoices
+            .Select(minutes => new KeyValuePair<int, string>(minutes, Strings.Hours(TimeSpan.FromMinutes(minutes)))).ToList();
+        BreakAfterBox.DisplayMemberPath = "Value";
+        BreakAfterBox.SelectedValuePath = "Key";
+        BreakAfterBox.SelectedValue = settings.BreakAfterMinutes;
         UpdatesBox.IsChecked = settings.CheckForUpdates;
         VersionText.Text = Strings.InstalledVersion(Updater.Format(Updater.CurrentVersion))
             + (Updater.IsDevBuild ? Strings.DevBuildSuffix : Updater.IsInstalled ? "" : Strings.PortableSuffix);
@@ -259,6 +265,8 @@ public partial class SettingsWindow : Window
             _settings.NightMode = NightModeBox.IsChecked == true;
             _settings.NightStart = (string)NightStartBox.SelectedItem;
             _settings.NightEnd = (string)NightEndBox.SelectedItem;
+            _settings.BreakReminder = BreakBox.IsChecked == true;
+            _settings.BreakAfterMinutes = (int)BreakAfterBox.SelectedValue;
             _settings.CheckForUpdates = UpdatesBox.IsChecked == true;
             _settings.SessionMarks = SessionMarksBox.IsChecked == true;
             _settings.StartWithWindows = AutostartBox.IsChecked == true;
