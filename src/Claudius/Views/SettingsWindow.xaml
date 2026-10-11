@@ -106,7 +106,7 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="PET">
+        <GroupBox Header="{x:Static core:Strings.GroupPet}">
             <StackPanel>
                 <Grid Style="{StaticResource Row}">
                     <Grid.ColumnDefinitions>

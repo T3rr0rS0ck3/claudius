@@ -57,6 +57,7 @@ public static class Strings
         "ClaudiusBridge.exe wurde nicht gefunden (muss neben Claudius.exe liegen).");
     public static string SetupNotConnected => L("Not connected.", "Nicht verbunden.");
 
+    public static string GroupPet => "CLAUDIUS";
     public static string GroupLaunch => L("LAUNCH ASSISTANT", "ASSISTENT STARTEN");
     public static string ReposFolder => L("Repo folder", "Repo-Ordner");
     public static string ReposFolderTip => L("Folder containing all your projects", "Ordner, in dem alle Projekte liegen");
@@ -66,8 +67,8 @@ public static class Strings
         : L("Automatic (cmd)", "Automatisch (cmd)");
     public static string TerminalCmd => L("Command Prompt (cmd)", "Eingabeaufforderung (cmd)");
     public static string TerminalDesktop => L("Desktop app (Code tab)", "Desktop-App (Code-Tab)");
-    public static string GhostDrag => L("Dragging the pet onto Explorer with the left mouse button opens the assistant there",
-        "Pet mit linker Maustaste auf Explorer ziehen öffnet den Assistenten dort");
+    public static string GhostDrag => L("Dragging Claudius onto Explorer with the left mouse button opens the assistant there",
+        "Claudius mit linker Maustaste auf Explorer ziehen öffnet den Assistenten dort");
     public static string VoiceOffer => L("Offer voice chat (menu item “Start voice chat…”)",
         "Sprachchat anbieten (Menüeintrag „Sprachchat starten…“)");
     public static string VoiceOfferTip => L(
@@ -81,8 +82,8 @@ public static class Strings
     public static string Color => L("Color", "Farbe");
     public static string PickColor => L("Pick…", "Wählen…");
     public static string DefaultColor => L("Default", "Standard");
-    public static string MascotColor => L("Assistant mascot in the terminal in the pet's color",
-        "Assistenten-Maskottchen im Terminal in Pet-Farbe");
+    public static string MascotColor => L("Assistant mascot in the terminal in Claudius' color",
+        "Assistenten-Maskottchen im Terminal in der Farbe von Claudius");
     public static string MascotColorTip => L(
         "Creates a theme of its own for the AI assistant (themes\\claudius.json) and selects it. Switching it off restores the previous theme.",
         "Legt ein eigenes Theme für den KI-Assistenten an (themes\\claudius.json) und wählt es aus. Beim Ausschalten wird das vorherige Theme wiederhergestellt.");
@@ -95,8 +96,8 @@ public static class Strings
         "Läuft oder hüpft dort zum Nachbarmonitor, wo sich die Monitore laut Windows-Anordnung berühren.");
     public static string ChaseCursor => L("Chase the mouse pointer now and then", "Ab und zu dem Mauszeiger nachlaufen");
     public static string ChaseCursorTip => L(
-        "When calm, the pet sometimes eyes the pointer nearby and runs after it, and hops up at a pointer held above it.",
-        "In ruhiger Stimmung fixiert das Pet manchmal den Zeiger in seiner Nähe und rennt ihm hinterher, und es springt nach einem Zeiger über ihm.");
+        "When calm, Claudius sometimes eyes the pointer nearby and runs after it, and hops up at a pointer held above it.",
+        "In ruhiger Stimmung fixiert Claudius manchmal den Zeiger in seiner Nähe und rennt ihm hinterher, und er springt nach einem Zeiger über ihm.");
     public static string Emotes => L("Emotes on hover (feed, pat, …)", "Emotes beim Drüberfahren (Füttern, Streicheln, …)");
     public static string ModelOutfits => L("Outfit for the AI model", "Outfit passend zum KI-Modell");
     public static string ModelOutfitsTip => L(
@@ -108,10 +109,10 @@ public static class Strings
         "Hexenhut und Besen im Oktober, Weihnachtsmütze bis Weihnachten, Hasenohren an Ostern und Partyhut an Silvester und deinem Geburtstag. Ersetzt die Kopfbedeckung des Modells.");
     public static string Birthday => L("Birthday", "Geburtstag");
     public static string BirthdayInvalid => L("This birthday does not exist.", "Diesen Geburtstag gibt es nicht.");
-    public static string NightMode => L("Night mode: nightcap and a sleepy pet", "Nachtmodus: Schlafmütze und müdes Pet");
+    public static string NightMode => L("Night mode: nightcap and a sleepy Claudius", "Nachtmodus: Schlafmütze und müder Claudius");
     public static string NightModeTip => L(
-        "Between these times the pet wears a nightcap and sleeps in a bed on the taskbar (or where it is, if it does not walk around).",
-        "Zwischen diesen Uhrzeiten trägt das Pet eine Schlafmütze und schläft in einem Bett auf der Taskleiste (oder wo es steht, wenn es nicht herumläuft).");
+        "Between these times Claudius wears a nightcap and sleeps in a bed on the taskbar (or where it is, if it does not walk around).",
+        "Zwischen diesen Uhrzeiten trägt Claudius eine Schlafmütze und schläft in einem Bett auf der Taskleiste (oder wo er steht, wenn er nicht herumläuft).");
     public static string NightFrom => L("from", "von");
     public static string NightTo => L("to", "bis");
     public static string StartWithWindows => L("Start with Windows", "Mit Windows starten");
@@ -185,8 +186,8 @@ public static class Strings
     public static string UpdatedJustNow => L("Updated just now", "Aktualisiert gerade eben");
     public static string UpdatedAgo(string duration) => L($"Updated {duration} ago", $"Aktualisiert vor {duration}");
     public static string HintNotConnected => L(
-        "The AI assistant isn't connected yet. Right-click the pet → “Connect AI assistant”.",
-        "Der KI-Assistent ist noch nicht verbunden. Rechtsklick auf das Pet → „KI-Assistent verbinden“.");
+        "The AI assistant isn't connected yet. Right-click Claudius → “Connect AI assistant”.",
+        "Der KI-Assistent ist noch nicht verbunden. Rechtsklick auf Claudius → „KI-Assistent verbinden“.");
     public static string HintBridgeMissing => L("ClaudiusBridge.exe is missing next to Claudius.exe.",
         "ClaudiusBridge.exe fehlt neben Claudius.exe.");
     public static string HintFirstReply => L(
@@ -214,7 +215,7 @@ public static class Strings
     public static string OpenAssistant => L("Open assistant…", "Assistent öffnen…");
     public static string StartVoiceChat => L("Start voice chat…", "Sprachchat starten…");
     public static string SayHello => L("Say hello", "Hallo sagen");
-    public static string ShowPet => L("Show pet", "Pet anzeigen");
+    public static string ShowPet => L("Show Claudius", "Claudius anzeigen");
     public static string WalkAround => L("Walk around", "Herumlaufen");
     public static string MinimizeToTray => L("Minimize to tray", "In den Tray minimieren");
     public static string ConnectMenu => L("Connect AI assistant…", "KI-Assistent verbinden…");
@@ -277,7 +278,7 @@ public static class Strings
         "Connected! The usage values appear after the next reply in the AI assistant (running sessions pick up the change automatically).",
         "Verbunden! Die Usage-Werte erscheinen nach der nächsten Antwort im KI-Assistenten (laufende Sessions übernehmen die Änderung automatisch).");
     public static string UpdateNotification(string version) => L(
-        $"Version {version} is available (right-click the pet).", $"Version {version} ist verfügbar (Rechtsklick aufs Pet).");
+        $"Version {version} is available (right-click Claudius).", $"Version {version} ist verfügbar (Rechtsklick auf Claudius).");
     public static string InstallUpdateQuestion(string version) => L(
         $"Install version {version}?\n\nClaudius closes briefly for this and restarts automatically afterwards.",
         $"Version {version} installieren?\n\nClaudius wird dafür kurz geschlossen und danach automatisch neu gestartet.");
