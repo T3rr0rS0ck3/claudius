@@ -81,6 +81,8 @@ public sealed class AppSettings
     public List<int> WeekWarnThresholds { get; set; } = [75, 90, 100];
     /// <summary>How full a session's context window gets (%) before the pet looks sick at level 1, 2 and 3.</summary>
     public List<int> ContextThresholds { get; set; } = [.. ContextLevels.DefaultThresholds];
+    /// <summary>Reset time (Unix seconds) of the last week the pet summed up, so each week is reviewed only once.</summary>
+    public long LastWeekReview { get; set; }
 
     // Speech bubbles
     public bool SpeechBubbles { get; set; } = true;
@@ -89,7 +91,7 @@ public sealed class AppSettings
     public string UserName { get; set; } = Capitalize(Environment.UserName);
     /// <summary>
     /// Bubble texts per event in the UI language; one variant is picked at random.
-    /// Placeholders: {name}, {NAME}, {percent}, {session}, {week}, {folder}, {version}.
+    /// Placeholders: {name}, {NAME}, {percent}, {session}, {week}, {folder}, {version}, {lastweek}, {day}.
     /// </summary>
     public Dictionary<string, List<string>> Texts { get; set; } = [];
     /// <summary>Which rewordings of the default texts have been applied, see <see cref="RewordedTexts"/>.</summary>
@@ -132,6 +134,8 @@ public sealed class AppSettings
         ["Panic"] = ["{NAME}. ALMOST EMPTY."],
         ["Exhausted"] = ["Okay... I'll sleep until the reset."],
         ["Reset"] = ["Fresh quota! Let's go!", "Well rested. Let's carry on!"],
+        ["WeekReview"] = ["Last week: {lastweek}%, busiest day: {day}.", "That was the week: {lastweek}%, most of it on {day}."],
+        ["WeekReviewQuiet"] = ["Last week was really quiet. Holiday? 🏖"],
         ["Poke"] = ["Hey!", "I'm keeping watch, promise.", "Session {session}%, week {week}%."],
         ["Launch"] = ["Have fun in {folder}!", "Off we go: {folder}"],
         ["NoFolder"] = ["There's no folder here I can open…"],
@@ -166,6 +170,8 @@ public sealed class AppSettings
         ["Panic"] = ["{NAME}. FAST LEER."],
         ["Exhausted"] = ["Okay... ich schlafe jetzt bis zum Reset."],
         ["Reset"] = ["Frisches Kontingent! Los geht's!", "Ausgeschlafen. Weiter geht's!"],
+        ["WeekReview"] = ["Letzte Woche {lastweek} %, stärkster Tag: {day}.", "Das war die Woche: {lastweek} %, das meiste am {day}."],
+        ["WeekReviewQuiet"] = ["Letzte Woche war ganz ruhig. Urlaub? 🏖"],
         ["Poke"] = ["Hey!", "Ich pass auf, versprochen.", "Session {session} %, Woche {week} %."],
         ["Launch"] = ["Viel Spaß in {folder}!", "Auf geht's: {folder}"],
         ["NoFolder"] = ["Da ist kein Ordner, den ich öffnen kann…"],

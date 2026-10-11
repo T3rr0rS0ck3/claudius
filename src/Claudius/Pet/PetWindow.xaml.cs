@@ -377,6 +377,9 @@ public partial class PetWindow : Window
         Render();
     }
 
+    /// <summary>A speech bubble is showing.</summary>
+    public bool Speaking => _bubbleTimer.IsEnabled;
+
     public void Say(string text, double seconds)
     {
         BubbleText.Text = text;

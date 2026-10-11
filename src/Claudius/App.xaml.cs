@@ -34,6 +34,8 @@ public partial class App : Application
     private UsageState _state = UsageState.Compute(null, new MoodThresholds(), DateTimeOffset.Now);
     private PetMood? _lastMood;
     private bool? _wasNight;
+    private IReadOnlyList<HistorySample>? _reviewedHistory;
+    private DateTimeOffset _reviewCheckAt;
     private DateTime _settingsWrite;
 
     public AppSettings Settings { get; private set; } = null!;
@@ -220,6 +222,7 @@ public partial class App : Application
         _pet.SetMood(mood, Working);
         _pet.SetOutfit(Settings.ModelOutfits ? Sprite.OutfitFor(_state.Snapshot?.Model) : Outfit.None);
         ApplyOccasion(initial);
+        if (!initial) CheckWeekReview(now);
 
         var snapshot = _state.Snapshot;
         CheckWarning(true, snapshot?.FiveHour, _state.Session, Settings.SessionWarnThresholds, _sessionWarn, initial, now);
@@ -242,6 +245,32 @@ public partial class App : Application
         if (night && _wasNight == false && !initial) Say("GoodNight");
         if (!night && _wasNight == true && !initial) Say("GoodMorning");
         _wasNight = night;
+    }
+
+    /// <summary>
+    /// Sums up the past week once after its reset, also if the app was not running then (up to 3 days later).
+    /// Rechecked when the history changes and once a minute, as a reset can pass without new data.
+    /// </summary>
+    private void CheckWeekReview(DateTimeOffset now)
+    {
+        if (_pet.Speaking) return;   // e.g. the greeting; it comes once the bubble is gone
+        if (ReferenceEquals(_reviewedHistory, _monitor.History) && now < _reviewCheckAt) return;
+        _reviewedHistory = _monitor.History;
+        _reviewCheckAt = now.AddMinutes(1);
+
+        var review = WeekReview.Last(_monitor.History, now);
+        if (review == null || review.ResetsAt <= Settings.LastWeekReview + 600) return;
+        Settings.LastWeekReview = review.ResetsAt;
+        SaveSettings();
+        if (now - review.ResetsAtTime > TimeSpan.FromDays(3)) return;
+
+        string percent = PercentText(review.Percent);
+        string? day = review.StrongestDay is { } d ? Strings.DayName(d) : null;
+        bool quiet = review.Percent < 1 || day == null;
+        if (Settings.SpeechBubbles)
+            Say(quiet ? "WeekReviewQuiet" : "WeekReview", extra: [("{lastweek}", percent), ("{day}", day ?? "")]);
+        else if (Settings.Notifications)
+            ShowNotification("Claudius", Strings.LastWeek(Strings.Percent(percent), day));
     }
 
     private sealed class WarnState
@@ -271,7 +300,7 @@ public partial class App : Application
         ShowNotification("Claudius", text);
     }
 
-    private void Say(string key, string? folder = null)
+    private void Say(string key, string? folder = null, (string Placeholder, string Value)[]? extra = null)
     {
         if (!Settings.SpeechBubbles) return;
         if (!Settings.Texts.TryGetValue(key, out var variants) || variants.Count == 0) return;
@@ -284,8 +313,10 @@ public partial class App : Application
             .Replace("{percent}", PercentText(_state.Max))
             .Replace("{session}", PercentText(_state.Session))
             .Replace("{week}", PercentText(_state.Week))
-            .Replace("{version}", AvailableUpdate?.VersionText ?? "")
-            .Replace(" %", " %"); // keep "62 %" together when wrapping
+            .Replace("{version}", AvailableUpdate?.VersionText ?? "");
+        foreach (var (placeholder, value) in extra ?? [])
+            text = text.Replace(placeholder, value);
+        text = text.Replace(" %", " %"); // keep "62 %" together when wrapping
         _pet.Say(text, Settings.BubbleDurationSeconds);
     }
 

@@ -84,6 +84,7 @@
             </Grid>
             <TextBlock x:Name="WeekReset" Style="{StaticResource Info}" />
             <TextBlock x:Name="WeekForecast" Style="{StaticResource Info}" Foreground="#A8A49B" FontStyle="Italic" />
+            <TextBlock x:Name="LastWeekText" Style="{StaticResource Info}" Foreground="#A8A49B" Visibility="Collapsed" />
 
             <Border Height="1" Background="#3A3936" Margin="0,12,0,10" />
             <StackPanel Orientation="Horizontal">

@@ -40,6 +40,7 @@ Panik → schläft bis zum Reset.
 - 💬 **Sprechblasen** beim Überschreiten von Schwellen, z. B. *„90 %! 😰“*, ohne Dauergequatsche
 - 🔔 **Windows-Benachrichtigungen** bei einstellbaren Warnschwellen für Session und Woche
 - 📈 **Prognose**: „Limit bei aktuellem Verbrauch in 1h 42m“
+- 🗓️ **Wochenrückblick**: Nach dem Wochen-Reset fasst das Pet die letzte Woche zusammen („Letzte Woche 87 %, stärkster Tag: Dienstag“), dazu eine Zeile im Usage-Fenster
 - 🧺 **Tray-Icon** in der aktuellen Stimmung, Autostart mit Windows
 - 👻 **Geist ziehen**: einen Geist des Pets mit der linken Maustaste auf ein Explorer-Fenster ziehen und der Assistent öffnet sich in diesem Ordner
 - 📄 **Datei aufs Pet ziehen**: der Assistent öffnet sich im Ordner der Datei, mit der Datei als `@datei`
