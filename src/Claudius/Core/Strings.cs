@@ -180,6 +180,10 @@ public static class Strings
     public static string LimitIn(string duration) => $"Limit in {duration}";
     public static string LimitAt(string dayTime) => $"Limit {dayTime}";
     public static string NoData => L("No data", "Keine Daten");
+    public static string LastWeek(string percent, string? day) => day == null
+        ? L($"Last week: {percent}", $"Letzte Woche: {percent}")
+        : L($"Last week: {percent} · busiest day: {day}", $"Letzte Woche: {percent} · stärkster Tag: {day}");
+    public static string DayName(DateTime day) => day.ToString("dddd", Culture);
     public static string Forecast(string text) => L("Forecast: ", "Prognose: ") + text;
     public static string ForecastLasts => L("Forecast: lasts until the reset", "Prognose: reicht bis zum Reset");
     public static string UpdatedJustNow => L("Updated just now", "Aktualisiert gerade eben");

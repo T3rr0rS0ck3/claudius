@@ -40,6 +40,7 @@ until the limit resets.
 - 💬 **Speech bubbles** when thresholds are crossed, e.g. *"90 %! 😰"* — not constantly chattering
 - 🔔 **Windows notifications** at configurable session and weekly warning thresholds
 - 📈 **Forecast** — "at the current pace you'll hit the limit in 1h 42m"
+- 🗓️ **Weekly review** — after the weekly reset the pet sums up the past week ("Last week: 87%, busiest day: Tuesday"), also shown in the usage overlay
 - 🧺 **Tray icon** that reflects the current mood, plus autostart with Windows
 - 👻 **Ghost drag** — drag a ghost of the pet (left mouse button) onto an Explorer window to open the assistant in that folder
 - 📄 **File drop** — drag a file from Explorer onto the pet to open the assistant in its folder with the file as `@file`

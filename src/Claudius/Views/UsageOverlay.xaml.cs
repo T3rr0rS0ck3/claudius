@@ -62,6 +62,7 @@ public partial class UsageOverlay : Window
             WeekForecast.Visibility = Visibility.Collapsed;
             WeekChart.Visibility = Visibility.Collapsed;
         }
+        SetLastWeek(history, now);
 
         StateText.Text = Strings.MoodLabel(state.Mood);
         StateDot.Fill = state.Max is { } max ? Palette.ForPercent(max, t) : Palette.Neutral;
@@ -123,6 +124,20 @@ public partial class UsageOverlay : Window
         for (int i = 0; i < bar.Children.Count; i++)
             ((Rectangle)bar.Children[i]).Fill = i < filled ? brush : EmptySegment;
         label.Text = Strings.Percent(percent is { } v ? Format.Percent(v) : "–");
+    }
+
+    /// <summary>The week before the current one, if the history still covers it.</summary>
+    private void SetLastWeek(IReadOnlyList<HistorySample> history, DateTimeOffset now)
+    {
+        var review = WeekReview.Last(history, now);
+        if (review == null || now - review.ResetsAtTime > TimeSpan.FromDays(7))
+        {
+            LastWeekText.Visibility = Visibility.Collapsed;
+            return;
+        }
+        LastWeekText.Visibility = Visibility.Visible;
+        LastWeekText.Text = Strings.LastWeek(Strings.Percent(Format.Percent(review.Percent)),
+            review.StrongestDay is { } day ? Strings.DayName(day) : null);
     }
 
     /// <summary>Shows when the limit will be hit, if the forecast is on and there is one; returns that time.</summary>
