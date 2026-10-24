@@ -32,6 +32,7 @@ public partial class PetWindow : Window
     private readonly PetWalker _walker = new();
     private readonly DesktopSurfaces _surfaces = new();
     private TimeSpan _lastScan;
+    private TimeSpan _lastTopCheck;
     // A single click waits for the double-click time, so a double-click does not also flash the overlay.
     private readonly DispatcherTimer _clickTimer = new() { Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime()) };
     private DateTime _clickedAt;
@@ -717,6 +718,12 @@ public partial class PetWindow : Window
         var now = _walkClock.Elapsed;
         double dt = Math.Clamp((now - _lastTick).TotalSeconds, 0, 0.1);
         _lastTick = now;
+        if (_topmost && (now - _lastTopCheck).Duration() > TimeSpan.FromSeconds(1))
+        {
+            KeepOnTop(hwnd);
+            if (_reaper is { IsVisible: true }) KeepOnTop(new WindowInteropHelper(_reaper).Handle);
+            _lastTopCheck = now;
+        }
         if (_dragging || _paused) return;
 
         // Hold still under the mouse so clicks and double-clicks land on the pet; a fall or jump still finishes.
@@ -1113,9 +1120,27 @@ public partial class PetWindow : Window
         SetWindowLong(hwnd, GWL_EXSTYLE, (style | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
     }
 
+    /// <summary>
+    /// Puts the window back among the topmost ones if Windows has pushed it below normal windows. The
+    /// WS_EX_TOPMOST flag stays set then, so setting WPF's Topmost again would change nothing.
+    /// </summary>
+    private static void KeepOnTop(IntPtr hwnd)
+    {
+        // All topmost windows come first in the z-order, so a normal one above means it has slipped.
+        for (var above = GetWindow(hwnd, GW_HWNDPREV); above != IntPtr.Zero; above = GetWindow(above, GW_HWNDPREV))
+            if ((GetWindowLong(above, GWL_EXSTYLE) & WS_EX_TOPMOST) == 0)
+            {
+                SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                return;
+            }
+    }
+
     private const int GWL_EXSTYLE = -20;
+    private const int WS_EX_TOPMOST = 0x00000008;
     private const int WS_EX_TOOLWINDOW = 0x00000080;
     private const int WS_EX_APPWINDOW = 0x00040000;
+    private const uint GW_HWNDPREV = 3;
+    private static readonly IntPtr HWND_TOPMOST = new(-1);
 
     private const int VK_ESCAPE = 0x1B;
 
@@ -1128,6 +1153,7 @@ public partial class PetWindow : Window
     [DllImport("user32.dll")] private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
     private const uint SWP_NOSIZE = 0x0001;
+    private const uint SWP_NOMOVE = 0x0002;
     private const uint SWP_NOZORDER = 0x0004;
     private const uint SWP_NOACTIVATE = 0x0010;
 
@@ -1135,6 +1161,7 @@ public partial class PetWindow : Window
     private struct RECT { public int Left, Top, Right, Bottom; }
 
     [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+    [DllImport("user32.dll")] private static extern IntPtr GetWindow(IntPtr hWnd, uint cmd);
     [DllImport("user32.dll")]
     private static extern bool SetWindowPos(IntPtr hWnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
 }
