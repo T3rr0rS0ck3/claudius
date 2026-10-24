@@ -68,6 +68,7 @@ public partial class PetWindow : Window
     private bool _listening;
     private Mark _sessionMark = Mark.None;
     private Outfit _outfit = Outfit.None;
+    private Snack _snack = Snack.Cookie;
     private Accessory _accessory = Accessory.None;
     private bool _night;
     private IReadOnlyList<SessionView> _sessions = [];
@@ -180,6 +181,8 @@ public partial class PetWindow : Window
     public void ApplySettings(AppSettings settings, bool initial = false)
     {
         Topmost = _topmost = settings.AlwaysOnTop;
+        _snack = settings.Snack;
+        FeedButton.Content = _snack == Snack.Beans ? "🫘" : "🍪";
         if (_reaper != null)
         {
             _reaper.Topmost = _topmost;
@@ -532,7 +535,7 @@ public partial class PetWindow : Window
             if (et < PetAnimator.EmoteTicks(emote))
             {
                 var emoteFrame = _refusing ? PetAnimator.RefuseFrame(et, _sick) : PetAnimator.EmoteFrame(emote, et) with { Sick = _sick };
-                PetImage.Source = Sprite.Render(emoteFrame with { Outfit = _outfit, Accessory = _accessory });
+                PetImage.Source = Sprite.Render(emoteFrame with { Outfit = _outfit, Accessory = _accessory, Snack = _snack });
                 return;
             }
             _emote = null;
@@ -547,7 +550,7 @@ public partial class PetWindow : Window
             {
                 var recoveryFrame = PetAnimator.RecoveryFrame(rt, recovery.From);
                 if (recoveryFrame.Sick < _sick) recoveryFrame = recoveryFrame with { Sick = _sick };
-                PetImage.Source = Sprite.Render(recoveryFrame with { Outfit = _outfit, Accessory = _accessory });
+                PetImage.Source = Sprite.Render(recoveryFrame with { Outfit = _outfit, Accessory = _accessory, Snack = _snack });
                 return;
             }
             _recovery = null;
@@ -559,7 +562,7 @@ public partial class PetWindow : Window
             if (Stretching)
             {
                 long st = (long)((DateTime.Now - stretch).TotalSeconds * PetAnimator.TicksPerSecond);
-                PetImage.Source = Sprite.Render(PetAnimator.StretchFrame(st) with { Sick = _sick, Outfit = _outfit, Accessory = _accessory });
+                PetImage.Source = Sprite.Render(PetAnimator.StretchFrame(st) with { Sick = _sick, Outfit = _outfit, Accessory = _accessory, Snack = _snack });
                 return;
             }
             _stretchStart = null;
@@ -590,7 +593,7 @@ public partial class PetWindow : Window
         SplatImage.Visibility = puddle ? Visibility.Visible : Visibility.Collapsed;
         PetImage.Opacity = puddle ? 0 : 1;
         if (_squashShown is not 0 and < 100) frame = frame with { Squash = _squashShown, Mark = Mark.None, Sweat = 0 };
-        PetImage.Source = Sprite.Render(frame with { Outfit = _outfit, Accessory = _accessory });
+        PetImage.Source = Sprite.Render(frame with { Outfit = _outfit, Accessory = _accessory, Snack = _snack });
         ShowThought(frame.Mark);
     }
 

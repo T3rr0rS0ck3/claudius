@@ -47,6 +47,7 @@ public partial class InventoryWindow : Window
     private readonly Dictionary<ModelFamily, Border> _tiles = new();
     private readonly Dictionary<ModelFamily, Border> _chips = new();
     private readonly List<(Border Tile, Outfit Item, Func<Outfit, bool> IsWorn, UIElement Lock)> _items = [];
+    private readonly List<(Border Tile, Snack Snack)> _snacks = [];
     private readonly Achievements _achievements;
     private readonly List<(Border Swatch, string Color)> _swatches = [];
     /// <summary>Every pet picture in the window, redrawn when the color or an outfit changes.</summary>
@@ -97,6 +98,7 @@ public partial class InventoryWindow : Window
         }
 
         BuildWardrobe();
+        BuildSnacks();
         BuildColors();
 
         Run(() =>
@@ -249,11 +251,11 @@ public partial class InventoryWindow : Window
         _pictures.Add((WardrobePreview, () => Smiling(Dressed)));
 
         foreach (var hat in Enum.GetValues<Hat>())
-            AddItem(Sprite.IsDisneyCostume(new(hat)) ? DisneyItems : Sprite.IsMarioCostume(new(hat)) ? MarioItems : Sprite.IsFootballHelmet(hat) ? HelmetItems : HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
+            AddItem(Sprite.IsWizardingCostume(new(hat)) ? WizardingItems : Sprite.IsDisneyCostume(new(hat)) ? DisneyItems : Sprite.IsMarioCostume(new(hat)) ? MarioItems : Sprite.IsFootballHelmet(hat) ? HelmetItems : HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
         foreach (var face in Enum.GetValues<FaceWear>())
-            AddItem(Sprite.IsDisneyCostume(new(Face: face)) ? DisneyItems : Sprite.IsMarioCostume(new(Face: face)) ? MarioItems : FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
+            AddItem(Sprite.IsWizardingCostume(new(Face: face)) ? WizardingItems : Sprite.IsDisneyCostume(new(Face: face)) ? DisneyItems : Sprite.IsMarioCostume(new(Face: face)) ? MarioItems : FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
         foreach (var neck in Enum.GetValues<Neckwear>())
-            AddItem(Sprite.IsDisneyCostume(new(Neck: neck)) ? DisneyItems : Sprite.IsMarioCostume(new(Neck: neck)) ? MarioItems : Sprite.IsFanScarf(neck) ? FanScarfItems : NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
+            AddItem(Sprite.IsWizardingCostume(new(Neck: neck)) ? WizardingItems : Sprite.IsDisneyCostume(new(Neck: neck)) ? DisneyItems : Sprite.IsMarioCostume(new(Neck: neck)) ? MarioItems : Sprite.IsFanScarf(neck) ? FanScarfItems : NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
     }
 
     /// <summary>
@@ -284,6 +286,23 @@ public partial class InventoryWindow : Window
         });
         _items.Add((tile, alone, isWorn, lockMark));
         slot.Children.Add(tile);
+    }
+
+    /// <summary>The snacks to choose from, the pet looking up at each.</summary>
+    private void BuildSnacks()
+    {
+        foreach (var snack in Enum.GetValues<Snack>())
+        {
+            var picture = Picture(() => new SpriteFrame(Eyes.LookUp, Mouth.Open, Arms.Up, Mark: Mark.Cookie, Snack: snack), 2);
+            var tile = Tile(picture, null, Strings.SnackName(snack), () =>
+            {
+                _settings.Snack = snack;
+                _app.ApplySettings(save: true);
+                ShowWardrobe();
+            });
+            _snacks.Add((tile, snack));
+            SnackItems.Children.Add(tile);
+        }
     }
 
     private void Dress(Outfit outfit)
@@ -344,6 +363,7 @@ public partial class InventoryWindow : Window
     {
         foreach (var (family, chip) in _chips) Highlight(chip, family == _dressing);
         var outfit = Dressed;
+        foreach (var (tile, snack) in _snacks) Highlight(tile, snack == _settings.Snack);
         foreach (var (tile, item, isWorn, lockMark) in _items)
         {
             Highlight(tile, isWorn(outfit));

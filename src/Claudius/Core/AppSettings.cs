@@ -57,6 +57,8 @@ public sealed class AppSettings
     public Dictionary<ModelFamily, Outfit> Outfits { get; set; } = [];
     /// <summary>Headwear for Halloween, Christmas, New Year's Eve, Easter and the birthday.</summary>
     public bool SeasonalAccessories { get; set; } = true;
+    /// <summary>What the pet eats when it is fed; the beans are unlocked by an achievement.</summary>
+    public Snack Snack { get; set; } = Snack.Cookie;
     /// <summary>"MM-dd": a party hat on that day; null for none.</summary>
     public string? Birthday { get; set; }
     /// <summary>A nightcap and a sleepy pet from <see cref="NightStart"/> to <see cref="NightEnd"/> ("HH:mm").</summary>
@@ -156,6 +158,7 @@ public sealed class AppSettings
         ["NoWindow"] = ["I can't find the window of {folder}…"],
         ["Feed"] = ["Mmm, yummy! 🍪", "Cookies are the best token food.", "*munch munch*"],
         ["FeedSick"] = ["I don't feel like cookies right now…", "Ugh, not now.", "Maybe after a /compact?"],
+        ["FeedBeans"] = ["Mmm… was that earwax? 🫘", "Every flavour! Even sprouts.", "*chomp* …pepper!"],
         ["ContextFull"] = ["{folder}: I don't feel so good… /compact?", "{folder} is getting really full. /compact or /clear?"],
         ["ContextCritical"] = ["{folder}: Someone's standing behind me… /compact!", "I can feel a cold breath. /compact or /clear, quick!"],
         ["ContextCompacted"] = ["Phew, much better!", "Feeling better already. Thanks for the /compact!"],
@@ -195,6 +198,7 @@ public sealed class AppSettings
         ["NoWindow"] = ["Ich finde das Fenster von {folder} nicht…"],
         ["Feed"] = ["Mmmh, lecker! 🍪", "Kekse sind das beste Token-Futter.", "*mampf mampf*"],
         ["FeedSick"] = ["Mir ist gerade gar nicht nach Keksen…", "Uff, jetzt nicht.", "Vielleicht nach einem /compact?"],
+        ["FeedBeans"] = ["Mmmh… war das Ohrenschmalz? 🫘", "Jede Geschmacksrichtung! Sogar Rosenkohl.", "*mampf* …Pfeffer!"],
         ["ContextFull"] = ["{folder}: Mir geht's nicht so gut… /compact?", "{folder} wird ganz schön voll. /compact oder /clear?"],
         ["ContextCritical"] = ["{folder}: Da steht wer hinter mir… /compact!", "Mir wird ganz kalt. Schnell, /compact oder /clear!"],
         ["ContextCompacted"] = ["Puh, schon viel besser!", "Geht schon wieder. Danke fürs /compact!"],

@@ -276,6 +276,11 @@ public static class Strings
     public static string SlotFootballHelmets => L("Football helmets", "Footballhelme");
     public static string SlotMario => "Super Mario";
     public static string SlotDisney => "Disney";
+    public static string SlotWizarding => "Harry Potter";
+    public static string SnackLabel => L("Snack", "Futter");
+    public static string SnackName(Snack snack) => snack == Snack.Beans
+        ? L("Bertie Bott's Every Flavour Beans", "Bertie Botts Bohnen jeder Geschmacksrichtung")
+        : L("Cookie", "Keks");
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
@@ -355,6 +360,16 @@ public static class Strings
         Hat.Chip => L("Chip's hat", "Chips Hut"),
         Hat.Simba => L("Simba's mane", "Simbas Mähne"),
         Hat.Timon => L("Timon's tuft of hair", "Timons Haarbüschel"),
+        Hat.Hermione => L("Hermione's hair", "Hermines Haare"),
+        Hat.Ron => L("Ron's hair", "Rons Haare"),
+        Hat.Snape => L("Snape's hair", "Snapes Haare"),
+        Hat.Hagrid => L("Hagrid's hair and beard", "Hagrids Haare und Bart"),
+        Hat.Draco => L("Draco's hair", "Dracos Haare"),
+        Hat.Bellatrix => L("Bellatrix's hair", "Bellatrix' Haare"),
+        Hat.SortingHat => L("The Sorting Hat", "Der Sprechende Hut"),
+        Hat.McGonagall => L("McGonagall's hat", "McGonagalls Hut"),
+        Hat.Hedwig => "Hedwig",
+        Hat.Dobby => L("Dobby's ears", "Dobbys Ohren"),
         _ => Nothing,
     };
     public static string FaceName(FaceWear face) => face switch
@@ -368,6 +383,11 @@ public static class Strings
         FaceWear.WallE => L("WALL·E's eyes", "WALL·Es Augen"),
         FaceWear.Eve => L("EVE's visor", "EVEs Visier"),
         FaceWear.Pumbaa => L("Pumbaa's snout and tusks", "Pumbaas Schnauze und Hauer"),
+        FaceWear.HarryPotter => L("Harry's glasses and scar", "Harrys Brille und Narbe"),
+        FaceWear.Dumbledore => L("Dumbledore's beard", "Dumbledores Bart"),
+        FaceWear.Luna => L("Luna's spectrespecs", "Lunas Spektrospecs"),
+        FaceWear.DeathEater => L("Death Eater mask", "Todesser-Maske"),
+        FaceWear.Voldemort => L("Voldemort's face", "Voldemorts Gesicht"),
         _ => Nothing,
     };
     public static string NeckName(Neckwear neck) => neck switch
@@ -393,6 +413,10 @@ public static class Strings
         Neckwear.Stuttgart => "VfB Stuttgart",
         Neckwear.DonkeyKong => L("Donkey Kong's tie", "Donkey Kongs Krawatte"),
         Neckwear.Dale => L("Dale's Hawaiian shirt", "Chaps Hawaiihemd"),
+        Neckwear.Gryffindor => L("Gryffindor scarf", "Gryffindor-Schal"),
+        Neckwear.Slytherin => L("Slytherin scarf", "Slytherin-Schal"),
+        Neckwear.Ravenclaw => L("Ravenclaw scarf", "Ravenclaw-Schal"),
+        Neckwear.Hufflepuff => L("Hufflepuff scarf", "Hufflepuff-Schal"),
         _ => Nothing,
     };
     public static string ItemName(Outfit item) =>
@@ -404,6 +428,7 @@ public static class Strings
         AchievementId.HardLandings => SlotFootballHelmets,
         AchievementId.Wahoo => L("Super Mario costumes", "Super-Mario-Kostüme"),
         AchievementId.OnceUponATime => L("Disney costumes", "Disney-Kostüme"),
+        AchievementId.EveryFlavour => L("Harry Potter costumes", "Harry-Potter-Kostüme"),
         _ => ItemName(achievement.Reward),
     };
     public static string TabAchievements => L("Achievements", "Erfolge");
@@ -425,6 +450,7 @@ public static class Strings
         AchievementId.HardLandings => L("Tough cookie", "Hart im Nehmen"),
         AchievementId.Wahoo => "Wahoo!",
         AchievementId.OnceUponATime => L("Once upon a time…", "Es war einmal …"),
+        AchievementId.EveryFlavour => L("Every Flavour Beans", "Bohnen jeder Geschmacksrichtung"),
         _ => L("Party mood", "Feierlaune"),
     };
     public static string AchievementHint(AchievementId id) => id switch
@@ -447,6 +473,7 @@ public static class Strings
             "Lass Claudius 100-mal so tief fallen, dass es platscht."),
         AchievementId.Wahoo => L("Watch Claudius jump 500 times.", "Sieh Claudius 500-mal springen."),
         AchievementId.OnceUponATime => L("Pat Claudius 100 times.", "Streichle Claudius 100-mal."),
+        AchievementId.EveryFlavour => L("Feed Claudius beans 100 times.", "Füttere Claudius 100-mal mit Bohnen."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
     };

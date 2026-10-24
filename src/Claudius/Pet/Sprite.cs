@@ -31,9 +31,15 @@ public enum Hat
     Mario, Luigi, Wario, Waluigi, Peach, Daisy, Rosalina, Toad, Toadette, Bowser, Birdo,
     // Disney characters
     MickeyEars, Minnie, Donald, Goofy, Sorcerer, Elsa, SnowWhite, Ariel, DaisyDuck, Huey, Dewey, Louie, Chip, Simba, Timon,
+    // Harry Potter characters
+    Hermione, Ron, Snape, Hagrid, Draco, Bellatrix, SortingHat, McGonagall, Hedwig, Dobby,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
-public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy, WallE, Eve, Pumbaa }
+public enum FaceWear
+{
+    None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy, WallE, Eve, Pumbaa,
+    HarryPotter, Dumbledore, Luna, DeathEater, Voldemort,
+}
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
 public enum Neckwear
 {
@@ -45,7 +51,12 @@ public enum Neckwear
     DonkeyKong,
     // Dale's Hawaiian shirt
     Dale,
+    // The Hogwarts house scarves
+    Gryffindor, Slytherin, Ravenclaw, Hufflepuff,
 }
+/// <summary>What the pet eats when it is fed.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<Snack>))]
+public enum Snack { Cookie, Beans }
 /// <summary>The AI model families the pet dresses up for; <see cref="Other"/> for unknown models and none.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<ModelFamily>))]
 public enum ModelFamily { Opus, Sonnet, Haiku, Fable, Other }
@@ -69,7 +80,8 @@ public readonly record struct SpriteFrame(
     Outfit Outfit = default,
     Accessory Accessory = Accessory.None,
     int Squash = 0,
-    int Sick = 0);
+    int Sick = 0,
+    Snack Snack = Snack.Cookie);
 
 /// <summary>
 /// Procedural pixel-art renderer for the pet: a chunky orange block
@@ -253,6 +265,19 @@ public static class Sprite
             or Hat.PropellerCap or Hat.Halo or Hat.Mario or Hat.Luigi or Hat.Wario or Hat.Waluigi => 4,
         _ => 0,
     };
+
+    private static readonly Dictionary<Neckwear, FanScarf> HouseScarves = new()
+    {
+        [Neckwear.Gryffindor] = new(0xFF8A1C1C, 0xFFEEBA30, 0, "aaababaaababaa", "aaababaaababaa", "aa", "bb"),
+        [Neckwear.Slytherin] = new(0xFF1A472A, 0xFFAAAAAA, 0, "aaababaaababaa", "aaababaaababaa", "aa", "bb"),
+        [Neckwear.Ravenclaw] = new(0xFF1E2F6B, 0xFF946B2D, 0, "aaababaaababaa", "aaababaaababaa", "aa", "bb"),
+        [Neckwear.Hufflepuff] = new(0xFFECB939, 0xFF372E29, 0, "aaababaaababaa", "aaababaaababaa", "aa", "bb"),
+    };
+
+    /// <summary>Whether this costume item belongs to a Harry Potter character (or a Hogwarts house).</summary>
+    public static bool IsWizardingCostume(Outfit item) =>
+        item.Hat is >= Hat.Hermione and <= Hat.Dobby || item.Face is >= FaceWear.HarryPotter and <= FaceWear.Voldemort
+        || HouseScarves.ContainsKey(item.Neck);
 
     /// <summary>Whether this costume item belongs to a Disney character.</summary>
     public static bool IsDisneyCostume(Outfit item) =>
@@ -461,7 +486,8 @@ public static class Sprite
             }
         }
         // Behind sunglasses the eyes stay hidden, even where looking up or down would peek past the lenses
-        if (f.Outfit.Face is not (FaceWear.Sunglasses or FaceWear.ShyGuy or FaceWear.WallE or FaceWear.Eve))
+        if (f.Outfit.Face is not (FaceWear.Sunglasses or FaceWear.ShyGuy or FaceWear.WallE or FaceWear.Eve or FaceWear.Luna
+            or FaceWear.DeathEater or FaceWear.Voldemort))
         {
             Eye(c0 + 3, -1);
             Eye(c0 + 10, 1);
@@ -549,6 +575,35 @@ public static class Sprite
                     Glyph(c0 + 5, EyeColor, by + 5, "X..X");
                     Glyph(c0 + 2, FurWhite, by + 3, "X........X", "X........X", ".X......X.");
                     break;
+                // Harry's round black glasses, and the lightning scar on his forehead
+                case FaceWear.HarryPotter:
+                    Glyph(c0 + 1, FrameColor, by + 1, ".XXX....XXX.", "X...XXXX...X", "X...X..X...X", ".XXX....XXX.");
+                    Glyph(c0 + 5, 0xFF9C3324, by, "..X", ".XX", ".X.");
+                    break;
+                // Dumbledore's long silver beard below a moustache, reaching down between the legs
+                case FaceWear.Dumbledore:
+                    Glyph(c0 + 2, 0xFFE8E8EC, by + 4, ".XXXXXXXX.", "XXX....XXX", "XXXX..XXXX", ".XXXXXXXX.", "..XXXXXX..", "...XXXX...", "....XX....");
+                    Glyph(c0 + 2, 0xFFC4C4CE, by + 7, ".X......X.", "..X....X..", "...X..X...");
+                    break;
+                // Luna's spectrespecs: big pink frames with colorful lenses
+                case FaceWear.Luna:
+                    Glyph(c0 + 1, 0xFFD0408E, by + 1, ".XXX....XXX.", "X...XXXX...X", "X...X..X...X", ".XXX....XXX.");
+                    Glyph(c0 + 2, 0xFFF48FBF, by + 2, "XXX", "XXX");
+                    Glyph(c0 + 9, 0xFF5EC8F2, by + 2, "XXX", "XXX");
+                    Glyph(c0 + 2, 0xFFF5C400, by + 2, "..X......X");
+                    break;
+                // A Death Eater's silver mask with dark eye holes and engraved swirls
+                case FaceWear.DeathEater:
+                    Glyph(c0 + 1, 0xFFC9CED8, by + 1, "..XXXXXXXX..", ".XXXXXXXXXX.", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.", "..XXXXXXXX..");
+                    Glyph(c0 + 1, 0xFF7E8594, by + 1, ".....XX.....", "X..........X", ".X..X..X..X.", "............", "..X......X..", ".....XX.....");
+                    Glyph(c0 + 1, EyeColor, by + 2, "..XX....XX..", "..XX....XX..");
+                    break;
+                // Voldemort's pale face with red slit eyes, slits for a nose and a thin mouth
+                case FaceWear.Voldemort:
+                    Glyph(c0 + 1, 0xFFE4E9DC, by + 1, ".XXXXXXXXXX.", "XXXXXXXXXXXX", "XXXXXXXXXXXX", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.");
+                    Glyph(c0 + 1, 0xFFD02020, by + 2, "..X......X..", "..X......X..");
+                    Glyph(c0 + 1, 0xFF7E8594, by + 4, ".....X.X....", "....XXXX....");
+                    break;
                 // EVE's face: a black visor with two glowing blue eyes
                 case FaceWear.Eve:
                     Glyph(c0 + 1, EyeColor, by + 1, ".XXXXXXXXXX.", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.");
@@ -588,7 +643,7 @@ public static class Sprite
                     Glyph(c0 + 5, FurWhite, by + 7, "X..X", ".XX.");
                     break;
                 // A fan scarf in a club's colors, one end hanging down between the legs
-                case var club when FanScarves.TryGetValue(club, out var scarf):
+                case var club when FanScarves.TryGetValue(club, out var scarf) || HouseScarves.TryGetValue(club, out scarf):
                     Stripes(c0, by + 7, scarf, scarf.Top, scarf.Bottom);
                     Stripes(c0 + 7, by + 9, scarf, scarf.End, scarf.Fringe);
                     break;
@@ -797,6 +852,69 @@ public static class Sprite
             case Hat.Timon:
                 Glyph(c0 + 4, 0xFFC2452D, by - 3, "X.X.X.", ".XXXX.", "XXXXXX");
                 break;
+            // Hermione's and Bellatrix's big bushy hair, brown or wild black
+            case Hat.Hermione or Hat.Bellatrix:
+            {
+                var (hair, tips) = hat == Hat.Hermione ? (0xFF7A4A26u, 0xFF5A3418u) : (0xFF18181E, 0xFF34343E);
+                Glyph(c0 - 2, hair, by - 2, hat == Hat.Hermione ? "...XXXXXXXXXXXX..." : "..X.XXXX.XXXX.X...",
+                    ".XXXXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXXXX");
+                for (int i = 1; i <= 5 && f.Squash == 0; i++)
+                    Glyph(c0 - 2, i == 5 ? tips : hair, by + i, i == 5 ? ".XX............XX." : "XXX............XXX");
+                break;
+            }
+            // Ron's red hair
+            case Hat.Ron:
+                Glyph(c0 - 1, 0xFFD9622B, by - 1, ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                if (f.Squash == 0) Glyph(c0 - 1, 0xFFD9622B, by + 1, "XX.X........X.XX", "XX............XX");
+                break;
+            // Snape's greasy black hair, hanging down like curtains beside the face
+            case Hat.Snape:
+                Glyph(c0 - 1, 0xFF1C1C22, by - 1, ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                for (int i = 1; i <= 6 && f.Squash == 0; i++) Glyph(c0 - 1, 0xFF1C1C22, by + i, "XXX..........XXX");
+                break;
+            // Hagrid's wild dark hair and a big bushy beard around the mouth
+            case Hat.Hagrid:
+            {
+                uint hair = 0xFF2B2018;
+                Glyph(c0 - 1, hair, by - 2, "..X.XXXXXXXX.X..", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                if (f.Squash == 0)
+                {
+                    Glyph(c0 - 1, hair, by + 1, "XX............XX", "XX............XX", "XX............XX");
+                    Glyph(c0 - 1, hair, by + 4, "XXX..........XXX", "XXXX........XXXX", "XXXXXX....XXXXXX", ".XXXXXXXXXXXXXX.", "..XXXXXXXXXXXX..");
+                }
+                break;
+            }
+            // Draco's slicked-back platinum hair
+            case Hat.Draco:
+                Glyph(c0 - 1, 0xFFE8E2C8, by - 2, "....XXXXXXXX....", "..XXXXXXXXXXXX..", "XXXXXXXXXXXXXXXX");
+                Glyph(c0 - 1, 0xFFC9C1A0, by - 1, "...X..X..X..X...");
+                break;
+            // The Sorting Hat: a floppy, patched brown hat with a creased face
+            case Hat.SortingHat:
+                Glyph(c0 + 2, 0xFF8A6A44, by - 5, ".......XX.", ".....XXXX.", "....XXXXX.", "..XXXXXXX.", "XXXXXXXXXX");
+                Glyph(c0 + 2, 0xFF5E4628, by - 3, ".....X.X..", "....XXX...", "XXXXXXXXXX");
+                break;
+            // McGonagall's tall dark green witch's hat
+            case Hat.McGonagall:
+                Glyph(c0 + 3, 0xFF1F4D2E, by - 5, "....X...", "...XX...", "...XXX..", "..XXXX..", "XXXXXXXX");
+                Glyph(c0 + 3, 0xFF2E6B43, by - 2, "..XXXX..");
+                break;
+            // Hedwig, the snowy owl, sitting on the head
+            case Hat.Hedwig:
+                Glyph(c0 + 4, FurWhite, by - 5, ".XXXX.", "XXXXXX", "XXXXXX", "XXXXXX", ".XXXX.");
+                Glyph(c0 + 4, EyeColor, by - 4, ".X..X.", "......", "...X..", "X.....");
+                Glyph(c0 + 6, 0xFFE0A030, by - 3, "XX");
+                break;
+            // Dobby's big floppy ears, sticking out to the sides
+            case Hat.Dobby:
+                if (f.Squash == 0)
+                {
+                    Glyph(c0 - 4, 0xFFB9B49A, by, "XXXX", ".XXX", "..XX");
+                    Glyph(c0 + 14, 0xFFB9B49A, by, "XXXX", "XXX.", "XX..");
+                    Glyph(c0 - 4, 0xFFD9A0A0, by, ".XX.", "..X.");
+                    Glyph(c0 + 14, 0xFFD9A0A0, by, ".XX.", ".X..");
+                }
+                break;
             // A football helmet in a team's colors around the whole head: the shell with a stripe down the middle,
             // ear flaps down the sides and a face mask bar below the eyes (just the shell on a squashed pet)
             case var team when FootballHelmets.TryGetValue(team, out var helmet):
@@ -880,9 +998,20 @@ public static class Sprite
             // Emotes: hearts drifting up, a cookie on its way into the mouth, crumbs on the chin, a juggled ball
             case Mark.Heart1: Glyph(c0 + 11, HeartColor, 0, "XX.XX", "XXXXX", ".XXX.", "..X.."); break;
             case Mark.Heart2: Glyph(c0 + 13, HeartColor, 0, "XX.XX", "XXXXX", ".XXX.", "..X.."); break;
+            case Mark.Cookie when f.Snack == Snack.Beans:
+                // A handful of jelly beans in every flavour and color
+                Glyph(c0 + 5, 0xFFE5484D, 0, "XX...");
+                Glyph(c0 + 5, 0xFFF5C400, 1, "..XX.");
+                Glyph(c0 + 5, 0xFF5FAE4E, 2, "XX...");
+                Glyph(c0 + 5, 0xFF9A55B0, 2, "...XX");
+                Glyph(c0 + 5, 0xFFE8862E, 3, ".XX..");
+                break;
             case Mark.Cookie:
                 Glyph(c0 + 5, CookieColor, 0, ".XXX.", "XXXXX", "XXXXX", ".XXX.");
                 Glyph(c0 + 5, ChipColor, 0, ".....", ".X...", "...X.", ".....");
+                break;
+            case Mark.Crumbs when f.Snack == Snack.Beans:
+                Set(c0 + 5, by + 7, 0xFFE5484D); Set(c0 + 9, by + 7, 0xFF5FAE4E); Set(c0 + 7, by + 8, 0xFFF5C400);
                 break;
             case Mark.Crumbs:
                 Set(c0 + 5, by + 7, CookieColor); Set(c0 + 9, by + 7, CookieColor); Set(c0 + 7, by + 8, CookieColor);
