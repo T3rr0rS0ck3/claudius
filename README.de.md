@@ -28,8 +28,8 @@ Panik → schläft bis zum Reset.
   passend zur Monitoranordnung in Windows
 - 🐭 **Jagt den Mauszeiger**: ab und zu fixiert es in ruhiger Stimmung den Zeiger in seiner Nähe und rennt ihm hinterher; hält man
   den Zeiger über das Pet, springt es dreimal danach und bricht dann in Tränen aus (abschaltbar)
-- 🎨 **Deine Farbe**: das Pet in beliebiger Farbe; Usage-Fenster, Menüs und Sprechblasen übernehmen sie als Akzentfarbe
-- 👑 **Passend zum Modell gekleidet**: eine Krone bei Opus, eine Sonnenbrille bei Sonnet, eine kleine Blume bei Haiku, ein Zauberhut bei Fable (abschaltbar)
+- 🎨 **Deine Farbe**: das Pet in beliebiger Farbe, eingestellt im Inventar; Usage-Fenster, Menüs und Sprechblasen übernehmen sie als Akzentfarbe
+- 👑 **Eine Garderobe pro Modell**: ab Werk eine Krone bei Opus, eine Sonnenbrille bei Sonnet, eine kleine Blume bei Haiku und ein Zauberhut bei Fable; im Inventar (Rechtsklick → **Inventar…**) ziehst du jedes Modell selbst an, mit Hüten, Brillen, Schnurrbart, Fliege, Schal und mehr (abschaltbar)
 - 🎃 **Saisonale Kopfbedeckung**: Hexenhut und Besen im Oktober, Weihnachtsmütze bis Weihnachten, Hasenohren an Ostern und ein Partyhut
   an Silvester und deinem Geburtstag; sie ersetzen die Kopfbedeckung des Modells (abschaltbar)
 - 🌙 **Nachtmodus**: zwischen 23 und 6 Uhr (einstellbar) trägt das Pet eine Schlafmütze und sagt gute Nacht; auf der Taskleiste
@@ -209,8 +209,8 @@ Desktop-Chat bietet keine Hooks und wird nicht unterstützt.
 ## Konfiguration
 
 Die meisten Optionen gibt es unter Rechtsklick → **Einstellungen…**: Sprache, Repo-Ordner, Konsole, Geist ziehen, Sprachchat,
-Größe, Farbe, Vordergrund, Animationen, Herumlaufen, Monitorwechsel, Mauszeiger jagen, Emotes, Modell-Outfits, saisonale Kopfbedeckung und Geburtstag, Nachtmodus und Nachtzeit, Pausen-Erinnerung, Autostart, Update-Suche, Aktualisierungsintervall, Warn- und Zustandsschwellen, Sprechblasen,
-Benachrichtigungen und dein Name.
+Größe, Vordergrund, Animationen, Herumlaufen, Monitorwechsel, Mauszeiger jagen, Emotes, Nachtmodus und Nachtzeit, Pausen-Erinnerung, Autostart, Update-Suche, Aktualisierungsintervall, Warn- und Zustandsschwellen, Sprechblasen,
+Benachrichtigungen und dein Name. Farbe, Kostüme (samt saisonaler Kopfbedeckung und Geburtstag) sowie Modell und Aufwand für neue Sessions stehen unter Rechtsklick → **Inventar…**.
 
 Alles liegt in `%LOCALAPPDATA%\Claudius\settings.json`. Handänderungen werden sofort übernommen.
 `Language` ist `en` oder `de`. Die Sprechblasentexte stehen unter `Texts`; ein Sprachwechsel in den Einstellungen setzt

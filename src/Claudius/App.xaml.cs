@@ -223,7 +223,7 @@ public partial class App : Application
         }
         _lastMood = mood;
         _pet.SetMood(mood, Working);
-        _pet.SetOutfit(Settings.ModelOutfits ? Sprite.OutfitFor(_state.Snapshot?.Model) : Outfit.None);
+        _pet.SetOutfit(Settings.ModelOutfits ? Settings.OutfitFor(Sprite.FamilyOf(_state.Snapshot?.Model)) : Outfit.None);
         ApplyOccasion(initial);
         if (!initial) CheckWeekReview(now);
         if (_breaks.Update(Working, now, TimeSpan.FromMinutes(Settings.BreakAfterMinutes)) && Settings.BreakReminder && !initial)
@@ -435,7 +435,7 @@ public partial class App : Application
             _inventoryWindow.Activate();
             return;
         }
-        _inventoryWindow = new InventoryWindow();
+        _inventoryWindow = new InventoryWindow(this, Settings, Sprite.FamilyOf(_state.Snapshot?.Model));
         _inventoryWindow.Closed += (_, _) => _inventoryWindow = null;
         _inventoryWindow.Show();
         _inventoryWindow.Activate();

@@ -53,6 +53,8 @@ public sealed class AppSettings
     public bool Emotes { get; set; } = true;
     /// <summary>Dress for the AI model in use: crown for Opus, sunglasses for Sonnet, a flower for Haiku.</summary>
     public bool ModelOutfits { get; set; } = true;
+    /// <summary>What the pet wears per AI model, put together in the inventory; models left out wear their default.</summary>
+    public Dictionary<ModelFamily, Outfit> Outfits { get; set; } = [];
     /// <summary>Headwear for Halloween, Christmas, New Year's Eve, Easter and the birthday.</summary>
     public bool SeasonalAccessories { get; set; } = true;
     /// <summary>"MM-dd": a party hat on that day; null for none.</summary>
@@ -117,6 +119,8 @@ public sealed class AppSettings
     public bool GhostDrag { get; set; } = true;
     /// <summary>Offers "Start voice chat…" (the assistant's voice dictation) in the menus.</summary>
     public bool VoiceChat { get; set; }
+
+    public Outfit OutfitFor(ModelFamily family) => Outfits.TryGetValue(family, out var outfit) ? outfit : Sprite.DefaultOutfit(family);
 
     /// <summary>Switches the UI language; the bubble texts start over with that language's defaults.</summary>
     public void SetLanguage(string language)
@@ -251,6 +255,7 @@ public sealed class AppSettings
         UserName ??= "";
         Texts ??= [];
         RecentProjects ??= [];
+        Outfits ??= [];
         if (string.IsNullOrWhiteSpace(ReposPath)) ReposPath = null;
         if (!Occasions.TryParseTime(NightStart, out _)) NightStart = DefaultNightStart;
         if (!Occasions.TryParseTime(NightEnd, out _)) NightEnd = DefaultNightEnd;

@@ -100,8 +100,8 @@ public static class Strings
     public static string Emotes => L("Emotes on hover (feed, pat, …)", "Emotes beim Drüberfahren (Füttern, Streicheln, …)");
     public static string ModelOutfits => L("Outfit for the AI model", "Outfit passend zum KI-Modell");
     public static string ModelOutfitsTip => L(
-        "Opus wears a crown, Sonnet sunglasses, Haiku a flower, Fable a wizard's hat.",
-        "Opus trägt eine Krone, Sonnet eine Sonnenbrille, Haiku eine Blume, Fable einen Zauberhut.");
+        "Off: the pet wears no outfit, whichever model is running.",
+        "Aus: Das Pet trägt kein Outfit, egal welches Modell läuft.");
     public static string SeasonalAccessories => L("Seasonal headwear", "Saisonale Kopfbedeckung");
     public static string SeasonalAccessoriesTip => L(
         "A witch's hat and a broom in October, a Santa hat until Christmas, bunny ears at Easter and a party hat on New Year's Eve and your birthday. It takes the place of the model's headwear.",
@@ -256,6 +256,56 @@ public static class Strings
         "Wie viel das Modell vor der Antwort nachdenkt. Höher ist gründlicher, aber langsamer und verbraucht mehr vom Limit. Auto: der Standard des Modells.");
     public static string EffortNeedsModel => L("Pick a model to set its effort.", "Wähle ein Modell, um seinen Aufwand einzustellen.");
     public static string CurrentModelOther(string model) => L($"Currently set: {model}", $"Aktuell eingestellt: {model}");
+    public static string TabModel => L("Model", "Modell");
+    public static string TabWardrobe => L("Wardrobe", "Garderobe");
+    public static string TabColor => L("Color", "Farbe");
+    public static string OtherModels => L("Others", "Andere");
+    public static string OtherModelsTip => L("Unknown models, and before a session has reported its model.",
+        "Unbekannte Modelle, und solange noch keine Session ihr Modell gemeldet hat.");
+    public static string GroupAllModels => L("FOR ALL MODELS", "FÜR ALLE MODELLE");
+    public static string GroupOutfitPerModel => L("OUTFIT PER MODEL", "OUTFIT PRO MODELL");
+    public static string SlotHead => L("Head", "Kopf");
+    public static string SlotFace => L("Face", "Gesicht");
+    public static string SlotNeck => L("Neck", "Hals");
+    public static string Nothing => L("Nothing", "Nichts");
+    public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
+    public static string WardrobeHint => L(
+        "The pet wears the outfit of the model that is running. Seasonal headwear and the nightcap take the place of the hat while they are switched on.",
+        "Das Pet trägt das Outfit des Modells, das gerade läuft. Saison-Hüte und die Schlafmütze ersetzen den Hut, solange sie eingeschaltet sind.");
+    public static string ColorPresets => L("Presets", "Vorlagen");
+    public static string HexColor => L("Own color", "Eigene Farbe");
+    public static string HatName(Hat hat) => hat switch
+    {
+        Hat.Crown => L("Crown", "Krone"),
+        Hat.Flower => L("Flower", "Blume"),
+        Hat.WizardHat => L("Wizard's hat", "Zauberhut"),
+        Hat.TopHat => L("Top hat", "Zylinder"),
+        Hat.CowboyHat => L("Cowboy hat", "Cowboyhut"),
+        Hat.ChefHat => L("Chef's hat", "Kochmütze"),
+        Hat.Cap => L("Cap", "Cap"),
+        Hat.Headphones => L("Headphones", "Kopfhörer"),
+        Hat.HardHat => L("Hard hat", "Bauhelm"),
+        Hat.VikingHelmet => L("Viking helmet", "Wikingerhelm"),
+        Hat.PropellerCap => L("Propeller cap", "Propellermütze"),
+        Hat.Halo => L("Halo", "Heiligenschein"),
+        _ => Nothing,
+    };
+    public static string FaceName(FaceWear face) => face switch
+    {
+        FaceWear.Sunglasses => L("Sunglasses", "Sonnenbrille"),
+        FaceWear.NerdGlasses => L("Glasses", "Brille"),
+        FaceWear.Monocle => L("Monocle", "Monokel"),
+        FaceWear.Moustache => L("Moustache", "Schnurrbart"),
+        FaceWear.EyePatch => L("Eye patch", "Augenklappe"),
+        _ => Nothing,
+    };
+    public static string NeckName(Neckwear neck) => neck switch
+    {
+        Neckwear.BowTie => L("Bow tie", "Fliege"),
+        Neckwear.Scarf => L("Scarf", "Schal"),
+        Neckwear.Bell => L("Collar with bell", "Halsband mit Glöckchen"),
+        _ => Nothing,
+    };
     public static string InventoryHint => L(
         "Applies to new sessions. Running sessions keep their model and effort; change them there with /model and /effort.",
         "Gilt für neue Sessions. Laufende Sessions behalten Modell und Aufwand; dort wechselst du mit /model und /effort.");
