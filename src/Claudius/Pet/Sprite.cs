@@ -477,12 +477,13 @@ public static class Sprite
                 break;
         }
 
-        // Microphone held upright in the right hand, next to the face: a silver head with a dark grille
+        // Microphone held upright in the left hand, next to the face: a silver head with a dark grille (the left,
+        // because the thought cloud floats up on the right)
         if (f.Arms == Arms.Mic)
         {
-            Glyph(c0 + 15, MicColor, by + 1, "XXX", "XXX");
-            Glyph(c0 + 15, HandleColor, by + 1, ".X.", "X.X");
-            for (int y = by + 3; y <= by + 6; y++) Set(c0 + 16, y, HandleColor);
+            Glyph(c0 - 4, MicColor, by + 1, "XXX", "XXX");
+            Glyph(c0 - 4, HandleColor, by + 1, ".X.", "X.X");
+            for (int y = by + 3; y <= by + 6; y++) Set(c0 - 3, y, HandleColor);
         }
 
         if (f.Blush)
@@ -693,42 +694,43 @@ public static class Sprite
                 break;
         }
 
-        // Accessory, in the same place as the outfit's headwear
+        // Accessory, in the same place as the outfit's headwear, in the middle of the head
         switch (f.Accessory)
         {
-            // Halloween: a crooked witch's hat with an orange band, and a broom in the right hand
+            // Halloween: a crooked witch's hat with an orange band, and a broom in the left hand
             // (put away while the hand holds the microphone or the pet is squashed flat)
             case Accessory.WitchHat:
-                Glyph(c0 - 2, WitchColor, by - 5, "....X...", "...XX...", "..XXX...", "..XXXX..", "XXXXXXXX");
-                Glyph(c0 - 2, BandOrange, by - 2, "..XXXX..");
+                Glyph(c0 + 3, WitchColor, by - 5, "....X...", "...XX...", "..XXX...", "..XXXX..", "XXXXXXXX");
+                Glyph(c0 + 3, BandOrange, by - 2, "..XXXX..");
                 if (f.Arms != Arms.Mic && f.Squash == 0)
                 {
-                    for (int y = by + 1; y <= by + 6; y++) Set(c0 + 16, y, StickColor);
-                    Glyph(c0 + 15, BindingColor, by + 7, "XXX");
-                    Glyph(c0 + 15, StrawColor, by + 8, "XXX", "XXX", "X.X");
+                    for (int y = by + 1; y <= by + 6; y++) Set(c0 - 3, y, StickColor);
+                    Glyph(c0 - 4, BindingColor, by + 7, "XXX");
+                    Glyph(c0 - 4, StrawColor, by + 8, "XXX", "XXX", "X.X");
                 }
                 break;
             // Christmas: a red cap with a white brim, its tip and bobble flopping to the left
             case Accessory.SantaHat:
-                Glyph(c0 - 2, SantaRed, by - 4, ".XX....", ".XXXX..", ".XXXXX.");
-                Glyph(c0 - 2, FurWhite, by - 4, "X......", ".......", ".......", "XXXXXXX");
+                Glyph(c0 + 2, SantaRed, by - 4, ".XX....", ".XXXX..", ".XXXXX.");
+                Glyph(c0 + 2, FurWhite, by - 4, "X......", ".......", ".......", "XXXXXXX");
                 break;
             // New Year's Eve and birthdays: a striped party cone leaning to the left, a golden pompom on its tip
             case Accessory.PartyHat:
-                Glyph(c0 - 2, GoldColor, by - 5, "X");
-                Glyph(c0 - 2, HeartColor, by - 4, ".X.....", "..X.X..", "..X.X.X", "....X.X");
-                Glyph(c0 - 2, BallColor, by - 4, "..X....", ".X.X...", "...X.X.", "...X.X.");
+                Glyph(c0 + 2, GoldColor, by - 5, "X");
+                Glyph(c0 + 2, HeartColor, by - 4, ".X.....", "..X.X..", "..X.X.X", "....X.X");
+                Glyph(c0 + 2, BallColor, by - 4, "..X....", ".X.X...", "...X.X.", "...X.X.");
                 break;
             // Easter: two bunny ears with pink insides
             case Accessory.BunnyEars:
-                Glyph(c0, FurWhite, by - 5, "XX.XX", "X..X.", "X..X.", "X..X.", "XX.XX");
-                Glyph(c0, EarPink, by - 4, ".X..X", ".X..X", ".X..X");
+                Glyph(c0 + 4, FurWhite, by - 5, "XX.XX", "X..X.", "X..X.", "X..X.", "XX.XX");
+                Glyph(c0 + 4, EarPink, by - 4, ".X..X", ".X..X", ".X..X");
                 break;
-            // Night: a long blue nightcap, its tip hanging down beside the head with a white bobble
+            // Night: a long blue nightcap, its tip flopping over to the left and hanging down beside the head with
+            // a white bobble
             case Accessory.Nightcap:
-                Glyph(c0 - 2, NightcapBlue, by - 4, "..XXX..", ".XXXXX.", "X.XXXXX");
-                Glyph(c0 - 2, NightcapShade, by - 1, "X.XXXXX"); // the gap keeps the hanging tip apart
-                Set(c0 - 2, by, FurWhite);
+                Glyph(c0 - 1, NightcapBlue, by - 4, "..XXXXXX....", ".XX.XXXXXX..", "X...XXXXXXX.");
+                Glyph(c0 - 1, NightcapShade, by - 1, "X..XXXXXXXXX"); // the gap keeps the hanging tip apart
+                Set(c0 - 1, by, FurWhite);
                 break;
         }
 
