@@ -10,6 +10,8 @@
     <AssemblyName>Claudius</AssemblyName>
     <RootNamespace>Claudius</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- The pet in its default color, for the exe, its shortcuts and the windows in the taskbar. -->
+    <ApplicationIcon>Claudius.ico</ApplicationIcon>
     <!-- DPI awareness is declared in app.manifest for WPF; the WinForms analyzer warning (WFO0003, formerly WFAC010) does not apply. -->
     <NoWarn>$(NoWarn);WFAC010;WFO0003</NoWarn>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>

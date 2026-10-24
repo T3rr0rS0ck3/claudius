@@ -60,6 +60,7 @@ public partial class InventoryWindow : Window
     public InventoryWindow(App app, AppSettings settings, ModelFamily running)
     {
         InitializeComponent();
+        Icon = Sprite.WindowIcon();
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
         _app = app;
         _settings = settings;
@@ -149,6 +150,7 @@ public partial class InventoryWindow : Window
     private void RedrawPictures()
     {
         foreach (var (image, frame) in _pictures) image.Source = Sprite.Render(frame());
+        Icon = Sprite.WindowIcon(); // the color may have changed
     }
 
     /// <summary>A clickable tile with a picture and, optionally, a name below it.</summary>
