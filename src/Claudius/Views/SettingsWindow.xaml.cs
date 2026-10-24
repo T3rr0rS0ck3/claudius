@@ -16,6 +16,54 @@ public partial class SettingsWindow : Window
 {
     private readonly AppSettings _settings;
     private readonly App _app;
+    private readonly List<(Border Tab, GroupBox[] Groups)> _tabs = [];
+
+    /// <summary>The tab shown when the settings are opened again.</summary>
+    private static int _lastTab;
+
+    /// <summary>Tabs in the look of the inventory's, each showing some of the groups.</summary>
+    private void BuildTabs()
+    {
+        (string Name, GroupBox[] Groups)[] tabs =
+        [
+            (Strings.TabGeneral, [GeneralGroup, UpdatesGroup]),
+            (Strings.TabAssistant, [AssistantGroup, LaunchGroup]),
+            (Strings.TabPet, [PetGroup]),
+            (Strings.TabUsage, [UsageGroup]),
+            (Strings.TabBubbles, [BubblesGroup]),
+        ];
+        foreach (var (name, groups) in tabs)
+        {
+            int index = _tabs.Count;
+            var tab = new Border
+            {
+                Padding = new Thickness(0, 4, 0, 6),
+                BorderThickness = new Thickness(0, 0, 0, 2),
+                Background = Brushes.Transparent,
+                Cursor = System.Windows.Input.Cursors.Hand,
+                Child = new TextBlock { Text = name, HorizontalAlignment = HorizontalAlignment.Center },
+            };
+            tab.MouseLeftButtonUp += (_, _) => ShowTab(index);
+            _tabs.Add((tab, groups));
+            TabStrip.Children.Add(tab);
+        }
+        ShowTab(_lastTab);
+    }
+
+    private void ShowTab(int index)
+    {
+        _lastTab = index;
+        var accent = (Brush)FindResource("AccentBrush");
+        var line = new SolidColorBrush(Color.FromRgb(0x3A, 0x39, 0x36));
+        var text = new SolidColorBrush(Color.FromRgb(0xB5, 0xB1, 0xA8));
+        for (int i = 0; i < _tabs.Count; i++)
+        {
+            var (tab, groups) = _tabs[i];
+            tab.BorderBrush = i == index ? accent : line;
+            ((TextBlock)tab.Child).Foreground = i == index ? accent : text;
+            foreach (var group in groups) group.Visibility = i == index ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
 
     public SettingsWindow(App app, AppSettings settings)
     {
@@ -25,6 +73,7 @@ public partial class SettingsWindow : Window
         PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.Escape) Close(); };
         _app = app;
         _settings = settings;
+        BuildTabs();
 
         ScaleSlider.Value = settings.PetScale;
         AlwaysOnTopBox.IsChecked = settings.AlwaysOnTop;

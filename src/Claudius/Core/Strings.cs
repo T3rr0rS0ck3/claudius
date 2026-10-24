@@ -39,6 +39,11 @@ public static class Strings
     public static string Cancel => L("Cancel", "Abbrechen");
 
     public static string GroupGeneral => L("GENERAL", "ALLGEMEIN");
+    public static string TabGeneral => L("General", "Allgemein");
+    public static string TabAssistant => L("Assistant", "Assistent");
+    public static string TabPet => L("Pet", "Pet");
+    public static string TabUsage => L("Usage", "Usage");
+    public static string TabBubbles => L("Bubbles", "Sprechblasen");
     public static string Language => L("Language", "Sprache");
 
     public static string GroupAssistant => L("AI ASSISTANT", "KI-ASSISTENT");
