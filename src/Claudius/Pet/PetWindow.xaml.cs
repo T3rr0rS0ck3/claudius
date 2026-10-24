@@ -524,6 +524,7 @@ public partial class PetWindow : Window
 
     private void Render()
     {
+        ShowThought(Mark.None);
         if (_emote is { } emote)
         {
             // Emotes run on their own clock, so they also play with animations switched off.
@@ -590,6 +591,46 @@ public partial class PetWindow : Window
         PetImage.Opacity = puddle ? 0 : 1;
         if (_squashShown is not 0 and < 100) frame = frame with { Squash = _squashShown, Mark = Mark.None, Sweat = 0 };
         PetImage.Source = Sprite.Render(frame with { Outfit = _outfit, Accessory = _accessory });
+        ShowThought(frame.Mark);
+    }
+
+    /// <summary>
+    /// The thought cloud with "!" or "?" up and to the right of the head, or hidden for any other mark. Where it
+    /// would run off the right of the screen it is mirrored to the left; while the pet is at the top of the window,
+    /// with no room above it, it floats beside the pet.
+    /// </summary>
+    private void ShowThought(Mark mark)
+    {
+        if (mark is not (Mark.Exclaim or Mark.Question))
+        {
+            ThoughtImage.Visibility = Visibility.Collapsed;
+            ThoughtImage.Source = null;
+            return;
+        }
+        int x = Sprite.ThoughtX + (_petOnTop ? 2 : 0); // in the pet's grid
+        double reach = (x + Sprite.ThoughtWidth - Sprite.Width / 2.0) * _scale;
+        bool left = Left + Width / 2 + reach > SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth;
+        if (left) x = Sprite.Width - x - Sprite.ThoughtWidth;
+        ThoughtImage.Source = Sprite.RenderThought(mark, left);
+        ThoughtImage.Width = Sprite.ThoughtWidth * _scale;
+        ThoughtImage.Height = Sprite.ThoughtHeight * _scale;
+        double fromLeft = Width / 2 + (x - Sprite.Width / 2.0) * _scale;
+        ThoughtImage.VerticalAlignment = _petOnTop ? VerticalAlignment.Top : VerticalAlignment.Bottom;
+        ThoughtImage.Margin = _petOnTop
+            ? new Thickness(fromLeft, _petInset, 0, 0)
+            : new Thickness(fromLeft, 0, 0, (Sprite.Height - Sprite.ThoughtY - Sprite.ThoughtHeight) * _scale);
+        // Only a question can be clicked: it goes to the session asking
+        bool question = mark == Mark.Question;
+        ThoughtImage.IsHitTestVisible = question;
+        ThoughtImage.Cursor = question ? Cursors.Hand : null;
+        ThoughtImage.Visibility = Visibility.Visible;
+    }
+
+    private void Thought_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        // Right away: Windows lets the window come to the front only while the click is the last input.
+        if (AskingSession() is { } session) SessionClicked?.Invoke(session);
+        e.Handled = true;
     }
 
     // ---------------------------------------------------------------- walking around
@@ -862,16 +903,9 @@ public partial class PetWindow : Window
         else StartMove();
     }
 
-    /// <summary>The session that asked last if <paramref name="point"/> (on the pet image) is above the head, where the "?" is.</summary>
-    private SessionView? QuestionAt(Point point)
-    {
-        if (_sessionMark != Mark.Question || _emote != null) return null;
-        if (point.Y >= PetImage.ActualHeight * QuestionRows / Sprite.Height) return null;
-        return _sessions.LastOrDefault(s => s.State == SessionStates.Question);
-    }
-
-    /// <summary>Sprite rows above the head, where the "?" is drawn.</summary>
-    private const int QuestionRows = 5;
+    /// <summary>The session that asked last, while its "?" is shown.</summary>
+    private SessionView? AskingSession() =>
+        _sessionMark != Mark.Question || _emote != null ? null : _sessions.LastOrDefault(s => s.State == SessionStates.Question);
 
     private static bool Moved4(Vector delta) => Math.Abs(delta.X) >= 4 || Math.Abs(delta.Y) >= 4;
 
@@ -890,13 +924,6 @@ public partial class PetWindow : Window
         PetImage.ReleaseMouseCapture();
         if (_pressPoint == null) return;
         _pressPoint = null;
-        // A click on the "?" goes to the session asking, right away: Windows lets the window come to the
-        // front only while the click is the last input.
-        if (QuestionAt(e.GetPosition(PetImage)) is { } session)
-        {
-            SessionClicked?.Invoke(session);
-            return;
-        }
         _clickedAt = DateTime.Now;
         _clickTimer.Start();
     }

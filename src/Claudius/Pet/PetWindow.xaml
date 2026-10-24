@@ -50,6 +50,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!-- A thought cloud with "!" or "?" beside the head, reaching out of the pet's picture; placed in ShowThought -->
+        <Image x:Name="ThoughtImage" Grid.RowSpan="2" Stretch="Fill" HorizontalAlignment="Left"
+               RenderOptions.BitmapScalingMode="NearestNeighbor" Visibility="Collapsed"
+               MouseLeftButtonUp="Thought_MouseLeftButtonUp" />
+
         <!-- Speech bubble; fully transparent window areas stay click-through -->
         <StackPanel x:Name="Bubble" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center"
                     Opacity="0" Visibility="Collapsed" Cursor="Hand" Margin="0,0,0,2"

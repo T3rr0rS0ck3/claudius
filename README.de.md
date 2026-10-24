@@ -48,7 +48,7 @@ Panik → schläft bis zum Reset.
 - 📄 **Datei aufs Pet ziehen**: der Assistent öffnet sich im Ordner der Datei, mit der Datei als `@datei`
 - 📂 **Projektliste**: Doppelklick aufs Pet, Projekt aus deinem Repo-Ordner wählen, der Assistent startet dort
 - 🎤 **Sprachchat** (optional): öffnet den Assistenten mit eingeschaltetem Sprachdiktat; das Pet hört zu, während du sprichst
-- ❓ **Session-Status**: ein gelbes „?“, wenn eine Session etwas fragt, eine Sprechblase, wenn sie fertig ist;
+- ❓ **Session-Status**: ein gelbes „?“ in einer Gedankenwolke, wenn eine Session etwas fragt, eine Sprechblase, wenn sie fertig ist;
   Klick aufs „?“ springt zum Fenster der Session
 - 🤒 **Kränklich**: füllt sich das Kontextfenster einer Session (60 / 75 / 90 %, einstellbar), wird das Pet immer grüner und
   müder, lehnt Kekse ab und schlägt `/compact` vor; auf der höchsten Stufe schwebt ein Sensenmann hinter ihm her. Nach
@@ -180,7 +180,7 @@ vorbei ist, zählen als 0 %. Es wird nichts von Webseiten ausgelesen und es werd
 Ist der Assistent verbunden, trägt das Pet zusätzlich ein paar Hooks in dessen `settings.json` ein (mit Sicherung;
 eigene Hooks bleiben erhalten). Dann gilt:
 
-- **„?“** (gelb) erscheint, wenn eine Session eine Berechtigung braucht, per *AskUserQuestion* fragt oder auf eine
+- **„?“** (gelb, in einer Gedankenwolke neben dem Kopf) erscheint, wenn eine Session eine Berechtigung braucht, per *AskUserQuestion* fragt oder auf eine
   Eingabe wartet, dazu eine Sprechblase wie *„mein-projekt: Der Assistent hat eine Frage.“*
 - Ist eine Session mit ihrer Antwort fertig, erscheint eine Sprechblase wie *„mein-projekt: Der Assistent ist fertig!“*; am
   Pet bleibt kein Zeichen stehen.
