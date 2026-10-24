@@ -48,7 +48,7 @@ until the limit resets.
 - 📄 **File drop** — drag a file from Explorer onto the pet to open the assistant in its folder with the file as `@file`
 - 📂 **Project launcher** — double-click the pet to pick a project from your repo folder and open the assistant there
 - 🎤 **Voice chat** (optional) — opens the assistant with its voice dictation switched on; the pet listens while you talk
-- ❓ **Session status** — a yellow "?" when a session asks something, a bubble when it is done;
+- ❓ **Session status** — a yellow "?" in a thought cloud when a session asks something, a bubble when it is done;
   click the "?" to jump to that session's window
 - 🤒 **Feeling sick** — as a session's context window fills up (60 / 75 / 90 %, adjustable) the pet turns greener and more
   tired, turns down cookies and suggests `/compact`; at the top level a grim reaper floats along behind it. After `/compact`
@@ -177,7 +177,7 @@ has passed are treated as 0 %. Nothing is scraped from any website and no creden
 Once the assistant is connected, the pet also registers a few hooks in the assistant's `settings.json` (a backup is
 saved; your own hooks are kept). Then:
 
-- **"?"** (yellow) appears when a session asks for a permission, uses *AskUserQuestion* or needs input, with a bubble
+- **"?"** (yellow, in a thought cloud beside the head) appears when a session asks for a permission, uses *AskUserQuestion* or needs input, with a bubble
   like *"my-project: The assistant has a question."*
 - When a session finished its turn, a bubble like *"my-project: The assistant is done!"* pops up; no mark stays on the pet.
 - With several sessions the "?" stays as long as any of them waits for an answer.

@@ -81,8 +81,9 @@ public static class Sprite
     private const uint SweatColor = 0xFF67B7F0;
     private const uint BlushColor = 0xFFF2A28C;
     private const uint MarkColor = 0xFF8C90B8;
+    private const uint CloudOutline = 0xFF4A4A55;
     private const uint AlertColor = 0xFFE5484D;
-    private const uint QuestionColor = 0xFFE5C14B;
+    private const uint QuestionColor = 0xFFC9961A; // dark enough to stand out on its white cloud
     private const uint HeartColor = 0xFFEF5D7A;
     private const uint CookieColor = 0xFFC98D4F;
     private const uint ChipColor = 0xFF5B3A22;
@@ -234,6 +235,19 @@ public static class Sprite
         [Hat.Peach] = new(GoldColor, GoldShade, 0xFF3B6FE0, JewelColor, 0xFFFFDD6E, 0xFFE0B64A, 6),
         [Hat.Daisy] = new(GoldColor, GoldShade, 0xFF2BB3A0, 0xFF2BB3A0, 0xFFC8662A, 0xFF9C4A1C, 3),
         [Hat.Rosalina] = new(0xFFD9E2EE, 0xFFA6B2C4, 0xFF3B6FE0, JewelColor, 0xFFF4EED8, 0xFFD2C9A8, 6),
+    };
+
+    /// <summary>
+    /// How far a hat is moved right from where its picture starts, so that it sits in the middle of the head; the
+    /// ones that already span the whole head stay where they are.
+    /// </summary>
+    private static int HatShift(Hat hat) => hat switch
+    {
+        Hat.WizardHat or Hat.CowboyHat => 5,
+        Hat.Birdo => 3,
+        Hat.Crown or Hat.Flower or Hat.TopHat or Hat.ChefHat or Hat.Cap or Hat.HardHat or Hat.VikingHelmet
+            or Hat.PropellerCap or Hat.Halo or Hat.Mario or Hat.Luigi or Hat.Wario or Hat.Waluigi => 4,
+        _ => 0,
     };
 
     /// <summary>Whether this costume item belongs to a Super Mario character.</summary>
@@ -479,8 +493,7 @@ public static class Sprite
 
         }
 
-        // Outfit, one item per slot. Face and neck need the unsquashed body; a seasonal or night accessory takes the
-        // head. Headwear sits on the left half of the head, out of the way of the marks above its middle and right.
+        // Outfit, one item per slot. Face and neck need the unsquashed body; a seasonal or night accessory takes the head.
         if (f.Squash == 0)
         {
             switch (f.Outfit.Face)
@@ -547,132 +560,135 @@ public static class Sprite
                     break;
             }
         }
-        switch (f.Accessory != Accessory.None ? Hat.None : f.Outfit.Hat)
+        // Headwear sits in the middle of the head (Shift moves the smaller items, drawn from its left edge, there).
+        var hat = f.Accessory != Accessory.None ? Hat.None : f.Outfit.Hat;
+        int h0 = c0 + HatShift(hat);
+        switch (hat)
         {
             // A golden crown with a red jewel, sitting on the head
             case Hat.Crown:
-                Glyph(c0, GoldColor, by - 3, "X.X.X", "XXXXX", "XXXXX");
-                Glyph(c0, GoldShade, by - 3, ".....", ".....", "XXXXX");
-                Set(c0 + 2, by - 2, JewelColor);
+                Glyph(h0, GoldColor, by - 3, "X.X.X", "XXXXX", "XXXXX");
+                Glyph(h0, GoldShade, by - 3, ".....", ".....", "XXXXX");
+                Set(h0 + 2, by - 2, JewelColor);
                 break;
             // A little daisy tucked onto the head
             case Hat.Flower:
-                Glyph(c0 + 1, PetalColor, by - 3, ".X.", "X.X", ".X.");
-                Set(c0 + 2, by - 2, GoldColor);
-                Set(c0 + 3, by - 1, LeafColor);
+                Glyph(h0 + 1, PetalColor, by - 3, ".X.", "X.X", ".X.");
+                Set(h0 + 2, by - 2, GoldColor);
+                Set(h0 + 3, by - 1, LeafColor);
                 break;
             // A pointed wizard's hat with a little star, its tip bent to the side
             case Hat.WizardHat:
-                Glyph(c0 - 1, HatColor, by - 5, "....X.", "...XX.", "..XXX.", ".XXXX.");
-                Glyph(c0 - 1, HatShade, by - 1, "XXXXXX");
-                Set(c0 + 2, by - 3, GoldColor);
+                Glyph(h0 - 1, HatColor, by - 5, "....X.", "...XX.", "..XXX.", ".XXXX.");
+                Glyph(h0 - 1, HatShade, by - 1, "XXXXXX");
+                Set(h0 + 2, by - 3, GoldColor);
                 break;
             // A tall black top hat with a red band
             case Hat.TopHat:
-                Glyph(c0, TopHatColor, by - 5, "XXXXX", "XXXXX", "XXXXX");
-                Glyph(c0, TopHatShine, by - 5, ".X...", ".X...", ".X...");
-                Glyph(c0, SantaRed, by - 2, "XXXXX");
-                Glyph(c0 - 1, TopHatColor, by - 1, "XXXXXXX");
+                Glyph(h0, TopHatColor, by - 5, "XXXXX", "XXXXX", "XXXXX");
+                Glyph(h0, TopHatShine, by - 5, ".X...", ".X...", ".X...");
+                Glyph(h0, SantaRed, by - 2, "XXXXX");
+                Glyph(h0 - 1, TopHatColor, by - 1, "XXXXXXX");
                 break;
             // A brown cowboy hat with a dented crown and a brim curling up at both ends
             case Hat.CowboyHat:
-                Glyph(c0, CowboyColor, by - 4, "XX.XX", "XXXXX");
-                Glyph(c0 - 2, CowboyColor, by - 2, "X......X", "XXXXXXXX");
-                Glyph(c0, CowboyShade, by - 2, "XXXXX");
+                Glyph(h0, CowboyColor, by - 4, "XX.XX", "XXXXX");
+                Glyph(h0 - 2, CowboyColor, by - 2, "X......X", "XXXXXXXX");
+                Glyph(h0, CowboyShade, by - 2, "XXXXX");
                 break;
             // A puffy white chef's hat
             case Hat.ChefHat:
-                Glyph(c0 - 1, FurWhite, by - 5, ".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.");
-                Glyph(c0 - 1, ChefShade, by - 3, "..X.X..", ".......", ".......", ".XXXXX.");
+                Glyph(h0 - 1, FurWhite, by - 5, ".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.");
+                Glyph(h0 - 1, ChefShade, by - 3, "..X.X..", ".......", ".......", ".XXXXX.");
                 break;
             // A blue cap with a white button, its peak pointing to the left
             case Hat.Cap:
-                Glyph(c0, CapColor, by - 3, ".XXX.", "XXXXX", "XXXXX");
-                Glyph(c0 - 3, CapShade, by - 1, "XXX");
-                Set(c0 + 2, by - 4, FurWhite);
+                Glyph(h0, CapColor, by - 3, ".XXX.", "XXXXX", "XXXXX");
+                Glyph(h0 - 3, CapShade, by - 1, "XXX");
+                Set(h0 + 2, by - 4, FurWhite);
                 break;
             // Headphones: a band over the head and a red cup on each side
             case Hat.Headphones:
-                Glyph(c0, HandleColor, by - 1, ".XXXXXXXXXXXX.", "X............X");
-                Glyph(c0 - 1, AlertColor, by + 1, "XX", "XX", "XX");
-                Glyph(c0 + 13, AlertColor, by + 1, "XX", "XX", "XX");
+                Glyph(h0, HandleColor, by - 1, ".XXXXXXXXXXXX.", "X............X");
+                Glyph(h0 - 1, AlertColor, by + 1, "XX", "XX", "XX");
+                Glyph(h0 + 13, AlertColor, by + 1, "XX", "XX", "XX");
                 break;
             // A yellow hard hat with a ridge down the middle and a brim all around
             case Hat.HardHat:
-                Glyph(c0 - 1, GoldColor, by - 4, "..XXX..", ".XXXXX.", ".XXXXX.");
-                Glyph(c0 - 1, GoldShade, by - 4, "...X...", "...X...", "...X...", "XXXXXXX");
+                Glyph(h0 - 1, GoldColor, by - 4, "..XXX..", ".XXXXX.", ".XXXXX.");
+                Glyph(h0 - 1, GoldShade, by - 4, "...X...", "...X...", "...X...", "XXXXXXX");
                 break;
             // A grey viking helmet with two white horns curving up
             case Hat.VikingHelmet:
-                Glyph(c0, HelmetColor, by - 3, ".XXX.", "XXXXX", "XXXXX");
-                Glyph(c0, HelmetShade, by - 1, "XXXXX");
-                Glyph(c0 - 2, BoneColor, by - 4, "X.......X", "X.......X", ".X.....X.");
+                Glyph(h0, HelmetColor, by - 3, ".XXX.", "XXXXX", "XXXXX");
+                Glyph(h0, HelmetShade, by - 1, "XXXXX");
+                Glyph(h0 - 2, BoneColor, by - 4, "X.......X", "X.......X", ".X.....X.");
                 break;
             // A colorful beanie with a little propeller on top
             case Hat.PropellerCap:
-                Glyph(c0, SantaRed, by - 2, ".X...", "XX...");
-                Glyph(c0, GoldColor, by - 2, "..X..", "..X..");
-                Glyph(c0, BallColor, by - 2, "...X.", "...XX");
-                Set(c0 + 2, by - 3, HandleColor);
-                Glyph(c0, LeafColor, by - 4, "XX...");
-                Glyph(c0, BallColor, by - 4, "...XX");
+                Glyph(h0, SantaRed, by - 2, ".X...", "XX...");
+                Glyph(h0, GoldColor, by - 2, "..X..", "..X..");
+                Glyph(h0, BallColor, by - 2, "...X.", "...XX");
+                Set(h0 + 2, by - 3, HandleColor);
+                Glyph(h0, LeafColor, by - 4, "XX...");
+                Glyph(h0, BallColor, by - 4, "...XX");
                 break;
             // A golden halo floating above the head
             case Hat.Halo:
-                Glyph(c0, GoldColor, by - 4, ".XXXX.", "X....X", ".XXXX.");
+                Glyph(h0, GoldColor, by - 4, ".XXXX.", "X....X", ".XXXX.");
                 break;
             // A plumber's cap with a round emblem and its letter on the front, the brim reaching out on both sides
             case var plumber when PlumberCaps.TryGetValue(plumber, out var cap):
-                Glyph(c0 - 2, cap.Cap, by - 5, "..XXXXX..", ".XXXXXXX.", "XXXXXXXXX", "XXXXXXXXX");
-                Glyph(c0, cap.Emblem, by - 4, ".XXX.", "XXXXX", "XXXXX");
-                Glyph(c0, cap.Letter, by - 4, cap.Glyph);
-                Glyph(c0 - 3, Blend(cap.Cap, 0xFF000000, 0.25), by - 1, "XXXXXXXXXXX");
+                Glyph(h0 - 2, cap.Cap, by - 5, "..XXXXX..", ".XXXXXXX.", "XXXXXXXXX", "XXXXXXXXX");
+                Glyph(h0, cap.Emblem, by - 4, ".XXX.", "XXXXX", "XXXXX");
+                Glyph(h0, cap.Letter, by - 4, cap.Glyph);
+                Glyph(h0 - 3, Blend(cap.Cap, 0xFF000000, 0.25), by - 1, "XXXXXXXXXXX");
                 break;
             // A princess's crown with jewels on her hair, which frames the face and hangs down the sides
             case var princess when Princesses.TryGetValue(princess, out var royal):
-                Glyph(c0 - 1, royal.Hair, by - 1, ".XXXXXXXXXXXXXX.");
-                Glyph(c0 - 1, royal.Hair, by, "XXXXXXXXXXXXXXXX");
+                Glyph(h0 - 1, royal.Hair, by - 1, ".XXXXXXXXXXXXXX.");
+                Glyph(h0 - 1, royal.Hair, by, "XXXXXXXXXXXXXXXX");
                 for (int i = 1; i <= royal.Locks && f.Squash == 0; i++)
-                    Glyph(c0 - 1, i == royal.Locks ? royal.HairShade : royal.Hair, by + i, "XX............XX");
+                    Glyph(h0 - 1, i == royal.Locks ? royal.HairShade : royal.Hair, by + i, "XX............XX");
                 if (princess == Hat.Rosalina && f.Squash == 0) // her long bang over the left eye
-                    Glyph(c0 + 1, royal.Hair, by + 1, "XXXX", "XXXX", ".XXX", "..X.");
-                Glyph(c0 + 4, royal.Crown, by - 4, "X.XX.X", "XXXXXX", "XXXXXX");
-                Glyph(c0 + 4, royal.CrownShade, by - 2, "XXXXXX");
-                Glyph(c0 + 4, royal.SideJewel, by - 3, ".X..X.");
-                Glyph(c0 + 4, royal.Jewel, by - 3, "..XX..");
+                    Glyph(h0 + 1, royal.Hair, by + 1, "XXXX", "XXXX", ".XXX", "..X.");
+                Glyph(h0 + 4, royal.Crown, by - 4, "X.XX.X", "XXXXXX", "XXXXXX");
+                Glyph(h0 + 4, royal.CrownShade, by - 2, "XXXXXX");
+                Glyph(h0 + 4, royal.SideJewel, by - 3, ".X..X.");
+                Glyph(h0 + 4, royal.Jewel, by - 3, "..XX..");
                 break;
             // Toad's and Toadette's big mushroom caps, white with red spots or pink with white spots
             case Hat.Toad or Hat.Toadette:
             {
                 var (top, spots) = f.Outfit.Hat == Hat.Toad ? (FurWhite, SantaRed) : (0xFFF48FBF, FurWhite);
-                Glyph(c0 - 1, top, by - 4, ".....XXXXXX.....", "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
-                Glyph(c0 - 1, spots, by - 4, "......XXXX......", "...XX......XX...", "..XXX......XXX..", "................");
-                Glyph(c0 - 1, top == FurWhite ? ChefShade : 0xFFD06E9E, by, "XXXXXXXXXXXXXXXX");
+                Glyph(h0 - 1, top, by - 4, ".....XXXXXX.....", "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                Glyph(h0 - 1, spots, by - 4, "......XXXX......", "...XX......XX...", "..XXX......XXX..", "................");
+                Glyph(h0 - 1, top == FurWhite ? ChefShade : 0xFFD06E9E, by, "XXXXXXXXXXXXXXXX");
                 break;
             }
             // Bowser's two horns and his red spiky hair
             case Hat.Bowser:
-                Glyph(c0 - 1, BoneColor, by - 3, "X..............X", ".X............X.", ".XX..........XX.");
-                Glyph(c0 + 3, 0xFFE2591B, by - 3, "X.X.X.X.", "XXXXXXXX", "XXXXXXXX");
+                Glyph(h0 - 1, BoneColor, by - 3, "X..............X", ".X............X.", ".XX..........XX.");
+                Glyph(h0 + 3, 0xFFE2591B, by - 3, "X.X.X.X.", "XXXXXXXX", "XXXXXXXX");
                 break;
             // Birdo's big red bow with white dots
             case Hat.Birdo:
-                Glyph(c0, SantaRed, by - 4, "XX...XX", "XXX.XXX", "XXXXXXX", "XXX.XXX", "XX...XX");
-                Glyph(c0, BindingColor, by - 2, "...X...");
-                Glyph(c0, FurWhite, by - 3, ".X...X.", ".......", "X.....X");
+                Glyph(h0, SantaRed, by - 4, "XX...XX", "XXX.XXX", "XXXXXXX", "XXX.XXX", "XX...XX");
+                Glyph(h0, BindingColor, by - 2, "...X...");
+                Glyph(h0, FurWhite, by - 3, ".X...X.", ".......", "X.....X");
                 break;
             // A football helmet in a team's colors around the whole head: the shell with a stripe down the middle,
             // ear flaps down the sides and a face mask bar below the eyes (just the shell on a squashed pet)
             case var team when FootballHelmets.TryGetValue(team, out var helmet):
-                Glyph(c0 + 4, helmet.Shell, by - 2, "XXXXXX");
-                Glyph(c0 + 1, helmet.Shell, by - 1, "XXXXXXXXXXXX");
-                Glyph(c0 - 1, helmet.Shell, by, "XXXXXXXXXXXXXXXX");
-                Glyph(c0 + 6, helmet.Stripe, by - 2, "XX", "XX", "XX");
+                Glyph(h0 + 4, helmet.Shell, by - 2, "XXXXXX");
+                Glyph(h0 + 1, helmet.Shell, by - 1, "XXXXXXXXXXXX");
+                Glyph(h0 - 1, helmet.Shell, by, "XXXXXXXXXXXXXXXX");
+                Glyph(h0 + 6, helmet.Stripe, by - 2, "XX", "XX", "XX");
                 if (f.Squash == 0)
                 {
                     uint flap = Blend(helmet.Shell, 0xFF000000, 0.22);
-                    Glyph(c0 - 1, flap, by + 1, "XX............XX", "XX............XX", "XX............XX");
-                    Glyph(c0, helmet.Mask, by + 4, "XXXXXXXXXXXXXX");
+                    Glyph(h0 - 1, flap, by + 1, "XX............XX", "XX............XX", "XX............XX");
+                    Glyph(h0, helmet.Mask, by + 4, "XXXXXXXXXXXXXX");
                 }
                 break;
         }
@@ -735,21 +751,14 @@ public static class Sprite
                 (int x, int y)[] dots = [(c0 + 10, 3), (c0 + 12, 2), (c0 + 14, 1)];
                 for (int i = 0; i < count; i++) Set(dots[i].x, dots[i].y, MarkColor);
                 break;
-            case Mark.Exclaim:
-                for (int y = 0; y <= 1; y++) { Set(c0 + 6, y, AlertColor); Set(c0 + 7, y, AlertColor); }
-                Set(c0 + 6, 3, AlertColor); Set(c0 + 7, 3, AlertColor);
-                break;
+            // "!" and "?" are not drawn here but in a thought cloud beside the head (RenderThought)
             // One Z drifting away from the head, then a short pause
             case Mark.Zzz1: Z(c0 + 11, 0); break;
             case Mark.Zzz2: Z(c0 + 13, 0); break;
             case Mark.Zzz3: break;
-            // The assistant sessions: a question is waiting
-            case Mark.Question:
-                Glyph(c0 + 5, QuestionColor, 0, "XXX", "..X", ".XX", "...", ".X.");
-                break;
             // Emotes: hearts drifting up, a cookie on its way into the mouth, crumbs on the chin, a juggled ball
-            case Mark.Heart1: Glyph(c0 + 9, HeartColor, 1, "XX.XX", "XXXXX", ".XXX.", "..X.."); break;
-            case Mark.Heart2: Glyph(c0 + 11, HeartColor, 0, "XX.XX", "XXXXX", ".XXX.", "..X.."); break;
+            case Mark.Heart1: Glyph(c0 + 11, HeartColor, 0, "XX.XX", "XXXXX", ".XXX.", "..X.."); break;
+            case Mark.Heart2: Glyph(c0 + 13, HeartColor, 0, "XX.XX", "XXXXX", ".XXX.", "..X.."); break;
             case Mark.Cookie:
                 Glyph(c0 + 5, CookieColor, 0, ".XXX.", "XXXXX", "XXXXX", ".XXX.");
                 Glyph(c0 + 5, ChipColor, 0, ".....", ".X...", "...X.", ".....");
@@ -869,10 +878,10 @@ public static class Sprite
             }
     }
 
-    private static BitmapSource ToBitmap(uint[] px)
+    private static BitmapSource ToBitmap(uint[] px, int width = Width, int height = Height)
     {
-        var bitmap = new WriteableBitmap(Width, Height, 96, 96, PixelFormats.Bgra32, null);
-        bitmap.WritePixels(new Int32Rect(0, 0, Width, Height), px, Width * 4, 0);
+        var bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
+        bitmap.WritePixels(new Int32Rect(0, 0, width, height), px, width * 4, 0);
         bitmap.Freeze();
         return bitmap;
     }
@@ -956,6 +965,51 @@ public static class Sprite
         bitmap.Freeze();
         SplatCache[step] = bitmap;
         return bitmap;
+    }
+
+    /// <summary>Size of the thought cloud's picture (<see cref="RenderThought"/>).</summary>
+    public const int ThoughtWidth = 17, ThoughtHeight = 17;
+    /// <summary>
+    /// Where the thought cloud's picture starts, in the pet's grid: up and to the right of the head, beyond the
+    /// pet's picture, with the little puffs at its bottom left just above the head's corner.
+    /// </summary>
+    public const int ThoughtX = 18, ThoughtY = -12;
+    private static readonly Dictionary<(Mark Mark, bool Left), BitmapSource> ThoughtCache = new();
+
+    /// <summary>
+    /// A thought cloud with a "!" (<see cref="Mark.Exclaim"/>) or a "?" (<see cref="Mark.Question"/>) in it: bumpy,
+    /// white with a dark outline, two little puffs trailing down to the head. <paramref name="left"/> mirrors it for
+    /// the left of the head (the sign itself stays the right way round).
+    /// </summary>
+    public static BitmapSource RenderThought(Mark mark, bool left)
+    {
+        if (ThoughtCache.TryGetValue((mark, left), out var cached)) return cached;
+        var px = new uint[ThoughtWidth * ThoughtHeight];
+        void Set(int x, int y, uint c)
+        {
+            if (left) x = ThoughtWidth - 1 - x;
+            if (x >= 0 && x < ThoughtWidth && y >= 0 && y < ThoughtHeight) px[y * ThoughtWidth + x] = c;
+        }
+        // The cloud: overlapping circles, outlined where they meet the outside
+        (double X, double Y, double R)[] blobs =
+            [(5.2, 3.6, 2.3), (8.6, 2.4, 2.4), (12.0, 3.4, 2.3), (3.6, 6.2, 2.2), (14.0, 6.2, 2.1), (6.4, 8.4, 2.1), (10.6, 8.6, 2.2), (8.8, 5.8, 3.4)];
+        bool Inside(int x, int y) => blobs.Any(b => (x - b.X) * (x - b.X) + (y - b.Y) * (y - b.Y) <= b.R * b.R);
+        for (int y = 0; y < ThoughtHeight; y++)
+            for (int x = 0; x < ThoughtWidth; x++)
+                if (Inside(x, y))
+                    Set(x, y, Inside(x - 1, y) && Inside(x + 1, y) && Inside(x, y - 1) && Inside(x, y + 1) ? White : CloudOutline);
+        // Two puffs trailing down and left to the head
+        Set(2, 12, CloudOutline); Set(1, 13, CloudOutline); Set(3, 13, CloudOutline); Set(2, 14, CloudOutline); Set(2, 13, White);
+        Set(0, 16, CloudOutline);
+        // The sign in the middle of the cloud, not mirrored
+        string[] sign = mark == Mark.Question ? [".XXX.", "XX.XX", "..XX.", ".....", "..X.."] : ["XX", "XX", "XX", "..", "XX"];
+        uint color = mark == Mark.Question ? QuestionColor : AlertColor;
+        int signLeft = 9 - (sign[0].Length + 1) / 2;
+        if (left) signLeft = ThoughtWidth - signLeft - sign[0].Length;
+        for (int y = 0; y < sign.Length; y++)
+            for (int i = 0; i < sign[y].Length; i++)
+                if (sign[y][i] == 'X') px[(3 + y) * ThoughtWidth + signLeft + i] = color;
+        return ThoughtCache[(mark, left)] = ToBitmap(px, ThoughtWidth, ThoughtHeight);
     }
 
     /// <summary>Extra pixels on each side of the tear layer, so wailing tears can fly out past the pet's picture.</summary>
