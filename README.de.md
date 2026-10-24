@@ -30,7 +30,7 @@ Panik → schläft bis zum Reset.
   den Zeiger über das Pet, springt es dreimal danach und bricht dann in Tränen aus (abschaltbar)
 - 🎨 **Deine Farbe**: das Pet in beliebiger Farbe, eingestellt im Inventar; Usage-Fenster, Menüs und Sprechblasen übernehmen sie als Akzentfarbe
 - 👑 **Eine Garderobe pro Modell**: ab Werk eine Krone bei Opus, eine Sonnenbrille bei Sonnet, eine kleine Blume bei Haiku und ein Zauberhut bei Fable; im Inventar (Rechtsklick → **Inventar…**) ziehst du jedes Modell selbst an, mit Hüten, Brillen, Schnurrbart, Fliege, Schal und mehr (abschaltbar)
-- 🏆 **Erfolge**: 14 Dinge, die ihr zusammen schafft, von der ersten Session über 25 Kekse bis zur ersten gemeinsamen Nacht; jeder schaltet ein Kostüm für die Garderobe frei, und das Pet jubelt dabei. Gezählt wird nur auf deinem Rechner
+- 🏆 **Erfolge**: 15 Dinge, die ihr zusammen schafft, von der ersten Session über 25 Kekse bis zur ersten gemeinsamen Nacht; jeder schaltet ein Kostüm für die Garderobe frei, und das Pet jubelt dabei. Gezählt wird nur auf deinem Rechner
 - 🎃 **Saisonale Kopfbedeckung**: Hexenhut und Besen im Oktober, Weihnachtsmütze bis Weihnachten, Hasenohren an Ostern und ein Partyhut
   an Silvester und deinem Geburtstag; sie ersetzen die Kopfbedeckung des Modells (abschaltbar)
 - 🌙 **Nachtmodus**: zwischen 23 und 6 Uhr (einstellbar) trägt das Pet eine Schlafmütze und sagt gute Nacht; auf der Taskleiste

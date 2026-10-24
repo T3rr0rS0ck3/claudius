@@ -247,7 +247,7 @@ public partial class InventoryWindow : Window
         _pictures.Add((WardrobePreview, () => Smiling(Dressed)));
 
         foreach (var hat in Enum.GetValues<Hat>())
-            AddItem(HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
+            AddItem(Sprite.IsFootballHelmet(hat) ? HelmetItems : HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
         foreach (var face in Enum.GetValues<FaceWear>())
             AddItem(FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
         foreach (var neck in Enum.GetValues<Neckwear>())
