@@ -1,6 +1,6 @@
 <Project>
 
-  <!-- File metadata of the released binaries. Code signing checks the product name against the project's. -->
+  <!-- File metadata of the released binaries. -->
   <PropertyGroup>
     <Product>Claudius - KI Usage Pet</Product>
     <Company>T3rr0rS0ck3</Company>
