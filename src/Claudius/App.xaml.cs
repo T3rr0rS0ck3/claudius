@@ -221,10 +221,10 @@ public partial class App : Application
         if (_announcements.Count == 0 || _pet.Speaking) return;
         var achievement = _announcements.Dequeue();
         _pet.Cheer(TimeSpan.FromSeconds(3));
-        (string, string)[] extra = [("{achievement}", Strings.AchievementTitle(achievement.Id)), ("{item}", Strings.ItemName(achievement.Reward))];
+        (string, string)[] extra = [("{achievement}", Strings.AchievementTitle(achievement.Id)), ("{item}", Strings.RewardName(achievement))];
         if (Settings.SpeechBubbles) Say("Achievement", extra: extra);
         else if (Settings.Notifications)
-            ShowNotification("Claudius", Strings.AchievementNotification(Strings.AchievementTitle(achievement.Id), Strings.ItemName(achievement.Reward)));
+            ShowNotification("Claudius", Strings.AchievementNotification(Strings.AchievementTitle(achievement.Id), Strings.RewardName(achievement)));
     }
 
     private void Evaluate(bool initial)
