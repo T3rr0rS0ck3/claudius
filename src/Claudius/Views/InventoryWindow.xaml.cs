@@ -142,6 +142,8 @@ public partial class InventoryWindow : Window
 
     private void Title_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
+        // DragMove keeps the mouse until it is released, so the close button would never see its click.
+        if (e.OriginalSource == CloseButton) return;
         try { DragMove(); } catch (InvalidOperationException) { }
     }
 

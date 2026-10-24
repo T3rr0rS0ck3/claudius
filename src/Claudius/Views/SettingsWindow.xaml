@@ -37,7 +37,7 @@
               MouseLeftButtonDown="Title_MouseLeftButtonDown">
             <TextBlock Text="{x:Static core:Strings.SettingsHeading}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" FontSize="14"
                        FontFamily="Consolas" HorizontalAlignment="Center" />
-            <TextBlock Text="✕" Foreground="#77736B" FontSize="12" Cursor="Hand" HorizontalAlignment="Right"
+            <TextBlock x:Name="CloseButton" Text="✕" Foreground="#77736B" FontSize="12" Cursor="Hand" HorizontalAlignment="Right"
                        VerticalAlignment="Center" MouseLeftButtonUp="Close_Click" ToolTip="{x:Static core:Strings.Close}" />
         </Grid>
 
