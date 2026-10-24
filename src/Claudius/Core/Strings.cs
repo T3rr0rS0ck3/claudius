@@ -275,6 +275,7 @@ public static class Strings
     public static string SlotFanScarves => L("Fan scarves", "Fanschals");
     public static string SlotFootballHelmets => L("Football helmets", "Footballhelme");
     public static string SlotMario => "Super Mario";
+    public static string SlotDisney => "Disney";
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
@@ -339,6 +340,21 @@ public static class Strings
         Hat.Toadette => L("Toadette's cap", "Toadettes Pilzkappe"),
         Hat.Bowser => L("Bowser's horns", "Bowsers Hörner"),
         Hat.Birdo => L("Birdo's bow", "Birdos Schleife"),
+        Hat.MickeyEars => L("Mickey's ears", "Mickys Ohren"),
+        Hat.Minnie => L("Minnie's ears and bow", "Minnies Ohren mit Schleife"),
+        Hat.Donald => L("Donald's sailor cap", "Donalds Matrosenmütze"),
+        Hat.Goofy => L("Goofy's hat", "Goofys Hut"),
+        Hat.Sorcerer => L("Sorcerer's apprentice hat", "Zauberlehrling-Hut"),
+        Hat.Elsa => L("Elsa's crown and braid", "Elsas Krone und Zopf"),
+        Hat.SnowWhite => L("Snow White's bow", "Schneewittchens Schleife"),
+        Hat.Ariel => L("Ariel's hair", "Arielles Haare"),
+        Hat.DaisyDuck => L("Daisy Duck's bow", "Daisy Ducks Schleife"),
+        Hat.Huey => L("Huey's cap", "Ticks Kappe"),
+        Hat.Dewey => L("Dewey's cap", "Tricks Kappe"),
+        Hat.Louie => L("Louie's cap", "Tracks Kappe"),
+        Hat.Chip => L("Chip's hat", "Chips Hut"),
+        Hat.Simba => L("Simba's mane", "Simbas Mähne"),
+        Hat.Timon => L("Timon's tuft of hair", "Timons Haarbüschel"),
         _ => Nothing,
     };
     public static string FaceName(FaceWear face) => face switch
@@ -349,6 +365,9 @@ public static class Strings
         FaceWear.Moustache => L("Moustache", "Schnurrbart"),
         FaceWear.EyePatch => L("Eye patch", "Augenklappe"),
         FaceWear.ShyGuy => L("Shy Guy's mask", "Shy Guys Maske"),
+        FaceWear.WallE => L("WALL·E's eyes", "WALL·Es Augen"),
+        FaceWear.Eve => L("EVE's visor", "EVEs Visier"),
+        FaceWear.Pumbaa => L("Pumbaa's snout and tusks", "Pumbaas Schnauze und Hauer"),
         _ => Nothing,
     };
     public static string NeckName(Neckwear neck) => neck switch
@@ -373,6 +392,7 @@ public static class Strings
         Neckwear.Paderborn => "SC Paderborn 07",
         Neckwear.Stuttgart => "VfB Stuttgart",
         Neckwear.DonkeyKong => L("Donkey Kong's tie", "Donkey Kongs Krawatte"),
+        Neckwear.Dale => L("Dale's Hawaiian shirt", "Chaps Hawaiihemd"),
         _ => Nothing,
     };
     public static string ItemName(Outfit item) =>
@@ -383,6 +403,7 @@ public static class Strings
         AchievementId.FootballFan => SlotFanScarves,
         AchievementId.HardLandings => SlotFootballHelmets,
         AchievementId.Wahoo => L("Super Mario costumes", "Super-Mario-Kostüme"),
+        AchievementId.OnceUponATime => L("Disney costumes", "Disney-Kostüme"),
         _ => ItemName(achievement.Reward),
     };
     public static string TabAchievements => L("Achievements", "Erfolge");
@@ -403,6 +424,7 @@ public static class Strings
         AchievementId.FootballFan => L("A thousand friends", "Tausend Freunde"),
         AchievementId.HardLandings => L("Tough cookie", "Hart im Nehmen"),
         AchievementId.Wahoo => "Wahoo!",
+        AchievementId.OnceUponATime => L("Once upon a time…", "Es war einmal …"),
         _ => L("Party mood", "Feierlaune"),
     };
     public static string AchievementHint(AchievementId id) => id switch
@@ -424,6 +446,7 @@ public static class Strings
         AchievementId.HardLandings => L("Let Claudius fall from high up 100 times, until it goes splat.",
             "Lass Claudius 100-mal so tief fallen, dass es platscht."),
         AchievementId.Wahoo => L("Watch Claudius jump 500 times.", "Sieh Claudius 500-mal springen."),
+        AchievementId.OnceUponATime => L("Pat Claudius 100 times.", "Streichle Claudius 100-mal."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
     };

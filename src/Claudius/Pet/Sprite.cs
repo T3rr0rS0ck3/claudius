@@ -29,9 +29,11 @@ public enum Hat
     FortyNiners, Seahawks, Buccaneers, Titans, Commanders,
     // The Super Mario characters
     Mario, Luigi, Wario, Waluigi, Peach, Daisy, Rosalina, Toad, Toadette, Bowser, Birdo,
+    // Disney characters
+    MickeyEars, Minnie, Donald, Goofy, Sorcerer, Elsa, SnowWhite, Ariel, DaisyDuck, Huey, Dewey, Louie, Chip, Simba, Timon,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
-public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy }
+public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy, WallE, Eve, Pumbaa }
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
 public enum Neckwear
 {
@@ -41,6 +43,8 @@ public enum Neckwear
     Mainz, Gladbach, Bayern, Paderborn, Stuttgart,
     // Donkey Kong's tie
     DonkeyKong,
+    // Dale's Hawaiian shirt
+    Dale,
 }
 /// <summary>The AI model families the pet dresses up for; <see cref="Other"/> for unknown models and none.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<ModelFamily>))]
@@ -250,6 +254,11 @@ public static class Sprite
         _ => 0,
     };
 
+    /// <summary>Whether this costume item belongs to a Disney character.</summary>
+    public static bool IsDisneyCostume(Outfit item) =>
+        item.Hat is >= Hat.MickeyEars and <= Hat.Timon || item.Face is FaceWear.WallE or FaceWear.Eve or FaceWear.Pumbaa
+        || item.Neck == Neckwear.Dale;
+
     /// <summary>Whether this costume item belongs to a Super Mario character.</summary>
     public static bool IsMarioCostume(Outfit item) =>
         item.Hat is >= Hat.Mario and <= Hat.Birdo || item.Face == FaceWear.ShyGuy || item.Neck == Neckwear.DonkeyKong;
@@ -452,7 +461,7 @@ public static class Sprite
             }
         }
         // Behind sunglasses the eyes stay hidden, even where looking up or down would peek past the lenses
-        if (f.Outfit.Face is not (FaceWear.Sunglasses or FaceWear.ShyGuy))
+        if (f.Outfit.Face is not (FaceWear.Sunglasses or FaceWear.ShyGuy or FaceWear.WallE or FaceWear.Eve))
         {
             Eye(c0 + 3, -1);
             Eye(c0 + 10, 1);
@@ -527,6 +536,24 @@ public static class Sprite
                     Glyph(c0 + 1, FurWhite, by + 1, "..XXXXXXXX..", ".XXXXXXXXXX.", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.", "..XXXXXXXX..");
                     Glyph(c0 + 1, EyeColor, by + 2, "...X....X...", "...X....X...", "............", ".....XX.....");
                     break;
+                // WALL-E's eyes: two grey binocular boxes with dark lenses, joined in the middle
+                case FaceWear.WallE:
+                    Glyph(c0 + 1, HelmetColor, by + 1, "XXXXX..XXXXX", "XXXXXXXXXXXX", "XXXXX..XXXXX", "XXXXX..XXXXX");
+                    Glyph(c0 + 1, LensColor, by + 2, ".XXX....XXX.", ".XXX....XXX.");
+                    Set(c0 + 2, by + 2, GlintColor);
+                    Set(c0 + 9, by + 2, GlintColor);
+                    break;
+                // Pumbaa's snout with two nostrils, between two white tusks curving up
+                case FaceWear.Pumbaa:
+                    Glyph(c0 + 4, 0xFF8A5A44, by + 4, ".XXXX.", "XXXXXX", ".XXXX.");
+                    Glyph(c0 + 5, EyeColor, by + 5, "X..X");
+                    Glyph(c0 + 2, FurWhite, by + 3, "X........X", "X........X", ".X......X.");
+                    break;
+                // EVE's face: a black visor with two glowing blue eyes
+                case FaceWear.Eve:
+                    Glyph(c0 + 1, EyeColor, by + 1, ".XXXXXXXXXX.", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.");
+                    Glyph(c0 + 1, 0xFF5EC8F2, by + 2, "..XX....XX..", "..XX....XX..");
+                    break;
             }
             switch (f.Outfit.Neck)
             {
@@ -553,6 +580,12 @@ public static class Sprite
                     Glyph(c0 + 5, SantaRed, by + 7, ".XX.", "XXXX", ".XX.", ".XX.");
                     Glyph(c0 + 6, BindingColor, by + 7, "XX");
                     Glyph(c0 + 6, GoldColor, by + 8, "X");
+                    break;
+                // Dale's red Hawaiian shirt with yellow flowers and a white collar
+                case Neckwear.Dale:
+                    Glyph(c0, SantaRed, by + 7, "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX");
+                    Glyph(c0, 0xFFF5C400, by + 7, ".X........X...", "...X....X....X");
+                    Glyph(c0 + 5, FurWhite, by + 7, "X..X", ".XX.");
                     break;
                 // A fan scarf in a club's colors, one end hanging down between the legs
                 case var club when FanScarves.TryGetValue(club, out var scarf):
@@ -677,6 +710,92 @@ public static class Sprite
                 Glyph(h0, SantaRed, by - 4, "XX...XX", "XXX.XXX", "XXXXXXX", "XXX.XXX", "XX...XX");
                 Glyph(h0, BindingColor, by - 2, "...X...");
                 Glyph(h0, FurWhite, by - 3, ".X...X.", ".......", "X.....X");
+                break;
+            // Mickey's round black ears; Minnie's with a red bow with white dots between them
+            case Hat.MickeyEars or Hat.Minnie:
+                Glyph(c0, EyeColor, by - 4, ".XX.", "XXXX", "XXXX", ".XX.");
+                Glyph(c0 + 10, EyeColor, by - 4, ".XX.", "XXXX", "XXXX", ".XX.");
+                if (hat == Hat.Minnie)
+                {
+                    Glyph(c0 + 4, SantaRed, by - 3, "XX..XX", "XXXXXX", "XX..XX");
+                    Glyph(c0 + 6, BindingColor, by - 2, "XX");
+                    Glyph(c0 + 4, FurWhite, by - 3, ".X....", "......", "....X.");
+                }
+                break;
+            // Donald's blue sailor cap with a black band, its ribbon fluttering to the right
+            case Hat.Donald:
+                Glyph(c0 + 3, 0xFF3B6FD4, by - 3, ".XXXXXX.", "XXXXXXXX");
+                Glyph(c0 + 3, EyeColor, by - 1, "XXXXXXXX");
+                Glyph(c0 + 11, EyeColor, by - 1, "X.", ".X");
+                break;
+            // Goofy's crumpled green hat with a black band
+            case Hat.Goofy:
+                Glyph(c0 + 4, 0xFF3F8F3A, by - 5, ".XXX..", ".XXXX.", "XXXXXX");
+                Glyph(c0 + 4, EyeColor, by - 2, "XXXXXX");
+                Glyph(c0 + 3, 0xFF3F8F3A, by - 1, "XXXXXXXX");
+                break;
+            // The sorcerer's apprentice: a tall blue pointed hat with a golden moon and star
+            case Hat.Sorcerer:
+                Glyph(c0 + 3, 0xFF2E4FB8, by - 5, "...X...", "..XXX..", "..XXX..", ".XXXXX.", "XXXXXXX");
+                Set(c0 + 7, by - 4, GoldColor);
+                Glyph(c0 + 4, GoldColor, by - 2, "X.", ".X");
+                break;
+            // Elsa: platinum hair with a long braid over the left shoulder and an icy crown
+            case Hat.Elsa:
+            {
+                uint hair = 0xFFF2EBD3, braid = 0xFFD2C9A8;
+                Glyph(c0 - 1, hair, by - 1, ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                if (f.Squash == 0)
+                {
+                    Glyph(c0 + 13, hair, by + 1, "XX", "XX");
+                    Glyph(c0 - 1, hair, by + 1, "XX", "XX", "XX", "XX", "XX", ".X");
+                    Glyph(c0 - 1, braid, by + 2, "X.", "..", ".X", "..", "X.");
+                }
+                Glyph(c0 + 4, 0xFFB8E4F5, by - 3, "X.XX.X", "XXXXXX");
+                Glyph(c0 + 6, 0xFF3B6FE0, by - 2, "XX");
+                break;
+            }
+            // Snow White: a short black bob with a red bow on top
+            case Hat.SnowWhite:
+                Glyph(c0 - 1, 0xFF1E1E2E, by - 1, ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                if (f.Squash == 0) Glyph(c0 - 1, 0xFF1E1E2E, by + 1, "XX............XX", "XX............XX");
+                Glyph(c0 + 4, SantaRed, by - 3, "XX..XX", "XXXXXX");
+                Glyph(c0 + 6, BindingColor, by - 3, "XX");
+                break;
+            // Ariel: long red hair, swept up high over the head and down both sides
+            case Hat.Ariel:
+                Glyph(c0 - 1, 0xFFE2382A, by - 2, "...XXXXXXXXX....", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                for (int i = 1; i <= 6 && f.Squash == 0; i++)
+                    Glyph(c0 - 1, i == 6 ? 0xFFB02A20 : 0xFFE2382A, by + i, "XX............XX");
+                break;
+            // Daisy Duck's big purple bow
+            case Hat.DaisyDuck:
+                Glyph(c0 + 3, 0xFFC47BD6, by - 3, "XXX..XXX", "XXXXXXXX", "XXX..XXX");
+                Glyph(c0 + 6, 0xFF9A55B0, by - 2, "XX");
+                break;
+            // Huey's, Dewey's and Louie's caps: red, blue and green
+            case Hat.Huey or Hat.Dewey or Hat.Louie:
+            {
+                uint color = hat switch { Hat.Huey => SantaRed, Hat.Dewey => CapColor, _ => 0xFF3F8F3A };
+                Glyph(c0 + 4, color, by - 4, ".XXXX.", "XXXXXX", "XXXXXX");
+                Glyph(c0 + 3, Blend(color, 0xFF000000, 0.25), by - 1, "XXXXXXXX");
+                break;
+            }
+            // Chip's brown fedora with a dark band
+            case Hat.Chip:
+                Glyph(c0 + 4, CowboyColor, by - 4, ".XXXX.", "XXXXXX");
+                Glyph(c0 + 4, 0xFF3A2414, by - 2, "XXXXXX");
+                Glyph(c0 + 2, CowboyShade, by - 1, "XXXXXXXXXX");
+                break;
+            // Simba's mane: a shaggy orange-brown mane around the whole head
+            case Hat.Simba:
+                Glyph(c0 - 1, 0xFFC0702A, by - 2, "..X.X.X..X.X.X..", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                for (int i = 1; i <= 5 && f.Squash == 0; i++)
+                    Glyph(c0 - 1, i == 5 ? 0xFF8A4A1C : 0xFFC0702A, by + i, "XX............XX");
+                break;
+            // Timon's red tuft of hair, sticking up
+            case Hat.Timon:
+                Glyph(c0 + 4, 0xFFC2452D, by - 3, "X.X.X.", ".XXXX.", "XXXXXX");
                 break;
             // A football helmet in a team's colors around the whole head: the shell with a stripe down the middle,
             // ear flaps down the sides and a face mask bar below the eyes (just the shell on a squashed pet)

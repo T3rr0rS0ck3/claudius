@@ -104,6 +104,8 @@
                             <WrapPanel x:Name="HelmetItems" />
                             <TextBlock Text="{x:Static core:Strings.SlotMario}" Style="{StaticResource SlotLabel}" />
                             <WrapPanel x:Name="MarioItems" />
+                            <TextBlock Text="{x:Static core:Strings.SlotDisney}" Style="{StaticResource SlotLabel}" />
+                            <WrapPanel x:Name="DisneyItems" />
                         </StackPanel>
                     </ScrollViewer>
                     <TextBlock x:Name="LockText" Style="{StaticResource Hint}" FontSize="12" Margin="2,8,0,0" Visibility="Collapsed" />
