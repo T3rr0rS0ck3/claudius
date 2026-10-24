@@ -241,6 +241,43 @@ public static class AssistantSetup
         Save(root);
     }
 
+    // ---------------------------------------------------------------- model and effort (inventory)
+
+    /// <summary>The <c>model</c> new sessions start with, or null for the account's default.</summary>
+    public static string? CurrentModel() => Load()?["model"]?.GetValue<string>();
+
+    /// <summary>Sets <c>model</c> for new sessions; null removes it, so the account's default applies again.</summary>
+    public static void SetModel(string? model)
+    {
+        if (CurrentModel() == model) return;
+        var root = Load() ?? new JsonObject();
+        Backup();
+        if (model == null) root.Remove("model");
+        else root["model"] = model;
+        Save(root);
+    }
+
+    /// <summary>
+    /// The effort level saved for a model (<c>modelSettings.&lt;id&gt;.effortLevel</c>), or null if it starts at its
+    /// own default. The top-level <c>effortLevel</c> is not read: newer models ignore it.
+    /// </summary>
+    public static string? CurrentEffort(string model) => Load()?["modelSettings"]?[model]?["effortLevel"]?.GetValue<string>();
+
+    /// <summary>Saves the effort level for a model; null removes it, other fields of its entry are kept.</summary>
+    public static void SetEffort(string model, string? level)
+    {
+        if (CurrentEffort(model) == level) return;
+        var root = Load() ?? new JsonObject();
+        Backup();
+        if (root["modelSettings"] is not JsonObject models) root["modelSettings"] = models = new JsonObject();
+        if (models[model] is not JsonObject entry) models[model] = entry = new JsonObject();
+        if (level == null) entry.Remove("effortLevel");
+        else entry["effortLevel"] = level;
+        if (entry.Count == 0) models.Remove(model);
+        if (models.Count == 0) root.Remove("modelSettings");
+        Save(root);
+    }
+
     /// <summary>The <c>theme</c> currently selected in the assistant's settings.json, or null if none is set.</summary>
     public static string? CurrentTheme()
     {
