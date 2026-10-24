@@ -239,13 +239,13 @@ public static class Sprite
 
     /// <summary>
     /// How far a hat is moved right from where its picture starts, so that it sits in the middle of the head; the
-    /// ones that already span the whole head stay where they are.
+    /// ones that already span the whole head stay where they are, and so does the flower tucked in at the side.
     /// </summary>
     private static int HatShift(Hat hat) => hat switch
     {
         Hat.WizardHat or Hat.CowboyHat => 5,
         Hat.Birdo => 3,
-        Hat.Crown or Hat.Flower or Hat.TopHat or Hat.ChefHat or Hat.Cap or Hat.HardHat or Hat.VikingHelmet
+        Hat.Crown or Hat.TopHat or Hat.ChefHat or Hat.Cap or Hat.HardHat or Hat.VikingHelmet
             or Hat.PropellerCap or Hat.Halo or Hat.Mario or Hat.Luigi or Hat.Wario or Hat.Waluigi => 4,
         _ => 0,
     };
@@ -1088,6 +1088,22 @@ public static class Sprite
         bitmap.Freeze();
         BedCache[layer] = bitmap;
         return bitmap;
+    }
+
+    /// <summary>
+    /// The icon of the app's windows in the taskbar: the smiling pet in its current color, cropped to the creature
+    /// and scaled up with hard edges onto a square, like the tray icon.
+    /// </summary>
+    public static BitmapSource WindowIcon()
+    {
+        const int cropX = 2, cropY = 4, cropW = 18, cropH = 12, k = 3, size = cropW * k;
+        var pixels = Pixels(new SpriteFrame(Eyes.Normal, Mouth.Smile));
+        var px = new uint[size * size];
+        int top = (size - cropH * k) / 2;
+        for (int y = 0; y < cropH * k; y++)
+            for (int x = 0; x < size; x++)
+                px[(top + y) * size + x] = pixels[(cropY + y / k) * Width + cropX + x / k];
+        return ToBitmap(px, size, size);
     }
 
     /// <summary>Small tray icon showing the pet for the given frame.</summary>

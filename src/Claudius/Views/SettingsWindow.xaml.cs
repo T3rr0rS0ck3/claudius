@@ -68,6 +68,7 @@ public partial class SettingsWindow : Window
     public SettingsWindow(App app, AppSettings settings)
     {
         InitializeComponent();
+        Icon = Sprite.WindowIcon();
         // Scroll instead of growing past the screen; Escape closes like a normal dialog.
         MaxHeight = SystemParameters.WorkArea.Height - 20;
         PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.Escape) Close(); };
