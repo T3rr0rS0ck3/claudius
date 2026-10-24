@@ -247,11 +247,11 @@ public partial class InventoryWindow : Window
         _pictures.Add((WardrobePreview, () => Smiling(Dressed)));
 
         foreach (var hat in Enum.GetValues<Hat>())
-            AddItem(Sprite.IsFootballHelmet(hat) ? HelmetItems : HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
+            AddItem(Sprite.IsMarioCostume(new(hat)) ? MarioItems : Sprite.IsFootballHelmet(hat) ? HelmetItems : HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
         foreach (var face in Enum.GetValues<FaceWear>())
-            AddItem(FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
+            AddItem(Sprite.IsMarioCostume(new(Face: face)) ? MarioItems : FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
         foreach (var neck in Enum.GetValues<Neckwear>())
-            AddItem(Sprite.IsFanScarf(neck) ? FanScarfItems : NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
+            AddItem(Sprite.IsMarioCostume(new(Neck: neck)) ? MarioItems : Sprite.IsFanScarf(neck) ? FanScarfItems : NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
     }
 
     /// <summary>

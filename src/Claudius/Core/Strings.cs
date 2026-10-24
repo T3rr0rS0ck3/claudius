@@ -274,6 +274,7 @@ public static class Strings
     public static string SlotNeck => L("Neck", "Hals");
     public static string SlotFanScarves => L("Fan scarves", "Fanschals");
     public static string SlotFootballHelmets => L("Football helmets", "Footballhelme");
+    public static string SlotMario => "Super Mario";
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
@@ -327,6 +328,17 @@ public static class Strings
         Hat.Buccaneers => "Tampa Bay Buccaneers",
         Hat.Titans => "Tennessee Titans",
         Hat.Commanders => "Washington Commanders",
+        Hat.Mario => L("Mario's cap", "Marios Mütze"),
+        Hat.Luigi => L("Luigi's cap", "Luigis Mütze"),
+        Hat.Wario => L("Wario's cap", "Warios Mütze"),
+        Hat.Waluigi => L("Waluigi's cap", "Waluigis Mütze"),
+        Hat.Peach => L("Peach's crown", "Peachs Krone"),
+        Hat.Daisy => L("Daisy's crown", "Daisys Krone"),
+        Hat.Rosalina => L("Rosalina's crown", "Rosalinas Krone"),
+        Hat.Toad => L("Toad's cap", "Toads Pilzkappe"),
+        Hat.Toadette => L("Toadette's cap", "Toadettes Pilzkappe"),
+        Hat.Bowser => L("Bowser's horns", "Bowsers Hörner"),
+        Hat.Birdo => L("Birdo's bow", "Birdos Schleife"),
         _ => Nothing,
     };
     public static string FaceName(FaceWear face) => face switch
@@ -336,6 +348,7 @@ public static class Strings
         FaceWear.Monocle => L("Monocle", "Monokel"),
         FaceWear.Moustache => L("Moustache", "Schnurrbart"),
         FaceWear.EyePatch => L("Eye patch", "Augenklappe"),
+        FaceWear.ShyGuy => L("Shy Guy's mask", "Shy Guys Maske"),
         _ => Nothing,
     };
     public static string NeckName(Neckwear neck) => neck switch
@@ -359,6 +372,7 @@ public static class Strings
         Neckwear.Bayern => "FC Bayern München",
         Neckwear.Paderborn => "SC Paderborn 07",
         Neckwear.Stuttgart => "VfB Stuttgart",
+        Neckwear.DonkeyKong => L("Donkey Kong's tie", "Donkey Kongs Krawatte"),
         _ => Nothing,
     };
     public static string ItemName(Outfit item) =>
@@ -368,6 +382,7 @@ public static class Strings
     {
         AchievementId.FootballFan => SlotFanScarves,
         AchievementId.HardLandings => SlotFootballHelmets,
+        AchievementId.Wahoo => L("Super Mario costumes", "Super-Mario-Kostüme"),
         _ => ItemName(achievement.Reward),
     };
     public static string TabAchievements => L("Achievements", "Erfolge");
@@ -387,6 +402,7 @@ public static class Strings
         AchievementId.ModelsTried => L("Connoisseur", "Modellkenner"),
         AchievementId.FootballFan => L("A thousand friends", "Tausend Freunde"),
         AchievementId.HardLandings => L("Tough cookie", "Hart im Nehmen"),
+        AchievementId.Wahoo => "Wahoo!",
         _ => L("Party mood", "Feierlaune"),
     };
     public static string AchievementHint(AchievementId id) => id switch
@@ -407,6 +423,7 @@ public static class Strings
         AchievementId.FootballFan => L("Play ball with Claudius 1000 times.", "Spiele 1000-mal Ball mit Claudius."),
         AchievementId.HardLandings => L("Let Claudius fall from high up 100 times, until it goes splat.",
             "Lass Claudius 100-mal so tief fallen, dass es platscht."),
+        AchievementId.Wahoo => L("Watch Claudius jump 500 times.", "Sieh Claudius 500-mal springen."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
     };
