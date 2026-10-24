@@ -287,13 +287,6 @@ Ein Tag wie `v1.2.3` startet den [Release-Workflow](.github/workflows/release.ym
 erstellt den Inno-Setup-Installer und eine portable ZIP und veröffentlicht ein GitHub-Release. Tags mit Suffix
 (`v1.2.3-beta`) werden Pre-Releases. Bestehende Tags lassen sich über *Actions → Release → Run workflow* neu bauen.
 
-Signiert wird ([Code signing policy](#code-signing-policy)), sobald im Repository die Variable
-`SIGNPATH_ORGANIZATION_ID` und das Secret `SIGNPATH_API_TOKEN` (Token eines CI-Users) gesetzt sind. Der Workflow
-schickt dann erst die Programmdateien und später das Setup an SignPath und wartet, bis die Anfrage dort freigegeben ist.
-Das SignPath-Projekt braucht den Slug `claudius`, die Signing Policy `release-signing` (oder eine andere in der Variable
-`SIGNPATH_SIGNING_POLICY`) und zwei Artifact Configurations: `app` (ZIP mit `Claudius.exe`, `ClaudiusBridge.exe` und
-den DLLs) und `installer` (ZIP mit der Setup-exe).
-
 ### Projektstruktur
 
 ```text
@@ -316,18 +309,9 @@ installer/            Inno-Setup-Skript
 
 Unabhängiges Projekt. Der Pixel-Charakter ist eine eigene Zeichnung.
 
-## Code signing policy
+## Datenschutz
 
-Kostenlose Code-Signierung durch [SignPath.io](https://about.signpath.io), Zertifikat von der [SignPath Foundation](https://signpath.org)
-(Free code signing provided by SignPath.io, certificate by SignPath Foundation).
-
-Das Setup und die Programmdateien der GitHub-Releases werden vom [Release-Workflow](.github/workflows/release.yml)
-aus diesem Repository gebaut und dort signiert. Jede Signierung wird von Hand freigegeben.
-
-- Committers and reviewers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
-- Approvers: [T3rr0rS0ck3](https://github.com/T3rr0rS0ck3)
-
-Datenschutz: Die App sendet keine Daten an den Entwickler oder an Dritte. Ihr einziger Netzwerkzugriff ist die
+Die App sendet keine Daten an den Entwickler oder an Dritte. Ihr einziger Netzwerkzugriff ist die
 abschaltbare Update-Prüfung bei GitHub, siehe [Datenschutzerklärung](PRIVACY.md).
 
 ## Lizenz
