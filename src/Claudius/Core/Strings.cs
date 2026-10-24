@@ -273,6 +273,8 @@ public static class Strings
     public static string SlotHead => L("Head", "Kopf");
     public static string SlotFace => L("Face", "Gesicht");
     public static string SlotNeck => L("Neck", "Hals");
+    public static string SlotHand => "Hand";
+    public static string SlotGaming => "Gaming";
     public static string SlotFanScarves => L("Fan scarves", "Fanschals");
     public static string SlotFootballHelmets => L("Football helmets", "Footballhelme");
     public static string SlotMario => "Super Mario";
@@ -289,8 +291,8 @@ public static class Strings
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
-        "The pet wears the outfit of the model that is running. Seasonal headwear and the nightcap take the place of the hat while they are switched on. The mark in the corner of an item shows where it is worn: 🎩 on the head, 👓 on the face, 🧣 around the neck. Click a worn item again to take it off.",
-        "Das Pet trägt das Outfit des Modells, das gerade läuft. Saison-Hüte und die Schlafmütze ersetzen den Hut, solange sie eingeschaltet sind. Das Zeichen in der Ecke zeigt, wo ein Teil getragen wird: 🎩 auf dem Kopf, 👓 im Gesicht, 🧣 am Hals. Ein getragenes Teil noch mal anklicken zieht es aus.");
+        "The pet wears the outfit of the model that is running. Seasonal headwear and the nightcap take the place of the hat while they are switched on. The mark in the corner of an item shows where it is worn: 🎩 on the head, 👓 on the face, 🧣 around the neck, ✋ in the hand. Click a worn item again to take it off.",
+        "Das Pet trägt das Outfit des Modells, das gerade läuft. Saison-Hüte und die Schlafmütze ersetzen den Hut, solange sie eingeschaltet sind. Das Zeichen in der Ecke zeigt, wo ein Teil getragen wird: 🎩 auf dem Kopf, 👓 im Gesicht, 🧣 am Hals, ✋ in der Hand. Ein getragenes Teil noch mal anklicken zieht es aus.");
     public static string ColorPresets => L("Presets", "Vorlagen");
     public static string HexColor => L("Own color", "Eigene Farbe");
     public static string HatName(Hat hat) => hat switch
@@ -388,6 +390,7 @@ public static class Strings
         Hat.BB8 => "BB-8",
         Hat.Grogu => L("Grogu's ears", "Grogus Ohren"),
         Hat.Ewok => L("Ewok hood", "Ewok-Kapuze"),
+        Hat.GamingHeadset => L("Gaming headset", "Gaming-Headset"),
         _ => Nothing,
     };
     public static string FaceName(FaceWear face) => face switch
@@ -415,6 +418,7 @@ public static class Strings
         FaceWear.Mandalorian => L("Mandalorian helmet", "Mandalorianer-Helm"),
         FaceWear.TiePilot => L("TIE pilot helmet", "TIE-Piloten-Helm"),
         FaceWear.C3PO => L("C-3PO's face", "C-3POs Gesicht"),
+        FaceWear.VrHeadset => L("VR headset", "VR-Brille"),
         _ => Nothing,
     };
     public static string NeckName(Neckwear neck) => neck switch
@@ -449,7 +453,48 @@ public static class Strings
         _ => Nothing,
     };
     public static string ItemName(Outfit item) =>
-        item.Hat != Hat.None ? HatName(item.Hat) : item.Face != FaceWear.None ? FaceName(item.Face) : NeckName(item.Neck);
+        item.Hat != Hat.None ? HatName(item.Hat) : item.Face != FaceWear.None ? FaceName(item.Face)
+        : item.Hand != HeldItem.None ? HandName(item.Hand) : NeckName(item.Neck);
+    public static string HandName(HeldItem item) => item switch
+    {
+        HeldItem.SuperMushroom => L("Super Mushroom", "Superpilz"),
+        HeldItem.FireFlower => L("Fire Flower", "Feuerblume"),
+        HeldItem.SuperStar => L("Super Star", "Superstern"),
+        HeldItem.Coin => L("Coin", "Münze"),
+        HeldItem.GreenShell => L("Green shell", "Grüner Panzer"),
+        HeldItem.FairyWand => L("Fairy Godmother's wand", "Zauberstab der guten Fee"),
+        HeldItem.PoisonApple => L("Poisoned apple", "Giftapfel"),
+        HeldItem.Trident => L("Triton's trident", "Tritons Dreizack"),
+        HeldItem.MickeyBalloon => L("Mickey balloon", "Micky-Luftballon"),
+        HeldItem.Wand => L("Harry's wand", "Harrys Zauberstab"),
+        HeldItem.Nimbus2000 => "Nimbus 2000",
+        HeldItem.Snitch => L("Golden Snitch", "Goldener Schnatz"),
+        HeldItem.HogwartsLetter => L("Letter from Hogwarts", "Brief aus Hogwarts"),
+        HeldItem.LightsaberBlue => L("Luke's lightsaber", "Lukes Lichtschwert"),
+        HeldItem.LightsaberGreen => L("Yoda's lightsaber", "Yodas Lichtschwert"),
+        HeldItem.LightsaberRed => L("Darth Vader's lightsaber", "Darth Vaders Lichtschwert"),
+        HeldItem.LightsaberPurple => L("Mace Windu's lightsaber", "Mace Windus Lichtschwert"),
+        HeldItem.Blaster => L("Han Solo's blaster", "Han Solos Blaster"),
+        HeldItem.NesController => L("NES controller", "NES-Controller"),
+        HeldItem.SnesController => L("SNES controller", "SNES-Controller"),
+        HeldItem.N64Controller => L("N64 controller", "N64-Controller"),
+        HeldItem.GameCubeController => L("GameCube controller", "GameCube-Controller"),
+        HeldItem.JoyCons => "Joy-Con",
+        HeldItem.XboxController => L("Xbox controller", "Xbox-Controller"),
+        HeldItem.PlayStationController => L("PlayStation controller", "PlayStation-Controller"),
+        HeldItem.GameBoy => "Game Boy",
+        HeldItem.GameBoyAdvance => "Game Boy Advance",
+        HeldItem.NintendoDS => "Nintendo DS",
+        HeldItem.Psp => "PSP",
+        HeldItem.Switch => "Nintendo Switch",
+        HeldItem.SteamDeck => "Steam Deck",
+        HeldItem.AtariJoystick => L("Atari joystick", "Atari-Joystick"),
+        HeldItem.MegaDriveController => L("Mega Drive controller", "Mega-Drive-Controller"),
+        HeldItem.ArcadeStick => L("Arcade stick", "Arcade-Stick"),
+        HeldItem.WiiRemote => "Wii Remote",
+        HeldItem.Cartridge => L("Game cartridge", "Spielmodul"),
+        _ => Nothing,
+    };
     /// <summary>What an achievement unlocks: its costume item, or all the fan scarves or football helmets.</summary>
     public static string RewardName(Achievement achievement) => achievement.Id switch
     {
@@ -459,6 +504,7 @@ public static class Strings
         AchievementId.OnceUponATime => L("Disney costumes", "Disney-Kostüme"),
         AchievementId.EveryFlavour => L("Harry Potter costumes", "Harry-Potter-Kostüme"),
         AchievementId.TheForce => L("Star Wars costumes", "Star-Wars-Kostüme"),
+        AchievementId.Konami => L("gaming items", "Gaming-Sachen"),
         AchievementId.LostSock => L("the sock as a mascot", "die Socke als Maskottchen"),
         _ => ItemName(achievement.Reward),
     };
@@ -483,6 +529,7 @@ public static class Strings
         AchievementId.OnceUponATime => L("Once upon a time…", "Es war einmal …"),
         AchievementId.EveryFlavour => L("Every Flavour Beans", "Bohnen jeder Geschmacksrichtung"),
         AchievementId.TheForce => L("May the Force be with you", "Möge die Macht mit dir sein"),
+        AchievementId.Konami => L("Cheat activated!", "Cheat aktiviert!"),
         AchievementId.LostSock => L("The lost sock", "Die verlorene Socke"),
         _ => L("Party mood", "Feierlaune"),
     };
@@ -508,6 +555,8 @@ public static class Strings
         AchievementId.OnceUponATime => L("Pat Claudius 100 times.", "Streichle Claudius 100-mal."),
         AchievementId.EveryFlavour => L("Feed Claudius beans 100 times.", "Füttere Claudius 100-mal mit Bohnen."),
         AchievementId.TheForce => L("Move Claudius around with the mouse 100 times.", "Zieh Claudius 100-mal mit der Maus herum."),
+        AchievementId.Konami => L("Enter the most famous cheat in video game history in the inventory.",
+            "Gib im Inventar den berühmtesten Cheat der Videospielgeschichte ein."),
         AchievementId.LostSock => L("Reach all the other achievements.", "Erreiche alle anderen Erfolge."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),

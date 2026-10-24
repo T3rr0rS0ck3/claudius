@@ -11,7 +11,7 @@ namespace Claudius.Core;
 public enum AchievementId
 {
     FirstSession, Sessions10, Sessions100, Feed, Pat, Play, Tickle,
-    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo, OnceUponATime, EveryFlavour, TheForce, LostSock,
+    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo, OnceUponATime, EveryFlavour, TheForce, Konami, LostSock,
 }
 
 /// <summary>
@@ -23,7 +23,8 @@ public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counte
     /// <summary>
     /// Whether reaching it makes this costume item wearable: its reward, for the football fan every fan scarf, for
     /// the hard landings every football helmet, for Wahoo! every Super Mario costume, for Once upon a time every
-    /// Disney costume, for Every flavour every Harry Potter costume and for May the Force every Star Wars costume.
+    /// Disney costume, for Every flavour every Harry Potter costume, for May the Force every Star Wars costume and
+    /// for the Konami Code every gaming item.
     /// The lost sock unlocks no costume but the sock as the pet.
     /// </summary>
     public bool Unlocks(Outfit item) => item != Outfit.None && item == Reward
@@ -32,7 +33,8 @@ public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counte
         || Id == AchievementId.Wahoo && Sprite.IsMarioCostume(item)
         || Id == AchievementId.OnceUponATime && Sprite.IsDisneyCostume(item)
         || Id == AchievementId.EveryFlavour && Sprite.IsWizardingCostume(item)
-        || Id == AchievementId.TheForce && Sprite.IsStarWarsCostume(item);
+        || Id == AchievementId.TheForce && Sprite.IsStarWarsCostume(item)
+        || Id == AchievementId.Konami && Sprite.IsGamingItem(item);
 }
 
 /// <summary>
@@ -86,6 +88,7 @@ public sealed class Achievements
         new(AchievementId.OnceUponATime, new(Hat.MickeyEars), nameof(Emote.Pat), PatsNeeded),
         new(AchievementId.EveryFlavour, new(Hat.SortingHat), BeansCounter, BeansNeeded),
         new(AchievementId.TheForce, new(Face: FaceWear.DarthVader), DragsCounter, DragsNeeded),
+        new(AchievementId.Konami, new(Hand: HeldItem.SnesController)),
         // Reached with all the others
         new(AchievementId.LostSock, Outfit.None, Target: Enum.GetValues<AchievementId>().Length - 1),
     ];

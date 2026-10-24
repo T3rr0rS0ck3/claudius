@@ -64,6 +64,7 @@ public partial class InventoryWindow : Window
         InitializeComponent();
         Icon = Sprite.WindowIcon();
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
+        PreviewKeyDown += (_, e) => KonamiKey(e.Key);
         _app = app;
         _settings = settings;
         _achievements = app.Achievements;
@@ -261,11 +262,15 @@ public partial class InventoryWindow : Window
         foreach (var neck in Enum.GetValues<Neckwear>().Where(n => n != Neckwear.None))
             AddItem(new Outfit(Neck: neck), Strings.NeckName(neck), "🧣", Strings.SlotNeck, o => o.Neck == neck,
                 o => o with { Neck = neck }, o => o with { Neck = Neckwear.None });
+        foreach (var held in Enum.GetValues<HeldItem>().Where(h => h != HeldItem.None))
+            AddItem(new Outfit(Hand: held), Strings.HandName(held), "✋", Strings.SlotHand, o => o.Hand == held,
+                o => o with { Hand = held }, o => o with { Hand = HeldItem.None });
     }
 
     /// <summary>The row an item goes in: its theme, the fan scarves, the football helmets or the standard items.</summary>
     private WrapPanel Row(Outfit item) =>
-        Sprite.IsStarWarsCostume(item) ? StarWarsItems
+        Sprite.IsGamingItem(item) ? GamingItems
+        : Sprite.IsStarWarsCostume(item) ? StarWarsItems
         : Sprite.IsWizardingCostume(item) ? WizardingItems
         : Sprite.IsDisneyCostume(item) ? DisneyItems
         : Sprite.IsMarioCostume(item) ? MarioItems
@@ -357,6 +362,19 @@ public partial class InventoryWindow : Window
             _characters.Add((tile, character, lockMark));
             CharacterItems.Children.Add(tile);
         }
+    }
+
+    private static readonly Key[] KonamiCode =
+        [Key.Up, Key.Up, Key.Down, Key.Down, Key.Left, Key.Right, Key.Left, Key.Right, Key.B, Key.A];
+    private int _konami;
+
+    /// <summary>Follows the keys pressed in the inventory; the whole Konami Code reaches its achievement.</summary>
+    private void KonamiKey(Key key)
+    {
+        _konami = key == KonamiCode[_konami] ? _konami + 1 : key == KonamiCode[0] ? 1 : 0;
+        if (_konami < KonamiCode.Length) return;
+        _konami = 0;
+        _achievements.Unlock(AchievementId.Konami);
     }
 
     private bool CharacterLocked(PetCharacter character) =>
