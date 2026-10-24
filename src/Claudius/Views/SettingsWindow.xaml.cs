@@ -106,6 +106,7 @@ public partial class SettingsWindow : Window
         BubbleDurationBox.Text = settings.BubbleDurationSeconds.ToString(CultureInfo.InvariantCulture);
         NameBox.Text = settings.UserName;
         NotificationsBox.IsChecked = settings.Notifications;
+        AchievementPopupBox.IsChecked = settings.AchievementPopup;
         ReposPathBox.Text = settings.ReposPath ?? "";
         LanguageBox.ItemsSource = LanguageChoices;
         LanguageBox.DisplayMemberPath = "Value";
@@ -221,6 +222,9 @@ public partial class SettingsWindow : Window
     private void TestNotification_Click(object sender, RoutedEventArgs e) =>
         _app.ShowNotification("Claudius", Strings.TestNotificationText);
 
+    private void TestAchievementPopup_Click(object sender, RoutedEventArgs e) =>
+        _app.ShowAchievementPopup(Achievements.All[0]);
+
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -287,6 +291,7 @@ public partial class SettingsWindow : Window
             _settings.BubbleDurationSeconds = Math.Clamp(duration, 1, 60);
             _settings.UserName = NameBox.Text.Trim();
             _settings.Notifications = NotificationsBox.IsChecked == true;
+            _settings.AchievementPopup = AchievementPopupBox.IsChecked == true;
             _settings.ReposPath = reposPath.Length > 0 ? reposPath : null;
             _settings.Terminal = TerminalBox.SelectedValue is TerminalKind terminal ? terminal : TerminalKind.Auto;
             _settings.GhostDrag = GhostDragBox.IsChecked == true;

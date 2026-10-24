@@ -126,6 +126,8 @@ public partial class InventoryWindow : Window
 
     // ---------------------------------------------------------------- tabs and shared pieces
 
+    public void ShowAchievementsTab() => ShowTab(3);
+
     private void ShowTab(int tab)
     {
         _lastTab = tab;

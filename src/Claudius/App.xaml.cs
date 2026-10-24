@@ -41,6 +41,7 @@ public partial class App : Application
     private bool _breakSuggested;
     /// <summary>Achievements reached but not announced yet, one bubble at a time.</summary>
     private readonly Queue<Achievement> _announcements = new();
+    private AchievementPopup? _achievementPopup;
     private DateTimeOffset _reviewCheckAt;
     private DateTime _settingsWrite;
 
@@ -219,16 +220,38 @@ public partial class App : Application
         AnnounceAchievement();
     }
 
-    /// <summary>Cheers about the next achievement reached, once the pet has finished speaking.</summary>
+    /// <summary>
+    /// Cheers about the next achievement reached, once the pet has finished speaking and the last pop-up is gone:
+    /// with the pop-up if it is switched on, else in a bubble or notification.
+    /// </summary>
     private void AnnounceAchievement()
     {
-        if (_announcements.Count == 0 || _pet.Speaking) return;
+        if (_announcements.Count == 0 || _pet.Speaking || _achievementPopup != null) return;
         var achievement = _announcements.Dequeue();
         _pet.Cheer(TimeSpan.FromSeconds(3));
+        if (Settings.AchievementPopup)
+        {
+            ShowAchievementPopup(achievement);
+            return;
+        }
         (string, string)[] extra = [("{achievement}", Strings.AchievementTitle(achievement.Id)), ("{item}", Strings.RewardName(achievement))];
         if (Settings.SpeechBubbles) Say("Achievement", extra: extra);
         else if (Settings.Notifications)
             ShowNotification("Claudius", Strings.AchievementNotification(Strings.AchievementTitle(achievement.Id), Strings.RewardName(achievement)));
+    }
+
+    /// <summary>The banner for an achievement in the middle of the main screen: the pet cheering with its reward.</summary>
+    public void ShowAchievementPopup(Achievement achievement)
+    {
+        _achievementPopup?.Close();
+        var frame = new SpriteFrame(Eyes.Happy, Mouth.Open, Arms.Up, Outfit: achievement.Reward);
+        if (achievement.Id == AchievementId.LostSock) frame = frame with { Character = PetCharacter.Sock };
+        int done = Achievements.All.Count(a => Achievements.IsUnlocked(a.Id));
+        _achievementPopup = new AchievementPopup(Strings.AchievementTitle(achievement.Id),
+            Strings.AchievementReward(Strings.RewardName(achievement)), Strings.AchievementCount(done, Achievements.All.Length) + " · " + Strings.AchievementPopupClick,
+            Sprite.Render(frame), (System.Windows.Media.Brush)Resources["AccentBrush"], () => ShowInventory(achievements: true));
+        _achievementPopup.Closed += (_, _) => _achievementPopup = null;
+        _achievementPopup.Show();
     }
 
     private void Evaluate(bool initial)
@@ -469,16 +492,18 @@ public partial class App : Application
         _settingsWindow.Activate();
     }
 
-    public void ShowInventory()
+    public void ShowInventory() => ShowInventory(achievements: false);
+
+    /// <summary>Opens the inventory, or brings it to the front; on the achievements tab if asked.</summary>
+    public void ShowInventory(bool achievements)
     {
-        if (_inventoryWindow != null)
+        if (_inventoryWindow == null)
         {
-            _inventoryWindow.Activate();
-            return;
+            _inventoryWindow = new InventoryWindow(this, Settings, Sprite.FamilyOf(_state.Snapshot?.Model));
+            _inventoryWindow.Closed += (_, _) => _inventoryWindow = null;
+            _inventoryWindow.Show();
         }
-        _inventoryWindow = new InventoryWindow(this, Settings, Sprite.FamilyOf(_state.Snapshot?.Model));
-        _inventoryWindow.Closed += (_, _) => _inventoryWindow = null;
-        _inventoryWindow.Show();
+        if (achievements) _inventoryWindow.ShowAchievementsTab();
         _inventoryWindow.Activate();
     }
 
