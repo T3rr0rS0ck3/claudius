@@ -113,6 +113,8 @@ public sealed class AppSettings
 
     // Notifications
     public bool Notifications { get; set; } = true;
+    /// <summary>A banner with a trophy in the middle of the main screen for each achievement reached.</summary>
+    public bool AchievementPopup { get; set; } = true;
 
     // Opening the assistant
     /// <summary>Folder containing all projects; its subfolders are offered on double-click.</summary>

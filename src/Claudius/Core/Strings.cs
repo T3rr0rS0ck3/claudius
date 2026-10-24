@@ -165,6 +165,13 @@ public static class Strings
     public static string BubbleDuration => L("Display time (s)", "Anzeigedauer (s)");
     public static string YourName => L("Your name", "Dein Name");
     public static string WindowsNotifications => L("Windows notifications", "Windows-Benachrichtigungen");
+    public static string AchievementPopupLabel => L("Pop-up for achievements", "Popup für Erfolge");
+    public static string AchievementPopupTip => L(
+        "A banner with a trophy in the middle of the main screen when an achievement is reached, instead of a speech bubble or notification.",
+        "Ein Banner mit Pokal mitten auf dem Hauptbildschirm, wenn ein Erfolg erreicht ist, statt Sprechblase oder Benachrichtigung.");
+    public static string TestAchievementPopup => L("Test pop-up", "Popup testen");
+    public static string AchievementPopupClick => L("Click for all achievements", "Klicken für alle Erfolge");
+    public static string AchievementUnlocked => L("ACHIEVEMENT UNLOCKED!", "ERFOLG FREIGESCHALTET!");
     public static string EditTexts => L("Edit texts…", "Texte bearbeiten…");
     public static string EditTextsTip => L("Opens settings.json; changes are picked up automatically.",
         "Öffnet settings.json; Änderungen werden automatisch übernommen.");

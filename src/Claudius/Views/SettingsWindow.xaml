@@ -227,10 +227,13 @@
                     <TextBox x:Name="NameBox" Grid.Column="1" />
                 </Grid>
                 <CheckBox x:Name="NotificationsBox" Content="{x:Static core:Strings.WindowsNotifications}" />
+                <CheckBox x:Name="AchievementPopupBox" Content="{x:Static core:Strings.AchievementPopupLabel}"
+                          ToolTip="{x:Static core:Strings.AchievementPopupTip}" />
                 <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                     <Button Content="{x:Static core:Strings.EditTexts}" Padding="10,3" Click="EditTexts_Click"
                             ToolTip="{x:Static core:Strings.EditTextsTip}" />
                     <Button Content="{x:Static core:Strings.TestNotification}" Padding="10,3" Margin="8,0,0,0" Click="TestNotification_Click" />
+                    <Button Content="{x:Static core:Strings.TestAchievementPopup}" Padding="10,3" Margin="8,0,0,0" Click="TestAchievementPopup_Click" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>
