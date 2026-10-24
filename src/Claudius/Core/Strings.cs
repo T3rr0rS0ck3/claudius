@@ -100,8 +100,8 @@ public static class Strings
     public static string Emotes => L("Emotes on hover (feed, pat, …)", "Emotes beim Drüberfahren (Füttern, Streicheln, …)");
     public static string ModelOutfits => L("Outfit for the AI model", "Outfit passend zum KI-Modell");
     public static string ModelOutfitsTip => L(
-        "Each model wears its own outfit, put together in the inventory (right-click → Inventory…).",
-        "Jedes Modell trägt sein eigenes Outfit, zusammengestellt im Inventar (Rechtsklick → Inventar…).");
+        "Off: the pet wears no outfit, whichever model is running.",
+        "Aus: Das Pet trägt kein Outfit, egal welches Modell läuft.");
     public static string SeasonalAccessories => L("Seasonal headwear", "Saisonale Kopfbedeckung");
     public static string SeasonalAccessoriesTip => L(
         "A witch's hat and a broom in October, a Santa hat until Christmas, bunny ears at Easter and a party hat on New Year's Eve and your birthday. It takes the place of the model's headwear.",
@@ -272,8 +272,6 @@ public static class Strings
         "Das Pet trägt das Outfit des Modells, das gerade läuft. Saison-Hüte und die Schlafmütze ersetzen den Hut, solange sie eingeschaltet sind.");
     public static string ColorPresets => L("Presets", "Vorlagen");
     public static string HexColor => L("Own color", "Eigene Farbe");
-    public static string LookMovedHint => L("Color and costumes: right-click the pet → Inventory…",
-        "Farbe und Kostüme: Rechtsklick aufs Pet → Inventar…");
     public static string HatName(Hat hat) => hat switch
     {
         Hat.Crown => L("Crown", "Krone"),

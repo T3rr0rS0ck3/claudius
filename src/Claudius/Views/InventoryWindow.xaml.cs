@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -104,6 +105,7 @@ public partial class InventoryWindow : Window
         });
         ShowSelection();
         ShowWardrobe();
+        ShowWardrobeOptions();
         ShowColor();
         ShowTab(_lastTab);
         _loading = false;
@@ -261,6 +263,43 @@ public partial class InventoryWindow : Window
     }
 
     private void ResetOutfit_Click(object sender, RoutedEventArgs e) => Dress(Sprite.DefaultOutfit(_dressing));
+
+    private const string NoChoice = "–";
+
+    private void ShowWardrobeOptions()
+    {
+        ModelOutfitsBox.IsChecked = _settings.ModelOutfits;
+        SeasonalBox.IsChecked = _settings.SeasonalAccessories;
+        BirthdayDayBox.ItemsSource = new[] { NoChoice }.Concat(Enumerable.Range(1, 31).Select(d => d.ToString(CultureInfo.InvariantCulture))).ToList();
+        BirthdayMonthBox.ItemsSource = new[] { NoChoice }.Concat(Strings.Culture.DateTimeFormat.MonthNames.Take(12)).ToList();
+        bool set = Occasions.TryParseDay(_settings.Birthday, out var day);
+        BirthdayDayBox.SelectedIndex = set ? day.Day : 0;
+        BirthdayMonthBox.SelectedIndex = set ? day.Month : 0;
+    }
+
+    private void WardrobeOption_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.ModelOutfits = ModelOutfitsBox.IsChecked == true;
+        _settings.SeasonalAccessories = SeasonalBox.IsChecked == true;
+        _app.ApplySettings(save: true);
+    }
+
+    /// <summary>Saves the birthday ("MM-dd") once day and month are both set, or clears it when one is left empty.</summary>
+    private void Birthday_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading) return;
+        int day = BirthdayDayBox.SelectedIndex, month = BirthdayMonthBox.SelectedIndex;
+        string? birthday = day <= 0 || month <= 0 ? null : $"{month:00}-{day:00}";
+        if (birthday != null && !Occasions.TryParseDay(birthday, out _))
+        {
+            ShowError(Strings.BirthdayInvalid);
+            return;
+        }
+        ErrorText.Visibility = Visibility.Collapsed;
+        if (birthday == _settings.Birthday) return;
+        _settings.Birthday = birthday;
+        _app.ApplySettings(save: true);
+    }
 
     private void ShowWardrobe()
     {

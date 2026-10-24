@@ -81,6 +81,16 @@
             <Button Content="{x:Static core:Strings.ResetOutfit}" HorizontalAlignment="Left" Padding="10,3" Margin="0,12,0,0"
                     Click="ResetOutfit_Click" />
             <Border Height="1" Background="#3A3936" Margin="0,12,0,8" />
+            <CheckBox x:Name="ModelOutfitsBox" Content="{x:Static core:Strings.ModelOutfits}"
+                      ToolTip="{x:Static core:Strings.ModelOutfitsTip}" Click="WardrobeOption_Click" />
+            <CheckBox x:Name="SeasonalBox" Content="{x:Static core:Strings.SeasonalAccessories}"
+                      ToolTip="{x:Static core:Strings.SeasonalAccessoriesTip}" Click="WardrobeOption_Click" />
+            <StackPanel Orientation="Horizontal" Margin="22,0,0,4" IsEnabled="{Binding IsChecked, ElementName=SeasonalBox}">
+                <TextBlock Text="{x:Static core:Strings.Birthday}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox x:Name="BirthdayDayBox" Width="56" SelectionChanged="Birthday_SelectionChanged" />
+                <ComboBox x:Name="BirthdayMonthBox" Width="120" Margin="6,0,0,0" SelectionChanged="Birthday_SelectionChanged" />
+            </StackPanel>
+            <Border Height="1" Background="#3A3936" Margin="0,8,0,8" />
             <TextBlock Text="{x:Static core:Strings.WardrobeHint}" Style="{StaticResource Hint}" />
         </StackPanel>
 

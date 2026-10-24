@@ -120,7 +120,6 @@
                     <TextBlock Grid.Column="2" Text="{Binding Value, ElementName=ScaleSlider, StringFormat={}{0}x}"
                                VerticalAlignment="Center" HorizontalAlignment="Right" />
                 </Grid>
-                <TextBlock Text="{x:Static core:Strings.LookMovedHint}" Style="{StaticResource Hint}" Margin="0,2,0,6" />
                 <CheckBox x:Name="AlwaysOnTopBox" Content="{x:Static core:Strings.AlwaysOnTop}" />
                 <CheckBox x:Name="AnimationsBox" Content="{x:Static core:Strings.Animations}" />
                 <CheckBox x:Name="WalkAroundBox" Content="{x:Static core:Strings.WalkAroundDesktop}"
@@ -132,15 +131,6 @@
                           ToolTip="{x:Static core:Strings.ChaseCursorTip}"
                           IsEnabled="{Binding IsChecked, ElementName=WalkAroundBox}" />
                 <CheckBox x:Name="EmotesBox" Content="{x:Static core:Strings.Emotes}" />
-                <CheckBox x:Name="ModelOutfitsBox" Content="{x:Static core:Strings.ModelOutfits}"
-                          ToolTip="{x:Static core:Strings.ModelOutfitsTip}" />
-                <CheckBox x:Name="SeasonalBox" Content="{x:Static core:Strings.SeasonalAccessories}"
-                          ToolTip="{x:Static core:Strings.SeasonalAccessoriesTip}" />
-                <StackPanel Orientation="Horizontal" Margin="22,0,0,4" IsEnabled="{Binding IsChecked, ElementName=SeasonalBox}">
-                    <TextBlock Text="{x:Static core:Strings.Birthday}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <ComboBox x:Name="BirthdayDayBox" Width="56" />
-                    <ComboBox x:Name="BirthdayMonthBox" Width="120" Margin="6,0,0,0" />
-                </StackPanel>
                 <CheckBox x:Name="NightModeBox" Content="{x:Static core:Strings.NightMode}"
                           ToolTip="{x:Static core:Strings.NightModeTip}" />
                 <StackPanel Orientation="Horizontal" Margin="22,0,0,4" IsEnabled="{Binding IsChecked, ElementName=NightModeBox}">

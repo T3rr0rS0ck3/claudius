@@ -203,8 +203,8 @@ desktop app as well. The normal desktop chat offers no hooks and is not supporte
 ## Configuration
 
 Most options are available via right-click → **Settings…**: language, repo folder, console, ghost drag,
-voice chat, size, always on top, animations, walking around, crossing monitors, chasing the pointer, emotes, model outfits, seasonal headwear and birthday, night mode and night hours, break reminder, autostart, update checks, update interval, warning thresholds, mood thresholds,
-speech bubbles, notifications and your name. Color, costumes, and the model and effort for new sessions are in right-click → **Inventory…**.
+voice chat, size, always on top, animations, walking around, crossing monitors, chasing the pointer, emotes, night mode and night hours, break reminder, autostart, update checks, update interval, warning thresholds, mood thresholds,
+speech bubbles, notifications and your name. Color, costumes (including seasonal headwear and the birthday), and the model and effort for new sessions are in right-click → **Inventory…**.
 
 Everything lives in `%LOCALAPPDATA%\Claudius\settings.json`, and manual edits are picked up live.
 `Language` is `en` or `de`. Speech bubble texts are under `Texts`; switching the language in the settings resets them

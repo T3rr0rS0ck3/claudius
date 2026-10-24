@@ -209,8 +209,8 @@ Desktop-Chat bietet keine Hooks und wird nicht unterstützt.
 ## Konfiguration
 
 Die meisten Optionen gibt es unter Rechtsklick → **Einstellungen…**: Sprache, Repo-Ordner, Konsole, Geist ziehen, Sprachchat,
-Größe, Vordergrund, Animationen, Herumlaufen, Monitorwechsel, Mauszeiger jagen, Emotes, Modell-Outfits, saisonale Kopfbedeckung und Geburtstag, Nachtmodus und Nachtzeit, Pausen-Erinnerung, Autostart, Update-Suche, Aktualisierungsintervall, Warn- und Zustandsschwellen, Sprechblasen,
-Benachrichtigungen und dein Name. Farbe, Kostüme sowie Modell und Aufwand für neue Sessions stehen unter Rechtsklick → **Inventar…**.
+Größe, Vordergrund, Animationen, Herumlaufen, Monitorwechsel, Mauszeiger jagen, Emotes, Nachtmodus und Nachtzeit, Pausen-Erinnerung, Autostart, Update-Suche, Aktualisierungsintervall, Warn- und Zustandsschwellen, Sprechblasen,
+Benachrichtigungen und dein Name. Farbe, Kostüme (samt saisonaler Kopfbedeckung und Geburtstag) sowie Modell und Aufwand für neue Sessions stehen unter Rechtsklick → **Inventar…**.
 
 Alles liegt in `%LOCALAPPDATA%\Claudius\settings.json`. Handänderungen werden sofort übernommen.
 `Language` ist `en` oder `de`. Die Sprechblasentexte stehen unter `Texts`; ein Sprachwechsel in den Einstellungen setzt
