@@ -62,6 +62,9 @@ public enum Neckwear
 /// <summary>What the pet eats when it is fed.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<Snack>))]
 public enum Snack { Cookie, Beans }
+/// <summary>Who the pet is: Claudius, the orange block, or the sock with a little monster in its cuff.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<PetCharacter>))]
+public enum PetCharacter { Claudius, Sock }
 /// <summary>The AI model families the pet dresses up for; <see cref="Other"/> for unknown models and none.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<ModelFamily>))]
 public enum ModelFamily { Opus, Sonnet, Haiku, Fable, Other }
@@ -86,7 +89,8 @@ public readonly record struct SpriteFrame(
     Accessory Accessory = Accessory.None,
     int Squash = 0,
     int Sick = 0,
-    Snack Snack = Snack.Cookie);
+    Snack Snack = Snack.Cookie,
+    PetCharacter? Character = null);
 
 /// <summary>
 /// Procedural pixel-art renderer for the pet: a chunky orange block
@@ -302,7 +306,14 @@ public static class Sprite
     public const uint DefaultBodyColor = 0xFFD97757;
 
     private static readonly Dictionary<SpriteFrame, BitmapSource> Cache = new();
+    /// <summary>The sock's own purple, which it takes on instead of the default orange.</summary>
+    public const uint SockBodyColor = 0xFF7B3FC4;
+    private const uint SockPink = 0xFFE8459A;
+    private const uint MonsterColor = 0xFFD8346A;
+    private const uint MonsterHorn = 0xFF8A1A44;
+
     private static uint _bodyColor;
+    private static PetCharacter _character;
     private static (uint Body, uint Shade) _normal, _hot, _pale;
 
     static Sprite() => SetBodyColor(DefaultBodyColor);
@@ -318,8 +329,7 @@ public static class Sprite
         _bodyColor = argb;
         var (h, s, l) = ToHsl(argb);
         // Offsets measured from the original hand-picked orange palette.
-        (uint, uint) Pair(double hue, double sat, double light) =>
-            (FromHsl(hue, sat, light), FromHsl(hue, sat * 0.76, light - 0.114));
+        (uint, uint) Pair(double hue, double sat, double light) => Shades(hue, sat, light);
         _normal = Pair(h, s, l);
         _hot = Pair(h - 3, Math.Min(1, s + 0.14), l - 0.025);
         _pale = Pair(h + 2, s * 0.67, Math.Min(0.9, l + 0.037));
@@ -327,6 +337,20 @@ public static class Sprite
         SplatCache.Clear(); // the puddle has the body's color
         Version++;
     }
+
+    /// <summary>Who the pet is drawn as, unless a frame says otherwise.</summary>
+    public static void SetCharacter(PetCharacter character)
+    {
+        if (character == _character) return;
+        _character = character;
+        Cache.Clear();
+        SplatCache.Clear();
+        Version++;
+    }
+
+    /// <summary>A body color and its shade.</summary>
+    private static (uint Body, uint Shade) Shades(double h, double s, double l) =>
+        (FromHsl(h, s, l), FromHsl(h, s * 0.76, l - 0.114));
 
     /// <summary>The family of an AI model, by name ("Opus 4.1") or id ("…-sonnet-4-5"); unknown models and none are Other.</summary>
     public static ModelFamily FamilyOf(string? model) =>
@@ -376,6 +400,13 @@ public static class Sprite
             Tint.Ghost => (0xFFE4ECF8u, 0xFFB3C2DBu),
             _ => _normal,
         };
+        // Drawn as the other character (in the inventory), the pet shows that one's own color
+        var character = f.Character ?? _character;
+        if (character != _character && f.Tint == Tint.Normal)
+        {
+            var (h, s, l) = ToHsl(character == PetCharacter.Sock ? SockBodyColor : DefaultBodyColor);
+            (body, shade) = Shades(h, s, l);
+        }
         // A full context window: the pet turns greener and greener
         if (f.Sick > 0 && f.Tint != Tint.Ghost)
         {
@@ -399,8 +430,9 @@ public static class Sprite
                 int inset = y == top ? 1 : 0; // rounded shoulders
                 for (int x = left + inset; x <= right - inset; x++) Set(x, y, y == bottom ? shade : body);
             }
-            foreach (int lx in (int[])[left + 1, left + 3, right - 3, right - 1])
-                for (int y = bottom + 1; y <= Height - 1; y++) Set(lx, y, shade);
+            if (character != PetCharacter.Sock)
+                foreach (int lx in (int[])[left + 1, left + 3, right - 3, right - 1])
+                    for (int y = bottom + 1; y <= Height - 1; y++) Set(lx, y, shade);
 
             int eyeY = top + Math.Max(1, h / 3), eyeL = left + w * 3 / 14, eyeR = right - w * 3 / 14;
             if (f.Squash >= 3)
@@ -429,6 +461,26 @@ public static class Sprite
         }
         else
         {
+        if (character == PetCharacter.Sock)
+        {
+            // The sock: a ribbed cuff with a pink stripe, a little wider than the leg, and below the face the foot
+            // pointing right, with a pink heel and toe, standing on the ground; it hops instead of walking.
+            int ground = Height - 1 - (f.Legs != 0 ? 1 : 0);
+            for (int x = c0 - 1; x <= c0 + 14; x++)
+            {
+                uint rib = (x - c0) % 2 == 0 ? shade : body;
+                Set(x, by - 1, rib);
+                Set(x, by, SockPink);
+                Set(x, by + 1, rib);
+            }
+            for (int y = by + 2; y <= ground - 4; y++)
+                for (int x = c0; x <= c0 + 13; x++)
+                    Set(x, y, body);
+            Glyph(c0, body, ground - 3, "XXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXX", ".XXXXXXXXXXXXXXX");
+            Glyph(c0, SockPink, ground - 2, "..............XX", "XXX..........XXXX", ".XX..........XXX");
+        }
+        else
+        {
         // Body
         for (int y = by; y <= by + 8; y++)
             for (int x = c0; x <= c0 + 13; x++)
@@ -442,6 +494,7 @@ public static class Sprite
             for (int y = by + 9; y <= Height - 1 - (lifted ? 1 : 0); y++)
                 Set(c0 + legCols[i], y, shade);
         }
+        }
 
         // Arms
         void ArmDown(bool left, int low)
@@ -452,7 +505,10 @@ public static class Sprite
         }
         void ArmUp(bool left)
         {
-            (int x, int y)[] pts = [(bx + 1, by + 3), (bx + 1, by + 2), (bx, by + 2), (bx, by + 1)];
+            // The sock's arm reaches out a little further, past its cuff
+            (int x, int y)[] pts = character == PetCharacter.Sock
+                ? [(bx + 1, by + 3), (bx, by + 3), (bx, by + 2), (bx - 1, by + 2), (bx - 1, by + 1)]
+                : [(bx + 1, by + 3), (bx + 1, by + 2), (bx, by + 2), (bx, by + 1)];
             foreach (var (x, y) in pts) Set(left ? x : Mirror(x), y, body);
         }
         switch (f.Arms)
@@ -1150,6 +1206,26 @@ public static class Sprite
                 Glyph(c0 - 1, NightcapShade, by - 1, "X..XXXXXXXXX"); // the gap keeps the hanging tip apart
                 Set(c0 - 1, by, FurWhite);
                 break;
+        }
+
+        // The sock's little monster peeks out of the cuff while nothing is worn on the head; it ducks down to its
+        // horns while the pet's eyes are closed or something shows above the head
+        if (character == PetCharacter.Sock && hat == Hat.None && f.Accessory == Accessory.None && f.Squash == 0
+            && f.Outfit.Face is not (FaceWear.DarthVader or FaceWear.KyloRen or FaceWear.Stormtrooper or FaceWear.BobaFett
+                or FaceWear.Mandalorian or FaceWear.TiePilot))
+        {
+            if (f.Eyes == Eyes.Closed || f.Mark != Mark.None)
+            {
+                Glyph(c0 + 3, MonsterHorn, by - 2, "X....X");
+                Glyph(c0 + 4, MonsterColor, by - 2, "XXXX");
+            }
+            else
+            {
+                Glyph(c0 + 3, MonsterHorn, by - 4, "X....X");
+                Glyph(c0 + 4, MonsterColor, by - 3, "XXXX");
+                Glyph(c0 + 3, MonsterColor, by - 2, "XXXXXX");
+                Glyph(c0 + 4, EyeColor, by - 2, "X..X");
+            }
         }
 
         // Sweat drops next to the head

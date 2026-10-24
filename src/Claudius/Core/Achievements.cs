@@ -11,7 +11,7 @@ namespace Claudius.Core;
 public enum AchievementId
 {
     FirstSession, Sessions10, Sessions100, Feed, Pat, Play, Tickle,
-    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo, OnceUponATime, EveryFlavour, TheForce,
+    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo, OnceUponATime, EveryFlavour, TheForce, LostSock,
 }
 
 /// <summary>
@@ -24,8 +24,9 @@ public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counte
     /// Whether reaching it makes this costume item wearable: its reward, for the football fan every fan scarf, for
     /// the hard landings every football helmet, for Wahoo! every Super Mario costume, for Once upon a time every
     /// Disney costume, for Every flavour every Harry Potter costume and for May the Force every Star Wars costume.
+    /// The lost sock unlocks no costume but the sock as the pet.
     /// </summary>
-    public bool Unlocks(Outfit item) => item == Reward
+    public bool Unlocks(Outfit item) => item != Outfit.None && item == Reward
         || Id == AchievementId.FootballFan && Sprite.IsFanScarf(item.Neck)
         || Id == AchievementId.HardLandings && Sprite.IsFootballHelmet(item.Hat)
         || Id == AchievementId.Wahoo && Sprite.IsMarioCostume(item)
@@ -85,6 +86,8 @@ public sealed class Achievements
         new(AchievementId.OnceUponATime, new(Hat.MickeyEars), nameof(Emote.Pat), PatsNeeded),
         new(AchievementId.EveryFlavour, new(Hat.SortingHat), BeansCounter, BeansNeeded),
         new(AchievementId.TheForce, new(Face: FaceWear.DarthVader), DragsCounter, DragsNeeded),
+        // Reached with all the others
+        new(AchievementId.LostSock, Outfit.None, Target: Enum.GetValues<AchievementId>().Length - 1),
     ];
 
     /// <summary>How many session ids are remembered so that each session is counted once.</summary>
@@ -125,6 +128,7 @@ public sealed class Achievements
     {
         if (IsUnlocked(achievement.Id)) return achievement.Target;
         int value = achievement.Id == AchievementId.ModelsTried ? _data.Models.Count
+            : achievement.Id == AchievementId.LostSock ? _data.Unlocked.Keys.Count(id => id != AchievementId.LostSock)
             : achievement.Counter != null ? _data.Counters.GetValueOrDefault(achievement.Counter) : 0;
         return Math.Min(value, achievement.Target);
     }
@@ -167,6 +171,7 @@ public sealed class Achievements
         _data.Unlocked[id] = DateTime.Now;
         if (save) Save();
         Unlocked?.Invoke(All.First(a => a.Id == id));
+        if (All.All(a => a.Id == AchievementId.LostSock || IsUnlocked(a.Id))) Unlock(AchievementId.LostSock, save);
     }
 
     private void Save()
