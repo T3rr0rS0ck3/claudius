@@ -28,6 +28,9 @@ public sealed class BreakTracker
         return true;
     }
 
+    /// <summary>The assistant has rested long enough for a break since it last worked.</summary>
+    public bool OnBreak(DateTimeOffset now) => _start != null && now - _lastWork >= Pause;
+
     /// <summary>How long the current stretch of work has lasted so far.</summary>
     public TimeSpan Worked(DateTimeOffset now) => _start is { } start && now - _lastWork < Pause ? now - start : TimeSpan.Zero;
 }

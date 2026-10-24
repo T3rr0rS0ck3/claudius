@@ -46,7 +46,8 @@ public partial class InventoryWindow : Window
     private readonly List<Border> _tabs = [];
     private readonly Dictionary<ModelFamily, Border> _tiles = new();
     private readonly Dictionary<ModelFamily, Border> _chips = new();
-    private readonly List<(Border Tile, Func<Outfit, bool> IsWorn)> _items = [];
+    private readonly List<(Border Tile, Outfit Item, Func<Outfit, bool> IsWorn, UIElement Lock)> _items = [];
+    private readonly Achievements _achievements;
     private readonly List<(Border Swatch, string Color)> _swatches = [];
     /// <summary>Every pet picture in the window, redrawn when the color or an outfit changes.</summary>
     private readonly List<(Image Image, Func<SpriteFrame> Frame)> _pictures = [];
@@ -62,9 +63,14 @@ public partial class InventoryWindow : Window
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
         _app = app;
         _settings = settings;
+        _achievements = app.Achievements;
         _dressing = running;
+        // Reached while the inventory is open: unlock the item right away.
+        Action<Achievement> unlocked = _ => Dispatcher.BeginInvoke(() => { ShowWardrobe(); ShowAchievements(); });
+        _achievements.Unlocked += unlocked;
+        Closed += (_, _) => _achievements.Unlocked -= unlocked;
 
-        string[] tabNames = [Strings.TabModel, Strings.TabWardrobe, Strings.TabColor];
+        string[] tabNames = [Strings.TabModel, Strings.TabWardrobe, Strings.TabColor, Strings.TabAchievements];
         for (int i = 0; i < tabNames.Length; i++)
         {
             int tab = i;
@@ -107,6 +113,7 @@ public partial class InventoryWindow : Window
         ShowWardrobe();
         ShowWardrobeOptions();
         ShowColor();
+        ShowAchievements();
         ShowTab(_lastTab);
         _loading = false;
     }
@@ -119,6 +126,7 @@ public partial class InventoryWindow : Window
         ModelPanel.Visibility = tab == 0 ? Visibility.Visible : Visibility.Collapsed;
         WardrobePanel.Visibility = tab == 1 ? Visibility.Visible : Visibility.Collapsed;
         ColorPanel.Visibility = tab == 2 ? Visibility.Visible : Visibility.Collapsed;
+        AchievementsPanel.Visibility = tab == 3 ? Visibility.Visible : Visibility.Collapsed;
         for (int i = 0; i < _tabs.Count; i++)
         {
             _tabs[i].BorderBrush = i == tab ? Accent : new SolidColorBrush(Color.FromRgb(0x3A, 0x39, 0x36));
@@ -246,11 +254,33 @@ public partial class InventoryWindow : Window
             AddItem(NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
     }
 
-    /// <summary>One item to pick for a slot, shown on the pet on its own.</summary>
+    /// <summary>
+    /// One item to pick for a slot, shown on the pet on its own. Until its achievement is reached it is faded,
+    /// marked with a lock, and a click tells how to get it.
+    /// </summary>
     private void AddItem(WrapPanel slot, string name, Outfit alone, Func<Outfit, bool> isWorn, Func<Outfit, Outfit> wear)
     {
-        var tile = Tile(Picture(() => Smiling(alone), 2), null, name, () => Dress(wear(Dressed)));
-        _items.Add((tile, isWorn));
+        var lockMark = new TextBlock
+        {
+            Text = "🔒",
+            FontSize = 11,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Bottom,
+            Margin = new Thickness(0, 0, -2, -3),
+        };
+        var picture = new Grid { Children = { Picture(() => Smiling(alone), 2), lockMark } };
+        var tile = Tile(picture, null, name, () =>
+        {
+            if (_achievements.LockedBy(alone) is { } achievement)
+            {
+                LockText.Text = Strings.LockedItem(name, Strings.AchievementHint(achievement.Id));
+                LockText.Visibility = Visibility.Visible;
+                return;
+            }
+            LockText.Visibility = Visibility.Collapsed;
+            Dress(wear(Dressed));
+        });
+        _items.Add((tile, alone, isWorn, lockMark));
         slot.Children.Add(tile);
     }
 
@@ -305,7 +335,13 @@ public partial class InventoryWindow : Window
     {
         foreach (var (family, chip) in _chips) Highlight(chip, family == _dressing);
         var outfit = Dressed;
-        foreach (var (tile, isWorn) in _items) Highlight(tile, isWorn(outfit));
+        foreach (var (tile, item, isWorn, lockMark) in _items)
+        {
+            Highlight(tile, isWorn(outfit));
+            bool locked = _achievements.LockedBy(item) != null;
+            tile.Opacity = locked ? 0.45 : 1;
+            lockMark.Visibility = locked ? Visibility.Visible : Visibility.Collapsed;
+        }
         RedrawPictures();
     }
 
@@ -363,6 +399,7 @@ public partial class InventoryWindow : Window
         ShowTab(_lastTab);
         ShowSelection();
         ShowWardrobe();
+        ShowAchievements();
     }
 
     private void ColorBox_KeyDown(object sender, KeyEventArgs e)
@@ -396,6 +433,87 @@ public partial class InventoryWindow : Window
     }
 
     private static Color ToColor(uint argb) => Color.FromRgb((byte)(argb >> 16), (byte)(argb >> 8), (byte)argb);
+
+    // ---------------------------------------------------------------- achievements
+
+    /// <summary>The list of achievements: reached ones with their date, open ones with how far along they are.</summary>
+    private void ShowAchievements()
+    {
+        AchievementList.Children.Clear();
+        int done = Achievements.All.Count(a => _achievements.IsUnlocked(a.Id));
+        AchievementCountText.Text = Strings.AchievementCount(done, Achievements.All.Length);
+        // Reached first, newest on top; then the open ones, closest to done first.
+        var ordered = Achievements.All
+            .OrderBy(a => _achievements.IsUnlocked(a.Id) ? 0 : 1)
+            .ThenByDescending(a => _achievements.UnlockedAt(a.Id))
+            .ThenByDescending(a => (double)_achievements.Progress(a) / a.Target);
+        foreach (var achievement in ordered) AchievementList.Children.Add(AchievementRow(achievement));
+    }
+
+    private Border AchievementRow(Achievement achievement)
+    {
+        bool unlocked = _achievements.IsUnlocked(achievement.Id);
+        var image = new Image
+        {
+            Width = Sprite.Width * 2,
+            Height = Sprite.Height * 2,
+            Source = Sprite.Render(Smiling(achievement.Reward)),
+            Opacity = unlocked ? 1 : 0.45,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.NearestNeighbor);
+
+        var text = new StackPanel { Margin = new Thickness(12, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center };
+        text.Children.Add(new TextBlock
+        {
+            Text = Strings.AchievementTitle(achievement.Id),
+            FontWeight = FontWeights.SemiBold,
+            Foreground = unlocked ? Accent : new SolidColorBrush(Color.FromRgb(0xF5, 0xF4, 0xEF)),
+        });
+        text.Children.Add(new TextBlock
+        {
+            Text = Strings.AchievementHint(achievement.Id),
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = new SolidColorBrush(Color.FromRgb(0xB5, 0xB1, 0xA8)),
+        });
+        text.Children.Add(new TextBlock
+        {
+            Text = unlocked && _achievements.UnlockedAt(achievement.Id) is { } at
+                ? Strings.AchievementDone(at) + " · " + Strings.ItemName(achievement.Reward)
+                : Strings.AchievementReward(Strings.ItemName(achievement.Reward)),
+            FontSize = 11,
+            Foreground = new SolidColorBrush(Color.FromRgb(0x77, 0x73, 0x6B)),
+        });
+
+        var status = new TextBlock
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            FontSize = unlocked ? 16 : 12,
+            Text = unlocked ? "✓" : achievement.Target > 1 ? $"{_achievements.Progress(achievement)}/{achievement.Target}" : "🔒",
+            Foreground = unlocked ? Accent : new SolidColorBrush(Color.FromRgb(0xB5, 0xB1, 0xA8)),
+        };
+
+        var row = new Grid();
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        Grid.SetColumn(text, 1);
+        Grid.SetColumn(status, 2);
+        row.Children.Add(image);
+        row.Children.Add(text);
+        row.Children.Add(status);
+        return new Border
+        {
+            Margin = new Thickness(0, 0, 0, 6),
+            Padding = new Thickness(10, 8, 12, 8),
+            CornerRadius = new CornerRadius(8),
+            BorderThickness = new Thickness(unlocked ? 2 : 1),
+            BorderBrush = unlocked ? Accent : new SolidColorBrush(Color.FromRgb(0x3A, 0x39, 0x36)),
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x2F, 0x2C)),
+            Child = row,
+        };
+    }
 
     // ---------------------------------------------------------------- errors and window
 
