@@ -99,7 +99,7 @@ public sealed class AppSettings
     public string UserName { get; set; } = Capitalize(Environment.UserName);
     /// <summary>
     /// Bubble texts per event in the UI language; one variant is picked at random.
-    /// Placeholders: {name}, {NAME}, {percent}, {session}, {week}, {folder}, {version}, {lastweek}, {day}, {hours}.
+    /// Placeholders: {name}, {NAME}, {percent}, {session}, {week}, {folder}, {version}, {lastweek}, {day}, {hours}, {achievement}, {item}.
     /// </summary>
     public Dictionary<string, List<string>> Texts { get; set; } = [];
     /// <summary>Which rewordings of the default texts have been applied, see <see cref="RewordedTexts"/>.</summary>
@@ -169,6 +169,7 @@ public sealed class AppSettings
         ["GoodMorning"] = ["Good morning, {name}! ☀️", "*stretch* Rested and ready."],
         ["Break"] = ["You've been at it for {hours}, {name}. Time for a little break? ☕", "*stretch* {hours} non-stop… how about a short break?"],
         ["BreakLimit"] = ["Limit reached – perfect time for a break, {name}! ☕"],
+        ["Achievement"] = ["Achievement: {achievement}! New in the wardrobe: {item} 🎉", "{achievement}! That earned me something: {item} 🎉"],
     };
 
     private static Dictionary<string, List<string>> GermanTexts() => new()
@@ -207,6 +208,7 @@ public sealed class AppSettings
         ["GoodMorning"] = ["Guten Morgen, {name}! ☀️", "*streck* Ausgeschlafen."],
         ["Break"] = ["Du bist schon {hours} dran, {name}. Zeit für eine kleine Pause? ☕", "*streck* {hours} am Stück… wie wär's mit einer kurzen Pause?"],
         ["BreakLimit"] = ["Limit erreicht – perfekte Zeit für eine Pause, {name}! ☕"],
+        ["Achievement"] = ["Erfolg: {achievement}! Neu in der Garderobe: {item} 🎉", "{achievement}! Dafür gibt's was Neues: {item} 🎉"],
     };
 
     public static AppSettings Load()

@@ -306,6 +306,50 @@ public static class Strings
         Neckwear.Bell => L("Collar with bell", "Halsband mit Glöckchen"),
         _ => Nothing,
     };
+    public static string ItemName(Outfit item) =>
+        item.Hat != Hat.None ? HatName(item.Hat) : item.Face != FaceWear.None ? FaceName(item.Face) : NeckName(item.Neck);
+    public static string TabAchievements => L("Achievements", "Erfolge");
+    public static string AchievementTitle(AchievementId id) => id switch
+    {
+        AchievementId.FirstSession => L("Hello, assistant!", "Hallo, Assistent!"),
+        AchievementId.Sessions10 => L("Hard at work", "Fleißig"),
+        AchievementId.Sessions100 => L("Old hand", "Alter Hase"),
+        AchievementId.Feed => L("Cookie monster", "Krümelmonster"),
+        AchievementId.Pat => L("Cuddle time", "Kuschelzeit"),
+        AchievementId.Play => L("Playmate", "Spielkamerad"),
+        AchievementId.Tickle => L("Tickle attack", "Kitzelattacke"),
+        AchievementId.NightOwl => L("Night owl", "Nachteule"),
+        AchievementId.BreakTaken => L("Well rested", "Gut erholt"),
+        AchievementId.ReaperEscaped => L("Cheated death", "Dem Sensenmann entwischt"),
+        AchievementId.LimitReached => L("All the way", "Bis zum Anschlag"),
+        AchievementId.ModelsTried => L("Connoisseur", "Modellkenner"),
+        _ => L("Party mood", "Feierlaune"),
+    };
+    public static string AchievementHint(AchievementId id) => id switch
+    {
+        AchievementId.FirstSession => L("Work with the AI assistant for the first time.", "Arbeite zum ersten Mal mit dem KI-Assistenten."),
+        AchievementId.Sessions10 => L("Work in 10 sessions with the AI assistant.", "Arbeite in 10 Sessions mit dem KI-Assistenten."),
+        AchievementId.Sessions100 => L("Work in 100 sessions with the AI assistant.", "Arbeite in 100 Sessions mit dem KI-Assistenten."),
+        AchievementId.Feed => L("Feed Claudius 25 cookies.", "Füttere Claudius mit 25 Keksen."),
+        AchievementId.Pat => L("Pat Claudius 25 times.", "Streichle Claudius 25-mal."),
+        AchievementId.Play => L("Play with Claudius 25 times.", "Spiele 25-mal mit Claudius."),
+        AchievementId.Tickle => L("Tickle Claudius 25 times.", "Kitzle Claudius 25-mal."),
+        AchievementId.NightOwl => L("Spend a night with Claudius (night mode).", "Verbringe eine Nacht mit Claudius (Nachtmodus)."),
+        AchievementId.BreakTaken => L("Take a break after Claudius suggested one.", "Mach eine Pause, nachdem Claudius eine vorgeschlagen hat."),
+        AchievementId.ReaperEscaped => L("Clean up a session with /compact or /clear while the grim reaper is waiting.",
+            "Räume eine Session mit /compact oder /clear auf, während der Sensenmann wartet."),
+        AchievementId.LimitReached => L("Use up a limit once.", "Schöpfe einmal ein Limit aus."),
+        AchievementId.ModelsTried => L("Work with three different AI models.", "Arbeite mit drei verschiedenen KI-Modellen."),
+        _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
+            "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
+    };
+    public static string AchievementReward(string item) => L($"Unlocks: {item}", $"Schaltet frei: {item}");
+    public static string AchievementDone(DateTime at) =>
+        L("Reached on ", "Erreicht am ") + at.ToString("d", Culture);
+    public static string AchievementCount(int done, int total) => L($"{done} of {total} reached", $"{done} von {total} erreicht");
+    public static string LockedItem(string item, string hint) => L($"🔒 {item}: {hint}", $"🔒 {item}: {hint}");
+    public static string AchievementNotification(string title, string item) =>
+        L($"Achievement: {title}! New in the wardrobe: {item}", $"Erfolg: {title}! Neu in der Garderobe: {item}");
     public static string InventoryHint => L(
         "Applies to new sessions. Running sessions keep their model and effort; change them there with /model and /effort.",
         "Gilt für neue Sessions. Laufende Sessions behalten Modell und Aufwand; dort wechselst du mit /model und /effort.");

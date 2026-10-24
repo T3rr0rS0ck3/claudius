@@ -37,10 +37,15 @@ public partial class App : Application
     private bool? _wasNight;
     private IReadOnlyList<HistorySample>? _reviewedHistory;
     private readonly BreakTracker _breaks = new();
+    /// <summary>A break was suggested and not taken yet; taking it is an achievement.</summary>
+    private bool _breakSuggested;
+    /// <summary>Achievements reached but not announced yet, one bubble at a time.</summary>
+    private readonly Queue<Achievement> _announcements = new();
     private DateTimeOffset _reviewCheckAt;
     private DateTime _settingsWrite;
 
     public AppSettings Settings { get; private set; } = null!;
+    public Achievements Achievements { get; private set; } = null!;
     public bool PetVisible => _pet.IsVisible;
     /// <summary>A newer release found by the last update check.</summary>
     public UpdateInfo? AvailableUpdate { get; private set; }
@@ -81,6 +86,8 @@ public partial class App : Application
         Legacy.RemoveOldAutostart();
         if (Settings.StartWithWindows != Autostart.IsEnabled()) Autostart.Set(Settings.StartWithWindows);
         Legacy.MigrateTheme(Settings);
+        Achievements = Achievements.Load();
+        Achievements.Unlocked += _announcements.Enqueue;
 
         ApplyPetColor();
         ContextLevels.Thresholds = Settings.ContextThresholds;
@@ -92,7 +99,11 @@ public partial class App : Application
         _pet.GhostDropped += OnGhostDropped;
         _pet.FilesDropped += OnFilesDropped;
         _pet.Moved += SavePosition;
-        _pet.Emoted += emote => Say(emote == Emote.Feed && _pet.Unwell ? "FeedSick" : emote.ToString());
+        _pet.Emoted += emote =>
+        {
+            Say(emote == Emote.Feed && _pet.Unwell ? "FeedSick" : emote.ToString());
+            Achievements.Count(emote.ToString());
+        };
         _pet.PetImage.ContextMenu = BuildContextMenu();
         _pet.Show();
 
@@ -122,6 +133,7 @@ public partial class App : Application
         {
             _pet.PlayRecovery(from);
             Say(kind == "clear" ? "ContextCleared" : "ContextCompacted", session.Label);
+            if (from >= 3) Achievements.Unlock(AchievementId.ReaperEscaped);
         };
 
         Say(_state.Mood == PetMood.Unknown ? "NoData" : "Greeting");
@@ -200,6 +212,19 @@ public partial class App : Application
         // Re-evaluate every second: reset times pass, "working" expires, countdowns tick.
         Evaluate(initial: false);
         _sessions.Poll();
+        AnnounceAchievement();
+    }
+
+    /// <summary>Cheers about the next achievement reached, once the pet has finished speaking.</summary>
+    private void AnnounceAchievement()
+    {
+        if (_announcements.Count == 0 || _pet.Speaking) return;
+        var achievement = _announcements.Dequeue();
+        _pet.Cheer(TimeSpan.FromSeconds(3));
+        (string, string)[] extra = [("{achievement}", Strings.AchievementTitle(achievement.Id)), ("{item}", Strings.ItemName(achievement.Reward))];
+        if (Settings.SpeechBubbles) Say("Achievement", extra: extra);
+        else if (Settings.Notifications)
+            ShowNotification("Claudius", Strings.AchievementNotification(Strings.AchievementTitle(achievement.Id), Strings.ItemName(achievement.Reward)));
     }
 
     private void Evaluate(bool initial)
@@ -223,11 +248,19 @@ public partial class App : Application
         }
         _lastMood = mood;
         _pet.SetMood(mood, Working);
-        _pet.SetOutfit(Settings.ModelOutfits ? Settings.OutfitFor(Sprite.FamilyOf(_state.Snapshot?.Model)) : Outfit.None);
+        var family = Sprite.FamilyOf(_state.Snapshot?.Model);
+        _pet.SetOutfit(Settings.ModelOutfits ? Settings.OutfitFor(family) : Outfit.None);
+        Achievements.ModelSeen(family);
+        if (mood == PetMood.Exhausted) Achievements.Unlock(AchievementId.LimitReached);
         ApplyOccasion(initial);
         if (!initial) CheckWeekReview(now);
         if (_breaks.Update(Working, now, TimeSpan.FromMinutes(Settings.BreakAfterMinutes)) && Settings.BreakReminder && !initial)
             SuggestBreak(limit: false, now);
+        if (_breakSuggested && _breaks.OnBreak(now))
+        {
+            _breakSuggested = false;
+            Achievements.Unlock(AchievementId.BreakTaken);
+        }
 
         var snapshot = _state.Snapshot;
         CheckWarning(true, snapshot?.FiveHour, _state.Session, Settings.SessionWarnThresholds, _sessionWarn, initial, now);
@@ -245,8 +278,11 @@ public partial class App : Application
     {
         var time = Occasions.Now;
         bool night = Occasions.IsNight(time, Settings);
-        _pet.SetAccessory(Occasions.For(time, Settings));
+        var accessory = Occasions.For(time, Settings);
+        _pet.SetAccessory(accessory);
         _pet.SetNight(night);
+        if (night) Achievements.Unlock(AchievementId.NightOwl);
+        else if (accessory != Accessory.None) Achievements.Unlock(AchievementId.Celebration);
         if (night && _wasNight == false && !initial) Say("GoodNight");
         if (!night && _wasNight == true && !initial) Say("GoodMorning");
         _wasNight = night;
@@ -282,6 +318,7 @@ public partial class App : Application
     private void SuggestBreak(bool limit, DateTimeOffset now)
     {
         _pet.Stretch();
+        _breakSuggested = true;
         string hours = Strings.WorkTime(_breaks.Worked(now));
         if (Settings.SpeechBubbles)
             Say(limit ? "BreakLimit" : "Break", extra: [("{hours}", hours)]);
@@ -443,6 +480,7 @@ public partial class App : Application
 
     private void ApplySessions()
     {
+        foreach (var session in _sessions.Sessions) Achievements.SessionSeen(session.Id);
         _pet.SetSessions(_sessions.Sessions, _sessions.Overall, Settings.SessionMarks);
         _pet.SetMood(_state.Mood, Working);
     }
