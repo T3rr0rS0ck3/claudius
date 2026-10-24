@@ -113,6 +113,8 @@
                             <WrapPanel x:Name="DisneyItems" />
                             <TextBlock Text="{x:Static core:Strings.SlotWizarding}" Style="{StaticResource SlotLabel}" />
                             <WrapPanel x:Name="WizardingItems" />
+                            <TextBlock Text="{x:Static core:Strings.SlotStarWars}" Style="{StaticResource SlotLabel}" />
+                            <WrapPanel x:Name="StarWarsItems" />
                         </StackPanel>
                     </ScrollViewer>
                     <TextBlock x:Name="LockText" Style="{StaticResource Hint}" FontSize="12" Margin="2,8,0,0" Visibility="Collapsed" />

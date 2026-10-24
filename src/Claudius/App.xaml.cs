@@ -99,6 +99,7 @@ public partial class App : Application
         _pet.GhostDropped += OnGhostDropped;
         _pet.FilesDropped += OnFilesDropped;
         _pet.Moved += SavePosition;
+        _pet.Moved += () => Achievements.Count(Achievements.DragsCounter);
         _pet.Emoted += emote =>
         {
             Say(emote != Emote.Feed ? emote.ToString() : _pet.Unwell ? "FeedSick" : Settings.Snack == Snack.Beans ? "FeedBeans" : "Feed");

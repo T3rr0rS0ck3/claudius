@@ -11,7 +11,7 @@ namespace Claudius.Core;
 public enum AchievementId
 {
     FirstSession, Sessions10, Sessions100, Feed, Pat, Play, Tickle,
-    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo, OnceUponATime, EveryFlavour,
+    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo, OnceUponATime, EveryFlavour, TheForce,
 }
 
 /// <summary>
@@ -23,14 +23,15 @@ public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counte
     /// <summary>
     /// Whether reaching it makes this costume item wearable: its reward, for the football fan every fan scarf, for
     /// the hard landings every football helmet, for Wahoo! every Super Mario costume, for Once upon a time every
-    /// Disney costume and for Every flavour every Harry Potter costume (and the beans as a snack).
+    /// Disney costume, for Every flavour every Harry Potter costume and for May the Force every Star Wars costume.
     /// </summary>
     public bool Unlocks(Outfit item) => item == Reward
         || Id == AchievementId.FootballFan && Sprite.IsFanScarf(item.Neck)
         || Id == AchievementId.HardLandings && Sprite.IsFootballHelmet(item.Hat)
         || Id == AchievementId.Wahoo && Sprite.IsMarioCostume(item)
         || Id == AchievementId.OnceUponATime && Sprite.IsDisneyCostume(item)
-        || Id == AchievementId.EveryFlavour && Sprite.IsWizardingCostume(item);
+        || Id == AchievementId.EveryFlavour && Sprite.IsWizardingCostume(item)
+        || Id == AchievementId.TheForce && Sprite.IsStarWarsCostume(item);
 }
 
 /// <summary>
@@ -58,6 +59,10 @@ public sealed class Achievements
     public const string BeansCounter = "Beans";
     /// <summary>Feedings with beans for all Harry Potter costumes.</summary>
     public const int BeansNeeded = 100;
+    /// <summary>Counts the times the pet is picked up and moved with the mouse.</summary>
+    public const string DragsCounter = "Drags";
+    /// <summary>Moves with the mouse for all Star Wars costumes.</summary>
+    public const int DragsNeeded = 100;
 
     public static readonly Achievement[] All =
     [
@@ -79,6 +84,7 @@ public sealed class Achievements
         new(AchievementId.Wahoo, new(Hat.Mario), JumpsCounter, JumpsNeeded),
         new(AchievementId.OnceUponATime, new(Hat.MickeyEars), nameof(Emote.Pat), PatsNeeded),
         new(AchievementId.EveryFlavour, new(Hat.SortingHat), BeansCounter, BeansNeeded),
+        new(AchievementId.TheForce, new(Face: FaceWear.DarthVader), DragsCounter, DragsNeeded),
     ];
 
     /// <summary>How many session ids are remembered so that each session is counted once.</summary>
