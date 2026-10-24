@@ -126,6 +126,8 @@ public partial class PetWindow : Window
     public event Action<Emote>? Emoted;
     /// <summary>The pet landed from a long fall and went splat.</summary>
     public event Action? Splatted;
+    /// <summary>The pet took off for a jump or a hop.</summary>
+    public event Action? Jumped;
 
     public PetWindow()
     {
@@ -785,10 +787,12 @@ public partial class PetWindow : Window
         var pose = (_walker.Motion, _walker.Direction);
         if (pose != _pose)
         {
-            bool splatted = pose.Motion == Motion.Splat && _pose.Motion != Motion.Splat;
+            var previous = _pose.Motion;
+            bool splatted = pose.Motion == Motion.Splat && previous != Motion.Splat;
             if (splatted) _splatStart = DateTime.Now;
             _pose = pose;
             if (splatted) Splatted?.Invoke();
+            else if (pose.Motion == Motion.Jump && previous != Motion.Jump) Jumped?.Invoke();
             Render();
         }
         else if (pose.Motion == Motion.Splat && SquashLevel() != _squashShown)

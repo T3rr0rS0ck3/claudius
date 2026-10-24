@@ -27,9 +27,11 @@ public enum Hat
     Cardinals, Falcons, Ravens, Bills, Panthers, Bears, Bengals, Browns, Cowboys, Broncos, Lions, Packers, Texans, Colts,
     Jaguars, Chiefs, Raiders, Chargers, Rams, Dolphins, Vikings, Patriots, Saints, Giants, Jets, Eagles, Steelers,
     FortyNiners, Seahawks, Buccaneers, Titans, Commanders,
+    // The Super Mario characters
+    Mario, Luigi, Wario, Waluigi, Peach, Daisy, Rosalina, Toad, Toadette, Bowser, Birdo,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
-public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch }
+public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy }
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
 public enum Neckwear
 {
@@ -37,6 +39,8 @@ public enum Neckwear
     // Fan scarves in the colors of the football clubs, by town
     Augsburg, UnionBerlin, Bremen, Dortmund, Elversberg, Frankfurt, Freiburg, Schalke, Hamburg, Cologne, Leverkusen,
     Mainz, Gladbach, Bayern, Paderborn, Stuttgart,
+    // Donkey Kong's tie
+    DonkeyKong,
 }
 /// <summary>The AI model families the pet dresses up for; <see cref="Other"/> for unknown models and none.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<ModelFamily>))]
@@ -207,6 +211,34 @@ public static class Sprite
 
     /// <summary>Whether this is one of the football helmets in an NFL team's colors.</summary>
     public static bool IsFootballHelmet(Hat hat) => FootballHelmets.ContainsKey(hat);
+
+    /// <summary>
+    /// A plumber's cap: its color, the round emblem on the front and the letter on it, five pixels wide and three
+    /// tall (X = letter).
+    /// </summary>
+    private readonly record struct PlumberCap(uint Cap, uint Emblem, uint Letter, string[] Glyph);
+
+    private static readonly Dictionary<Hat, PlumberCap> PlumberCaps = new()
+    {
+        [Hat.Mario] = new(0xFFE52521, ClubWhite, 0xFFE52521, ["XX.XX", "X.X.X", "X...X"]),
+        [Hat.Luigi] = new(0xFF3DA33F, ClubWhite, 0xFF3DA33F, [".X...", ".X...", ".XXX."]),
+        [Hat.Wario] = new(0xFFF5C400, ClubWhite, 0xFF2E5FC9, ["X...X", "X.X.X", "XX.XX"]),
+        [Hat.Waluigi] = new(0xFF5F2C82, 0xFFF5C400, 0xFF5F2C82, [".XXX.", ".X...", ".X..."]),
+    };
+
+    /// <summary>A princess's crown and hair: <paramref name="Locks"/> rows of hair down the sides of the head.</summary>
+    private readonly record struct Princess(uint Crown, uint CrownShade, uint Jewel, uint SideJewel, uint Hair, uint HairShade, int Locks);
+
+    private static readonly Dictionary<Hat, Princess> Princesses = new()
+    {
+        [Hat.Peach] = new(GoldColor, GoldShade, 0xFF3B6FE0, JewelColor, 0xFFFFDD6E, 0xFFE0B64A, 6),
+        [Hat.Daisy] = new(GoldColor, GoldShade, 0xFF2BB3A0, 0xFF2BB3A0, 0xFFC8662A, 0xFF9C4A1C, 3),
+        [Hat.Rosalina] = new(0xFFD9E2EE, 0xFFA6B2C4, 0xFF3B6FE0, JewelColor, 0xFFF4EED8, 0xFFD2C9A8, 6),
+    };
+
+    /// <summary>Whether this costume item belongs to a Super Mario character.</summary>
+    public static bool IsMarioCostume(Outfit item) =>
+        item.Hat is >= Hat.Mario and <= Hat.Birdo || item.Face == FaceWear.ShyGuy || item.Neck == Neckwear.DonkeyKong;
 
     /// <summary>Warm orange, the default body color.</summary>
     public const uint DefaultBodyColor = 0xFFD97757;
@@ -406,7 +438,7 @@ public static class Sprite
             }
         }
         // Behind sunglasses the eyes stay hidden, even where looking up or down would peek past the lenses
-        if (f.Outfit.Face != FaceWear.Sunglasses)
+        if (f.Outfit.Face is not (FaceWear.Sunglasses or FaceWear.ShyGuy))
         {
             Eye(c0 + 3, -1);
             Eye(c0 + 10, 1);
@@ -476,6 +508,11 @@ public static class Sprite
                 case FaceWear.EyePatch:
                     Glyph(c0, FrameColor, by, "......X", ".....X.", "XXXXX..", "..XXX..", "..XXX..", "...X...");
                     break;
+                // Shy Guy's round white mask over the whole face, with two dark eye holes and a mouth hole
+                case FaceWear.ShyGuy:
+                    Glyph(c0 + 1, FurWhite, by + 1, "..XXXXXXXX..", ".XXXXXXXXXX.", "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".XXXXXXXXXX.", "..XXXXXXXX..");
+                    Glyph(c0 + 1, EyeColor, by + 2, "...X....X...", "...X....X...", "............", ".....XX.....");
+                    break;
             }
             switch (f.Outfit.Neck)
             {
@@ -496,6 +533,12 @@ public static class Sprite
                     Glyph(c0, SantaRed, by + 7, "XXXXXXXXXXXXXX");
                     Glyph(c0 + 6, GoldColor, by + 8, "XX", "XX");
                     Glyph(c0 + 6, GoldShade, by + 9, "XX");
+                    break;
+                // Donkey Kong's red tie, hanging down between the legs, with a yellow mark
+                case Neckwear.DonkeyKong:
+                    Glyph(c0 + 5, SantaRed, by + 7, ".XX.", "XXXX", ".XX.", ".XX.");
+                    Glyph(c0 + 6, BindingColor, by + 7, "XX");
+                    Glyph(c0 + 6, GoldColor, by + 8, "X");
                     break;
                 // A fan scarf in a club's colors, one end hanging down between the legs
                 case var club when FanScarves.TryGetValue(club, out var scarf):
@@ -577,6 +620,46 @@ public static class Sprite
             // A golden halo floating above the head
             case Hat.Halo:
                 Glyph(c0, GoldColor, by - 4, ".XXXX.", "X....X", ".XXXX.");
+                break;
+            // A plumber's cap with a round emblem and its letter on the front, the brim reaching out on both sides
+            case var plumber when PlumberCaps.TryGetValue(plumber, out var cap):
+                Glyph(c0 - 2, cap.Cap, by - 5, "..XXXXX..", ".XXXXXXX.", "XXXXXXXXX", "XXXXXXXXX");
+                Glyph(c0, cap.Emblem, by - 4, ".XXX.", "XXXXX", "XXXXX");
+                Glyph(c0, cap.Letter, by - 4, cap.Glyph);
+                Glyph(c0 - 3, Blend(cap.Cap, 0xFF000000, 0.25), by - 1, "XXXXXXXXXXX");
+                break;
+            // A princess's crown with jewels on her hair, which frames the face and hangs down the sides
+            case var princess when Princesses.TryGetValue(princess, out var royal):
+                Glyph(c0 - 1, royal.Hair, by - 1, ".XXXXXXXXXXXXXX.");
+                Glyph(c0 - 1, royal.Hair, by, "XXXXXXXXXXXXXXXX");
+                for (int i = 1; i <= royal.Locks && f.Squash == 0; i++)
+                    Glyph(c0 - 1, i == royal.Locks ? royal.HairShade : royal.Hair, by + i, "XX............XX");
+                if (princess == Hat.Rosalina && f.Squash == 0) // her long bang over the left eye
+                    Glyph(c0 + 1, royal.Hair, by + 1, "XXXX", "XXXX", ".XXX", "..X.");
+                Glyph(c0 + 4, royal.Crown, by - 4, "X.XX.X", "XXXXXX", "XXXXXX");
+                Glyph(c0 + 4, royal.CrownShade, by - 2, "XXXXXX");
+                Glyph(c0 + 4, royal.SideJewel, by - 3, ".X..X.");
+                Glyph(c0 + 4, royal.Jewel, by - 3, "..XX..");
+                break;
+            // Toad's and Toadette's big mushroom caps, white with red spots or pink with white spots
+            case Hat.Toad or Hat.Toadette:
+            {
+                var (top, spots) = f.Outfit.Hat == Hat.Toad ? (FurWhite, SantaRed) : (0xFFF48FBF, FurWhite);
+                Glyph(c0 - 1, top, by - 4, ".....XXXXXX.....", "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                Glyph(c0 - 1, spots, by - 4, "......XXXX......", "...XX......XX...", "..XXX......XXX..", "................");
+                Glyph(c0 - 1, top == FurWhite ? ChefShade : 0xFFD06E9E, by, "XXXXXXXXXXXXXXXX");
+                break;
+            }
+            // Bowser's two horns and his red spiky hair
+            case Hat.Bowser:
+                Glyph(c0 - 1, BoneColor, by - 3, "X..............X", ".X............X.", ".XX..........XX.");
+                Glyph(c0 + 3, 0xFFE2591B, by - 3, "X.X.X.X.", "XXXXXXXX", "XXXXXXXX");
+                break;
+            // Birdo's big red bow with white dots
+            case Hat.Birdo:
+                Glyph(c0, SantaRed, by - 4, "XX...XX", "XXX.XXX", "XXXXXXX", "XXX.XXX", "XX...XX");
+                Glyph(c0, BindingColor, by - 2, "...X...");
+                Glyph(c0, FurWhite, by - 3, ".X...X.", ".......", "X.....X");
                 break;
             // A football helmet in a team's colors around the whole head: the shell with a stripe down the middle,
             // ear flaps down the sides and a face mask bar below the eyes (just the shell on a squashed pet)

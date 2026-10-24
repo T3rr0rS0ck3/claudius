@@ -11,7 +11,7 @@ namespace Claudius.Core;
 public enum AchievementId
 {
     FirstSession, Sessions10, Sessions100, Feed, Pat, Play, Tickle,
-    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings,
+    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings, Wahoo,
 }
 
 /// <summary>
@@ -21,12 +21,13 @@ public enum AchievementId
 public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counter = null, int Target = 1)
 {
     /// <summary>
-    /// Whether reaching it makes this costume item wearable: its reward, for the football fan every fan scarf and
-    /// for the hard landings every football helmet.
+    /// Whether reaching it makes this costume item wearable: its reward, for the football fan every fan scarf, for
+    /// the hard landings every football helmet and for Wahoo! every Super Mario costume.
     /// </summary>
     public bool Unlocks(Outfit item) => item == Reward
         || Id == AchievementId.FootballFan && Sprite.IsFanScarf(item.Neck)
-        || Id == AchievementId.HardLandings && Sprite.IsFootballHelmet(item.Hat);
+        || Id == AchievementId.HardLandings && Sprite.IsFootballHelmet(item.Hat)
+        || Id == AchievementId.Wahoo && Sprite.IsMarioCostume(item);
 }
 
 /// <summary>
@@ -44,6 +45,10 @@ public sealed class Achievements
     public const string FallsCounter = "Falls";
     /// <summary>Long falls for all football helmets.</summary>
     public const int FallsNeeded = 100;
+    /// <summary>Counts the pet's jumps and hops.</summary>
+    public const string JumpsCounter = "Jumps";
+    /// <summary>Jumps for all Super Mario costumes.</summary>
+    public const int JumpsNeeded = 500;
 
     public static readonly Achievement[] All =
     [
@@ -62,6 +67,7 @@ public sealed class Achievements
         new(AchievementId.ModelsTried, new(Face: FaceWear.Monocle), Target: ModelsNeeded),
         new(AchievementId.Celebration, new(Hat.TopHat)),
         new(AchievementId.HardLandings, new(Hat.Packers), FallsCounter, FallsNeeded),
+        new(AchievementId.Wahoo, new(Hat.Mario), JumpsCounter, JumpsNeeded),
     ];
 
     /// <summary>How many session ids are remembered so that each session is counted once.</summary>

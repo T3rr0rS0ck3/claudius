@@ -105,6 +105,7 @@ public partial class App : Application
             Achievements.Count(emote.ToString());
         };
         _pet.Splatted += () => Achievements.Count(Achievements.FallsCounter);
+        _pet.Jumped += () => Achievements.Count(Achievements.JumpsCounter);
         _pet.PetImage.ContextMenu = BuildContextMenu();
         _pet.Show();
 
