@@ -250,20 +250,36 @@ public partial class InventoryWindow : Window
         WardrobePreview.Source = Sprite.Render(Smiling(Dressed));
         _pictures.Add((WardrobePreview, () => Smiling(Dressed)));
 
-        foreach (var hat in Enum.GetValues<Hat>())
-            AddItem(Sprite.IsStarWarsCostume(new(hat)) ? StarWarsItems : Sprite.IsWizardingCostume(new(hat)) ? WizardingItems : Sprite.IsDisneyCostume(new(hat)) ? DisneyItems : Sprite.IsMarioCostume(new(hat)) ? MarioItems : Sprite.IsFootballHelmet(hat) ? HelmetItems : HatItems, Strings.HatName(hat), new Outfit(hat), o => o.Hat == hat, o => o with { Hat = hat });
-        foreach (var face in Enum.GetValues<FaceWear>())
-            AddItem(Sprite.IsStarWarsCostume(new(Face: face)) ? StarWarsItems : Sprite.IsWizardingCostume(new(Face: face)) ? WizardingItems : Sprite.IsDisneyCostume(new(Face: face)) ? DisneyItems : Sprite.IsMarioCostume(new(Face: face)) ? MarioItems : FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
-        foreach (var neck in Enum.GetValues<Neckwear>())
-            AddItem(Sprite.IsStarWarsCostume(new(Neck: neck)) ? StarWarsItems : Sprite.IsWizardingCostume(new(Neck: neck)) ? WizardingItems : Sprite.IsDisneyCostume(new(Neck: neck)) ? DisneyItems : Sprite.IsMarioCostume(new(Neck: neck)) ? MarioItems : Sprite.IsFanScarf(neck) ? FanScarfItems : NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
+        foreach (var hat in Enum.GetValues<Hat>().Where(h => h != Hat.None))
+            AddItem(new Outfit(hat), Strings.HatName(hat), "🎩", Strings.SlotHead, o => o.Hat == hat, o => o with { Hat = hat },
+                o => o with { Hat = Hat.None });
+        foreach (var face in Enum.GetValues<FaceWear>().Where(f => f != FaceWear.None))
+            AddItem(new Outfit(Face: face), Strings.FaceName(face), "👓", Strings.SlotFace, o => o.Face == face,
+                o => o with { Face = face }, o => o with { Face = FaceWear.None });
+        foreach (var neck in Enum.GetValues<Neckwear>().Where(n => n != Neckwear.None))
+            AddItem(new Outfit(Neck: neck), Strings.NeckName(neck), "🧣", Strings.SlotNeck, o => o.Neck == neck,
+                o => o with { Neck = neck }, o => o with { Neck = Neckwear.None });
     }
 
+    /// <summary>The row an item goes in: its theme, the fan scarves, the football helmets or the standard items.</summary>
+    private WrapPanel Row(Outfit item) =>
+        Sprite.IsStarWarsCostume(item) ? StarWarsItems
+        : Sprite.IsWizardingCostume(item) ? WizardingItems
+        : Sprite.IsDisneyCostume(item) ? DisneyItems
+        : Sprite.IsMarioCostume(item) ? MarioItems
+        : Sprite.IsFootballHelmet(item.Hat) ? HelmetItems
+        : Sprite.IsFanScarf(item.Neck) ? FanScarfItems
+        : StandardItems;
+
     /// <summary>
-    /// One item to pick for a slot, shown on the pet on its own. Until its achievement is reached it is faded,
-    /// marked with a lock, and a click tells how to get it.
+    /// One item to pick, shown on the pet on its own, with a mark in the corner for where it is worn. A click puts it
+    /// on, or takes it off again if it is worn. Until its achievement is reached it is faded, marked with a lock, and a
+    /// click tells how to get it.
     /// </summary>
-    private void AddItem(WrapPanel slot, string name, Outfit alone, Func<Outfit, bool> isWorn, Func<Outfit, Outfit> wear)
+    private void AddItem(Outfit alone, string name, string slotMark, string slotName, Func<Outfit, bool> isWorn,
+        Func<Outfit, Outfit> wear, Func<Outfit, Outfit> takeOff)
     {
+        var row = Row(alone);
         var lockMark = new TextBlock
         {
             Text = "🔒",
@@ -273,7 +289,16 @@ public partial class InventoryWindow : Window
             Margin = new Thickness(0, 0, -2, -3),
         };
         var picture = new Grid { Children = { Picture(() => Smiling(alone), 2), lockMark } };
-        var tile = Tile(picture, null, name, () =>
+        picture.Children.Add(new TextBlock
+        {
+            Text = slotMark,
+            FontSize = 9,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(-2, -3, 0, 0),
+            Foreground = new SolidColorBrush(Color.FromRgb(0xB8, 0xB4, 0xAC)),
+        });
+        var tile = Tile(picture, null, $"{name} · {slotName}", () =>
         {
             if (_achievements.LockedBy(alone) is { } achievement)
             {
@@ -282,10 +307,10 @@ public partial class InventoryWindow : Window
                 return;
             }
             LockText.Visibility = Visibility.Collapsed;
-            Dress(wear(Dressed));
+            Dress(isWorn(Dressed) ? takeOff(Dressed) : wear(Dressed));
         });
         _items.Add((tile, alone, isWorn, lockMark));
-        slot.Children.Add(tile);
+        row.Children.Add(tile);
     }
 
     /// <summary>The snacks to choose from, the pet looking up at each.</summary>

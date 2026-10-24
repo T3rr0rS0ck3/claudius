@@ -269,6 +269,7 @@ public static class Strings
         "Unbekannte Modelle, und solange noch keine Session ihr Modell gemeldet hat.");
     public static string GroupAllModels => L("FOR ALL MODELS", "FÜR ALLE MODELLE");
     public static string GroupOutfitPerModel => L("OUTFIT PER MODEL", "OUTFIT PRO MODELL");
+    public static string SlotStandard => "Standard";
     public static string SlotHead => L("Head", "Kopf");
     public static string SlotFace => L("Face", "Gesicht");
     public static string SlotNeck => L("Neck", "Hals");
@@ -285,8 +286,8 @@ public static class Strings
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
-        "The pet wears the outfit of the model that is running. Seasonal headwear and the nightcap take the place of the hat while they are switched on.",
-        "Das Pet trägt das Outfit des Modells, das gerade läuft. Saison-Hüte und die Schlafmütze ersetzen den Hut, solange sie eingeschaltet sind.");
+        "The pet wears the outfit of the model that is running. Seasonal headwear and the nightcap take the place of the hat while they are switched on. The mark in the corner of an item shows where it is worn: 🎩 on the head, 👓 on the face, 🧣 around the neck. Click a worn item again to take it off.",
+        "Das Pet trägt das Outfit des Modells, das gerade läuft. Saison-Hüte und die Schlafmütze ersetzen den Hut, solange sie eingeschaltet sind. Das Zeichen in der Ecke zeigt, wo ein Teil getragen wird: 🎩 auf dem Kopf, 👓 im Gesicht, 🧣 am Hals. Ein getragenes Teil noch mal anklicken zieht es aus.");
     public static string ColorPresets => L("Presets", "Vorlagen");
     public static string HexColor => L("Own color", "Eigene Farbe");
     public static string HatName(Hat hat) => hat switch
