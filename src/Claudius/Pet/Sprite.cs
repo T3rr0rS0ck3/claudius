@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -13,8 +14,20 @@ public enum Mark
     Heart1, Heart2, Cookie, Crumbs, Ball1, Ball2, Ball3,
 }
 public enum Tint { Normal, Hot, Pale, Ghost }
-/// <summary>Something the pet wears, drawn over the body: so far one per AI model (Opus, Sonnet, Haiku).</summary>
-public enum Outfit { None, Crown, Sunglasses, Flower, WizardHat }
+/// <summary>What the pet wears, one item per slot: on its head, on its face and around its neck.</summary>
+public readonly record struct Outfit(Hat Hat = Hat.None, FaceWear Face = FaceWear.None, Neckwear Neck = Neckwear.None)
+{
+    public static Outfit None => default;
+}
+[JsonConverter(typeof(JsonStringEnumConverter<Hat>))]
+public enum Hat { None, Crown, Flower, WizardHat, TopHat, CowboyHat, ChefHat, Cap, Headphones, HardHat, VikingHelmet, PropellerCap, Halo }
+[JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
+public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch }
+[JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
+public enum Neckwear { None, BowTie, Scarf, Bell }
+/// <summary>The AI model families the pet dresses up for; <see cref="Other"/> for unknown models and none.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<ModelFamily>))]
+public enum ModelFamily { Opus, Sonnet, Haiku, Fable, Other }
 /// <summary>Headwear for the season or the night; it replaces the outfit's headwear (not its sunglasses).</summary>
 public enum Accessory { None, WitchHat, SantaHat, PartyHat, BunnyEars, Nightcap }
 /// <summary>The bed's parts: behind the pet (head and foot ends, pillow) and in front of it (blanket), or all.</summary>
@@ -32,7 +45,7 @@ public readonly record struct SpriteFrame(
     int Sweat = 0,
     bool Blush = false,
     Tint Tint = Tint.Normal,
-    Outfit Outfit = Outfit.None,
+    Outfit Outfit = default,
     Accessory Accessory = Accessory.None,
     int Squash = 0,
     int Sick = 0);
@@ -94,6 +107,19 @@ public static class Sprite
     private const uint BoneColor = 0xFFE6E0D0;
     private const uint SmokeColor = 0xFFC4BCD4;
     private const uint SmokeShade = 0xFF8F87A3;
+    private const uint FrameColor = 0xFF24222A;
+    private const uint MoustacheColor = 0xFF4A3426;
+    private const uint ScarfColor = 0xFF3F8F5A;
+    private const uint ScarfShade = 0xFF2E6B43;
+    private const uint TopHatColor = 0xFF2E2B35;
+    private const uint TopHatShine = 0xFF555062;
+    private const uint CowboyColor = 0xFF9A6A3E;
+    private const uint CowboyShade = 0xFF6E4A2A;
+    private const uint ChefShade = 0xFFD6D2C8;
+    private const uint CapColor = 0xFF3D6FD0;
+    private const uint CapShade = 0xFF2C539F;
+    private const uint HelmetColor = 0xFFA6ABB8;
+    private const uint HelmetShade = 0xFF737887;
 
     /// <summary>Warm orange, the default body color.</summary>
     public const uint DefaultBodyColor = 0xFFD97757;
@@ -125,17 +151,27 @@ public static class Sprite
         Version++;
     }
 
+    /// <summary>The family of an AI model, by name ("Opus 4.1") or id ("…-sonnet-4-5"); unknown models and none are Other.</summary>
+    public static ModelFamily FamilyOf(string? model) =>
+        model == null ? ModelFamily.Other
+        : model.Contains("opus", StringComparison.OrdinalIgnoreCase) ? ModelFamily.Opus
+        : model.Contains("sonnet", StringComparison.OrdinalIgnoreCase) ? ModelFamily.Sonnet
+        : model.Contains("haiku", StringComparison.OrdinalIgnoreCase) ? ModelFamily.Haiku
+        : model.Contains("fable", StringComparison.OrdinalIgnoreCase) ? ModelFamily.Fable
+        : ModelFamily.Other;
+
     /// <summary>
-    /// The outfit for an AI model, by name ("Opus 4.1") or id ("…-sonnet-4-5"): Opus wears a crown,
-    /// Sonnet sunglasses, Haiku a flower, Fable a wizard's hat; unknown models nothing.
+    /// What a model wears until it is dressed differently in the inventory: Opus a crown, Sonnet sunglasses,
+    /// Haiku a flower, Fable a wizard's hat, other models nothing.
     /// </summary>
-    public static Outfit OutfitFor(string? model) =>
-        model == null ? Outfit.None
-        : model.Contains("opus", StringComparison.OrdinalIgnoreCase) ? Outfit.Crown
-        : model.Contains("sonnet", StringComparison.OrdinalIgnoreCase) ? Outfit.Sunglasses
-        : model.Contains("haiku", StringComparison.OrdinalIgnoreCase) ? Outfit.Flower
-        : model.Contains("fable", StringComparison.OrdinalIgnoreCase) ? Outfit.WizardHat
-        : Outfit.None;
+    public static Outfit DefaultOutfit(ModelFamily family) => family switch
+    {
+        ModelFamily.Opus => new(Hat.Crown),
+        ModelFamily.Sonnet => new(Face: FaceWear.Sunglasses),
+        ModelFamily.Haiku => new(Hat.Flower),
+        ModelFamily.Fable => new(Hat.WizardHat),
+        _ => Outfit.None,
+    };
 
     public static BitmapSource Render(SpriteFrame frame)
     {
@@ -283,7 +319,7 @@ public static class Sprite
             }
         }
         // Behind sunglasses the eyes stay hidden, even where looking up or down would peek past the lenses
-        if (f.Outfit != Outfit.Sunglasses)
+        if (f.Outfit.Face != FaceWear.Sunglasses)
         {
             Eye(c0 + 3, -1);
             Eye(c0 + 10, 1);
@@ -324,35 +360,131 @@ public static class Sprite
 
         }
 
-        // Outfit; headwear sits on the left half of the head, out of the way of the marks above its middle and right.
-        // A seasonal or night accessory takes the head, so only the sunglasses stay with it.
-        var outfit = f.Accessory != Accessory.None && f.Outfit != Outfit.Sunglasses ? Outfit.None : f.Outfit;
-        if (f.Squash != 0 && outfit == Outfit.Sunglasses) outfit = Outfit.None; // no face left for them
-        switch (outfit)
+        // Outfit, one item per slot. Face and neck need the unsquashed body; a seasonal or night accessory takes the
+        // head. Headwear sits on the left half of the head, out of the way of the marks above its middle and right.
+        if (f.Squash == 0)
         {
-            // Opus: a golden crown with a red jewel, sitting on the head
-            case Outfit.Crown:
+            switch (f.Outfit.Face)
+            {
+                // Dark sunglasses over both eyes, with a glint on each lens (the eyes are left out above)
+                case FaceWear.Sunglasses:
+                    Glyph(c0, LensColor, by + 1, "XXXXXXXXXXXXXX", ".XXXXX..XXXXX.", "..XXX....XXX..");
+                    Set(c0 + 2, by + 2, GlintColor);
+                    Set(c0 + 9, by + 2, GlintColor);
+                    break;
+                // Square black frames around the eyes, joined by a bridge
+                case FaceWear.NerdGlasses:
+                    Glyph(c0 + 1, FrameColor, by + 1, "XXXXX..XXXXX", "X...XXXX...X", "X...X..X...X", "XXXXX..XXXXX");
+                    break;
+                // A golden ring around the right eye, its chain hanging down the side
+                case FaceWear.Monocle:
+                    Glyph(c0 + 8, GoldColor, by, ".XXX.", "X...X", "X...X", "X...X", ".XXX.");
+                    Glyph(c0 + 12, GoldShade, by + 5, "X.", ".X", ".X");
+                    break;
+                // A curled moustache between the eyes and the mouth
+                case FaceWear.Moustache:
+                    Glyph(c0 + 3, MoustacheColor, by + 4, ".XXXXXX.", "X......X");
+                    break;
+                // A black patch over the left eye, its strap running across the face
+                case FaceWear.EyePatch:
+                    Glyph(c0, FrameColor, by, "......X", ".....X.", "XXXXX..", "..XXX..", "..XXX..", "...X...");
+                    break;
+            }
+            switch (f.Outfit.Neck)
+            {
+                // A red bow tie with a dark knot below the mouth
+                case Neckwear.BowTie:
+                    Glyph(c0 + 4, SantaRed, by + 7, "XX..XX", "XX..XX");
+                    Glyph(c0 + 6, BindingColor, by + 7, "XX", "XX");
+                    break;
+                // A striped green scarf, one end hanging down between the legs
+                case Neckwear.Scarf:
+                    Glyph(c0, ScarfColor, by + 7, "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX");
+                    Glyph(c0, FurWhite, by + 7, "..X...X...X...", "...X...X...X..");
+                    Glyph(c0 + 7, ScarfColor, by + 9, "XX", "XX");
+                    Glyph(c0 + 7, ScarfShade, by + 10, "XX");
+                    break;
+                // A red collar with a little golden bell
+                case Neckwear.Bell:
+                    Glyph(c0, SantaRed, by + 7, "XXXXXXXXXXXXXX");
+                    Glyph(c0 + 6, GoldColor, by + 8, "XX", "XX");
+                    Glyph(c0 + 6, GoldShade, by + 9, "XX");
+                    break;
+            }
+        }
+        switch (f.Accessory != Accessory.None ? Hat.None : f.Outfit.Hat)
+        {
+            // A golden crown with a red jewel, sitting on the head
+            case Hat.Crown:
                 Glyph(c0, GoldColor, by - 3, "X.X.X", "XXXXX", "XXXXX");
                 Glyph(c0, GoldShade, by - 3, ".....", ".....", "XXXXX");
                 Set(c0 + 2, by - 2, JewelColor);
                 break;
-            // Sonnet: dark sunglasses over both eyes, with a glint on each lens
-            case Outfit.Sunglasses:
-                Glyph(c0, LensColor, by + 1, "XXXXXXXXXXXXXX", ".XXXXX..XXXXX.", "..XXX....XXX..");
-                Set(c0 + 2, by + 2, GlintColor);
-                Set(c0 + 9, by + 2, GlintColor);
-                break;
-            // Haiku: a little daisy tucked onto the head
-            case Outfit.Flower:
+            // A little daisy tucked onto the head
+            case Hat.Flower:
                 Glyph(c0 + 1, PetalColor, by - 3, ".X.", "X.X", ".X.");
                 Set(c0 + 2, by - 2, GoldColor);
                 Set(c0 + 3, by - 1, LeafColor);
                 break;
-            // Fable: a pointed wizard's hat with a little star, its tip bent to the side
-            case Outfit.WizardHat:
+            // A pointed wizard's hat with a little star, its tip bent to the side
+            case Hat.WizardHat:
                 Glyph(c0 - 1, HatColor, by - 5, "....X.", "...XX.", "..XXX.", ".XXXX.");
                 Glyph(c0 - 1, HatShade, by - 1, "XXXXXX");
                 Set(c0 + 2, by - 3, GoldColor);
+                break;
+            // A tall black top hat with a red band
+            case Hat.TopHat:
+                Glyph(c0, TopHatColor, by - 5, "XXXXX", "XXXXX", "XXXXX");
+                Glyph(c0, TopHatShine, by - 5, ".X...", ".X...", ".X...");
+                Glyph(c0, SantaRed, by - 2, "XXXXX");
+                Glyph(c0 - 1, TopHatColor, by - 1, "XXXXXXX");
+                break;
+            // A brown cowboy hat with a dented crown and a brim curling up at both ends
+            case Hat.CowboyHat:
+                Glyph(c0, CowboyColor, by - 4, "XX.XX", "XXXXX");
+                Glyph(c0 - 2, CowboyColor, by - 2, "X......X", "XXXXXXXX");
+                Glyph(c0, CowboyShade, by - 2, "XXXXX");
+                break;
+            // A puffy white chef's hat
+            case Hat.ChefHat:
+                Glyph(c0 - 1, FurWhite, by - 5, ".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.");
+                Glyph(c0 - 1, ChefShade, by - 3, "..X.X..", ".......", ".......", ".XXXXX.");
+                break;
+            // A blue cap with a white button, its peak pointing to the left
+            case Hat.Cap:
+                Glyph(c0, CapColor, by - 3, ".XXX.", "XXXXX", "XXXXX");
+                Glyph(c0 - 3, CapShade, by - 1, "XXX");
+                Set(c0 + 2, by - 4, FurWhite);
+                break;
+            // Headphones: a band over the head and a red cup on each side
+            case Hat.Headphones:
+                Glyph(c0, HandleColor, by - 1, ".XXXXXXXXXXXX.", "X............X");
+                Glyph(c0 - 1, AlertColor, by + 1, "XX", "XX", "XX");
+                Glyph(c0 + 13, AlertColor, by + 1, "XX", "XX", "XX");
+                break;
+            // A yellow hard hat with a ridge down the middle and a brim all around
+            case Hat.HardHat:
+                Glyph(c0 - 1, GoldColor, by - 4, "..XXX..", ".XXXXX.", ".XXXXX.");
+                Glyph(c0 - 1, GoldShade, by - 4, "...X...", "...X...", "...X...", "XXXXXXX");
+                break;
+            // A grey viking helmet with two white horns curving up
+            case Hat.VikingHelmet:
+                Glyph(c0, HelmetColor, by - 3, ".XXX.", "XXXXX", "XXXXX");
+                Glyph(c0, HelmetShade, by - 1, "XXXXX");
+                Glyph(c0 - 2, BoneColor, by - 4, "X.......X", "X.......X", ".X.....X.");
+                break;
+            // A colorful beanie with a little propeller on top
+            case Hat.PropellerCap:
+                Glyph(c0, SantaRed, by - 2, ".X...", "XX...");
+                Glyph(c0, GoldColor, by - 2, "..X..", "..X..");
+                Glyph(c0, BallColor, by - 2, "...X.", "...XX");
+                Set(c0 + 2, by - 3, HandleColor);
+                Glyph(c0, LeafColor, by - 4, "XX...");
+                Glyph(c0, BallColor, by - 4, "...XX");
+                break;
+            // A golden halo floating above the head
+            case Hat.Halo:
+                Glyph(c0, GoldColor, by - 4, ".XXXX.", "X....X", ".XXXX.");
                 break;
         }
 

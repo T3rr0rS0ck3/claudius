@@ -27,8 +27,6 @@ public partial class SettingsWindow : Window
         _settings = settings;
 
         ScaleSlider.Value = settings.PetScale;
-        ColorBox.Text = settings.PetColor;
-        TerminalMascotBox.IsChecked = settings.TerminalMascotColor;
         AlwaysOnTopBox.IsChecked = settings.AlwaysOnTop;
         AnimationsBox.IsChecked = settings.Animations;
         WalkAroundBox.IsChecked = settings.WalkAround;
@@ -101,37 +99,6 @@ public partial class SettingsWindow : Window
         if (Directory.Exists(ReposPathBox.Text)) dialog.InitialDirectory = ReposPathBox.Text;
         if (dialog.ShowDialog(this) == true) ReposPathBox.Text = dialog.FolderName;
     }
-
-    private void ColorBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        bool valid = Sprite.TryParseColor(ColorBox.Text, out uint argb);
-        ColorPreview.Background = valid ? new SolidColorBrush(ToColor(argb)) : Brushes.Transparent;
-        // Show the color on the pet right away; closing without saving goes back to the saved one.
-        if (valid && IsLoaded) _app.PreviewPetColor(argb);
-    }
-
-    protected override void OnClosed(EventArgs e)
-    {
-        base.OnClosed(e);
-        _app.PreviewPetColor(null);
-    }
-
-    private void PickColor_Click(object sender, RoutedEventArgs e)
-    {
-        if (!Sprite.TryParseColor(ColorBox.Text, out uint argb)) argb = Sprite.DefaultBodyColor;
-        using var dialog = new Forms.ColorDialog
-        {
-            FullOpen = true,
-            Color = System.Drawing.Color.FromArgb(unchecked((int)argb)),
-        };
-        if (dialog.ShowDialog() == Forms.DialogResult.OK)
-            ColorBox.Text = Sprite.ToHex(unchecked((uint)dialog.Color.ToArgb()));
-    }
-
-    private void DefaultColor_Click(object sender, RoutedEventArgs e) => ColorBox.Text = AppSettings.DefaultPetColor;
-
-    private static Color ToColor(uint argb) =>
-        Color.FromRgb((byte)(argb >> 16), (byte)(argb >> 8), (byte)argb);
 
     private void RefreshSetupStatus()
     {
@@ -221,8 +188,6 @@ public partial class SettingsWindow : Window
             var context = ParseList(ContextThresholdsBox.Text, Strings.ContextField);
             if (context.Count != 3 || context[0] > context[1] || context[1] > context[2])
                 throw new FormatException(Strings.ContextError);
-            if (!Sprite.TryParseColor(ColorBox.Text, out uint petColor))
-                throw new FormatException(Strings.ColorError);
             string reposPath = ReposPathBox.Text.Trim().Trim('"');
             if (reposPath.Length > 0 && !Directory.Exists(reposPath))
                 throw new FormatException(Strings.ReposFolderMissing);
@@ -248,8 +213,6 @@ public partial class SettingsWindow : Window
 
             if (LanguageBox.SelectedValue is string language) _settings.SetLanguage(language);
             _settings.PetScale = ScaleSlider.Value;
-            _settings.PetColor = Sprite.ToHex(petColor);
-            _settings.TerminalMascotColor = TerminalMascotBox.IsChecked == true;
             _settings.AlwaysOnTop = AlwaysOnTopBox.IsChecked == true;
             _settings.Animations = AnimationsBox.IsChecked == true;
             _settings.WalkAround = WalkAroundBox.IsChecked == true;

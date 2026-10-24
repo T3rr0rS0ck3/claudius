@@ -28,8 +28,8 @@ until the limit resets.
   monitors are arranged in Windows
 - 🐭 **Chases the pointer** — now and then, when calm, it eyes the mouse pointer nearby and runs after it; hold the pointer
   above it and it hops up to grab it three times, then bursts into tears (can be turned off)
-- 🎨 **Your color** — pick any color for the pet; the usage overlay, menus and speech bubbles use it as accent color
-- 👑 **Dressed for the model** — a crown for Opus, sunglasses for Sonnet, a little flower for Haiku, a wizard's hat for Fable (can be turned off)
+- 🎨 **Your color** — pick any color for the pet in the inventory; the usage overlay, menus and speech bubbles use it as accent color
+- 👑 **A wardrobe per model** — out of the box a crown for Opus, sunglasses for Sonnet, a little flower for Haiku and a wizard's hat for Fable; in the inventory (right-click → **Inventory…**) you dress each model yourself from hats, glasses, a moustache, a bow tie, a scarf and more (can be turned off)
 - 🎃 **Seasonal headwear** — a witch's hat and a broom in October, a Santa hat until Christmas, bunny ears at Easter and a party hat
   on New Year's Eve and your birthday; they take the place of the model's headwear (can be turned off)
 - 🌙 **Night mode** — between 23:00 and 06:00 (adjustable) the pet wears a nightcap and says good night; a bed turns up on the
@@ -203,8 +203,8 @@ desktop app as well. The normal desktop chat offers no hooks and is not supporte
 ## Configuration
 
 Most options are available via right-click → **Settings…**: language, repo folder, console, ghost drag,
-voice chat, size, pet color, always on top, animations, walking around, crossing monitors, chasing the pointer, emotes, model outfits, seasonal headwear and birthday, night mode and night hours, break reminder, autostart, update checks, update interval, warning thresholds, mood thresholds,
-speech bubbles, notifications and your name.
+voice chat, size, always on top, animations, walking around, crossing monitors, chasing the pointer, emotes, model outfits, seasonal headwear and birthday, night mode and night hours, break reminder, autostart, update checks, update interval, warning thresholds, mood thresholds,
+speech bubbles, notifications and your name. Color, costumes, and the model and effort for new sessions are in right-click → **Inventory…**.
 
 Everything lives in `%LOCALAPPDATA%\Claudius\settings.json`, and manual edits are picked up live.
 `Language` is `en` or `de`. Speech bubble texts are under `Texts`; switching the language in the settings resets them
