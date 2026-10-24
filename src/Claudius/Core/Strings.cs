@@ -280,6 +280,9 @@ public static class Strings
     public static string SlotWizarding => "Harry Potter";
     public static string SlotStarWars => "Star Wars";
     public static string SnackLabel => L("Snack", "Futter");
+    public static string CharacterLabel => L("Mascot", "Maskottchen");
+    public static string CharacterName(PetCharacter character) =>
+        character == PetCharacter.Sock ? L("Sock", "Socke") : "Claudius";
     public static string SnackName(Snack snack) => snack == Snack.Beans
         ? L("Bertie Bott's Every Flavour Beans", "Bertie Botts Bohnen jeder Geschmacksrichtung")
         : L("Cookie", "Keks");
@@ -456,6 +459,7 @@ public static class Strings
         AchievementId.OnceUponATime => L("Disney costumes", "Disney-Kostüme"),
         AchievementId.EveryFlavour => L("Harry Potter costumes", "Harry-Potter-Kostüme"),
         AchievementId.TheForce => L("Star Wars costumes", "Star-Wars-Kostüme"),
+        AchievementId.LostSock => L("the sock as a mascot", "die Socke als Maskottchen"),
         _ => ItemName(achievement.Reward),
     };
     public static string TabAchievements => L("Achievements", "Erfolge");
@@ -479,6 +483,7 @@ public static class Strings
         AchievementId.OnceUponATime => L("Once upon a time…", "Es war einmal …"),
         AchievementId.EveryFlavour => L("Every Flavour Beans", "Bohnen jeder Geschmacksrichtung"),
         AchievementId.TheForce => L("May the Force be with you", "Möge die Macht mit dir sein"),
+        AchievementId.LostSock => L("The lost sock", "Die verlorene Socke"),
         _ => L("Party mood", "Feierlaune"),
     };
     public static string AchievementHint(AchievementId id) => id switch
@@ -503,6 +508,7 @@ public static class Strings
         AchievementId.OnceUponATime => L("Pat Claudius 100 times.", "Streichle Claudius 100-mal."),
         AchievementId.EveryFlavour => L("Feed Claudius beans 100 times.", "Füttere Claudius 100-mal mit Bohnen."),
         AchievementId.TheForce => L("Move Claudius around with the mouse 100 times.", "Zieh Claudius 100-mal mit der Maus herum."),
+        AchievementId.LostSock => L("Reach all the other achievements.", "Erreiche alle anderen Erfolge."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
     };

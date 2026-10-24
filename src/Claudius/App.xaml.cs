@@ -580,6 +580,7 @@ public partial class App : Application
 
     private void ApplyPetColor(uint color)
     {
+        Sprite.SetCharacter(Settings.Character);
         Sprite.SetBodyColor(color);
         var accent = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(
             (byte)(color >> 16), (byte)(color >> 8), (byte)color));

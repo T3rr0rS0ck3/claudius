@@ -48,6 +48,7 @@ public partial class InventoryWindow : Window
     private readonly Dictionary<ModelFamily, Border> _chips = new();
     private readonly List<(Border Tile, Outfit Item, Func<Outfit, bool> IsWorn, UIElement Lock)> _items = [];
     private readonly List<(Border Tile, Snack Snack)> _snacks = [];
+    private readonly List<(Border Tile, PetCharacter Character, UIElement Lock)> _characters = [];
     private readonly Achievements _achievements;
     private readonly List<(Border Swatch, string Color)> _swatches = [];
     /// <summary>Every pet picture in the window, redrawn when the color or an outfit changes.</summary>
@@ -98,6 +99,7 @@ public partial class InventoryWindow : Window
         }
 
         BuildWardrobe();
+        BuildCharacters();
         BuildSnacks();
         BuildColors();
 
@@ -313,6 +315,53 @@ public partial class InventoryWindow : Window
         row.Children.Add(tile);
     }
 
+    /// <summary>
+    /// Who the pet can be, each in its own color; the sock stays locked until its achievement. Picking the sock
+    /// while the color is the default gives it its own purple, and picking Claudius again gives that back.
+    /// </summary>
+    private void BuildCharacters()
+    {
+        foreach (var character in Enum.GetValues<PetCharacter>())
+        {
+            string name = Strings.CharacterName(character);
+            var lockMark = new TextBlock
+            {
+                Text = "🔒",
+                FontSize = 11,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(0, 0, -2, -3),
+            };
+            var picture = Picture(() => new SpriteFrame(Eyes.Normal, Mouth.Smile, Character: character), 2);
+            var tile = Tile(new Grid { Children = { picture, lockMark } }, null, name, () =>
+            {
+                if (CharacterLocked(character))
+                {
+                    CharacterLockText.Text = Strings.LockedItem(name, Strings.AchievementHint(AchievementId.LostSock));
+                    CharacterLockText.Visibility = Visibility.Visible;
+                    return;
+                }
+                CharacterLockText.Visibility = Visibility.Collapsed;
+                if (character == _settings.Character) return;
+                _settings.Character = character;
+                if (_settings.PetColor == (character == PetCharacter.Sock ? AppSettings.DefaultPetColor : AppSettings.SockPetColor))
+                    _settings.PetColor = character == PetCharacter.Sock ? AppSettings.SockPetColor : AppSettings.DefaultPetColor;
+                _app.ApplySettings(save: true);
+                // The accent color may have changed with the pet's.
+                ShowColor();
+                ShowTab(_lastTab);
+                ShowSelection();
+                ShowWardrobe();
+                ShowAchievements();
+            });
+            _characters.Add((tile, character, lockMark));
+            CharacterItems.Children.Add(tile);
+        }
+    }
+
+    private bool CharacterLocked(PetCharacter character) =>
+        character == PetCharacter.Sock && !_achievements.IsUnlocked(AchievementId.LostSock);
+
     /// <summary>The snacks to choose from, the pet looking up at each.</summary>
     private void BuildSnacks()
     {
@@ -388,6 +437,13 @@ public partial class InventoryWindow : Window
     {
         foreach (var (family, chip) in _chips) Highlight(chip, family == _dressing);
         var outfit = Dressed;
+        foreach (var (tile, character, lockMark) in _characters)
+        {
+            Highlight(tile, character == _settings.Character);
+            bool locked = CharacterLocked(character);
+            tile.Opacity = locked ? 0.45 : 1;
+            lockMark.Visibility = locked ? Visibility.Visible : Visibility.Collapsed;
+        }
         foreach (var (tile, snack) in _snacks) Highlight(tile, snack == _settings.Snack);
         foreach (var (tile, item, isWorn, lockMark) in _items)
         {
@@ -511,7 +567,9 @@ public partial class InventoryWindow : Window
         {
             Width = Sprite.Width * 2,
             Height = Sprite.Height * 2,
-            Source = Sprite.Render(Smiling(achievement.Reward)),
+            Source = Sprite.Render(achievement.Id == AchievementId.LostSock
+                ? Smiling(Outfit.None) with { Character = PetCharacter.Sock }
+                : Smiling(achievement.Reward)),
             Opacity = unlocked ? 1 : 0.45,
             VerticalAlignment = VerticalAlignment.Center,
         };

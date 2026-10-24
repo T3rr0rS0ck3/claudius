@@ -25,6 +25,8 @@ public enum TerminalKind { Auto, WindowsTerminal, Cmd, PowerShell, Desktop }
 public sealed class AppSettings
 {
     public const string DefaultPetColor = "#D97757";
+    /// <summary>The sock's own color, which it gets instead of the default one.</summary>
+    public const string SockPetColor = "#7B3FC4";
     public const string DefaultNightStart = "23:00";
     public const string DefaultNightEnd = "06:00";
     public const int DefaultBreakAfterMinutes = 120;
@@ -57,8 +59,10 @@ public sealed class AppSettings
     public Dictionary<ModelFamily, Outfit> Outfits { get; set; } = [];
     /// <summary>Headwear for Halloween, Christmas, New Year's Eve, Easter and the birthday.</summary>
     public bool SeasonalAccessories { get; set; } = true;
-    /// <summary>What the pet eats when it is fed; the beans are unlocked by an achievement.</summary>
+    /// <summary>What the pet eats when it is fed.</summary>
     public Snack Snack { get; set; } = Snack.Cookie;
+    /// <summary>Who the pet is; the sock is unlocked by an achievement.</summary>
+    public PetCharacter Character { get; set; } = PetCharacter.Claudius;
     /// <summary>"MM-dd": a party hat on that day; null for none.</summary>
     public string? Birthday { get; set; }
     /// <summary>A nightcap and a sleepy pet from <see cref="NightStart"/> to <see cref="NightEnd"/> ("HH:mm").</summary>
