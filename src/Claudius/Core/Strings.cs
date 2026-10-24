@@ -234,6 +234,32 @@ public static class Strings
         _ => L("Claudius is waiting for data", "Claudius wartet auf Daten"),
     };
 
+    // ---------------------------------------------------------------- inventory (model and effort)
+
+    public static string InventoryTitle => L("Claudius – Inventory", "Claudius – Inventar");
+    public static string InventoryHeading => L("INVENTORY", "INVENTAR");
+    public static string ModelDefault => L("Default", "Standard");
+    public static string ModelDefaultTip => L("No model of its own: new sessions use the account's default model.",
+        "Kein eigenes Modell: neue Sessions nehmen das Standardmodell des Kontos.");
+    public static string ModelTip(string name) => L($"New sessions start with {name}.", $"Neue Sessions starten mit {name}.");
+    public static string Effort => L("Effort", "Aufwand");
+    public static string EffortName(int level) => level switch
+    {
+        1 => L("Low", "Niedrig"),
+        2 => L("Medium", "Mittel"),
+        3 => L("High", "Hoch"),
+        4 => L("Extra high", "Sehr hoch"),
+        _ => L("Auto", "Auto"),
+    };
+    public static string EffortTip => L(
+        "How much the model thinks before answering. Higher is more thorough, but slower and uses more of the limits. Auto: the model's own default.",
+        "Wie viel das Modell vor der Antwort nachdenkt. Höher ist gründlicher, aber langsamer und verbraucht mehr vom Limit. Auto: der Standard des Modells.");
+    public static string EffortNeedsModel => L("Pick a model to set its effort.", "Wähle ein Modell, um seinen Aufwand einzustellen.");
+    public static string CurrentModelOther(string model) => L($"Currently set: {model}", $"Aktuell eingestellt: {model}");
+    public static string InventoryHint => L(
+        "Applies to new sessions. Running sessions keep their model and effort; change them there with /model and /effort.",
+        "Gilt für neue Sessions. Laufende Sessions behalten Modell und Aufwand; dort wechselst du mit /model und /effort.");
+
     // ---------------------------------------------------------------- menus and tray
 
     public static string ShowUsage => L("Show usage", "Usage anzeigen");
@@ -245,6 +271,7 @@ public static class Strings
     public static string MinimizeToTray => L("Minimize to tray", "In den Tray minimieren");
     public static string ConnectMenu => L("Connect AI assistant…", "KI-Assistent verbinden…");
     public static string SettingsMenu => L("Settings…", "Einstellungen…");
+    public static string InventoryMenu => L("Inventory…", "Inventar…");
     public static string Quit => L("Quit", "Beenden");
     public static string InstallUpdateMenu(string version) => L($"Install update to {version}…", $"Update auf {version} installieren…");
     public static string DownloadVersionMenu(string version) => L($"Download version {version}…", $"Version {version} herunterladen…");

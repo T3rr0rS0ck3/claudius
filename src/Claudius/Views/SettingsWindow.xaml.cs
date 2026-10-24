@@ -299,6 +299,8 @@ public partial class SettingsWindow : Window
     // Borderless like the usage overlay: drag by the title, close with the ✕.
     private void Title_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
+        // DragMove keeps the mouse until it is released, so the close button would never see its click.
+        if (e.OriginalSource == CloseButton) return;
         try { DragMove(); } catch (InvalidOperationException) { }
     }
 

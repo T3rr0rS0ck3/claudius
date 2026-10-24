@@ -31,6 +31,7 @@ public partial class App : Application
     private UsageOverlay? _overlay;
     private DateTime _overlayClosedAt;
     private SettingsWindow? _settingsWindow;
+    private InventoryWindow? _inventoryWindow;
     private UsageState _state = UsageState.Compute(null, new MoodThresholds(), DateTimeOffset.Now);
     private PetMood? _lastMood;
     private bool? _wasNight;
@@ -425,6 +426,19 @@ public partial class App : Application
         _settingsWindow.Closed += (_, _) => _settingsWindow = null;
         _settingsWindow.Show();
         _settingsWindow.Activate();
+    }
+
+    public void ShowInventory()
+    {
+        if (_inventoryWindow != null)
+        {
+            _inventoryWindow.Activate();
+            return;
+        }
+        _inventoryWindow = new InventoryWindow();
+        _inventoryWindow.Closed += (_, _) => _inventoryWindow = null;
+        _inventoryWindow.Show();
+        _inventoryWindow.Activate();
     }
 
     private void ApplySessions()
@@ -862,6 +876,7 @@ public partial class App : Application
         menu.Items.Add(new Separator());
         var update = Item("", () => InstallUpdate());
         Item(Strings.ConnectMenu, () => ConnectAssistant(null));
+        Item(Strings.InventoryMenu, ShowInventory);
         Item(Strings.SettingsMenu, ShowSettings);
         menu.Items.Add(new Separator());
         Item(Strings.Quit, Quit);

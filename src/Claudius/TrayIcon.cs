@@ -62,6 +62,7 @@ public sealed class TrayIcon : IDisposable
         menu.Items.Add(new Separator());
         if (app.AvailableUpdate != null) Item(app.UpdateMenuText, () => app.InstallUpdate());
         Item(Strings.ConnectMenu, () => app.ConnectAssistant(null));
+        Item(Strings.InventoryMenu, app.ShowInventory);
         Item(Strings.SettingsMenu, app.ShowSettings);
         menu.Items.Add(new Separator());
         Item(Strings.Quit, app.Quit);
