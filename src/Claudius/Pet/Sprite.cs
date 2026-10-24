@@ -14,8 +14,9 @@ public enum Mark
     Heart1, Heart2, Cookie, Crumbs, Ball1, Ball2, Ball3,
 }
 public enum Tint { Normal, Hot, Pale, Ghost }
-/// <summary>What the pet wears, one item per slot: on its head, on its face and around its neck.</summary>
-public readonly record struct Outfit(Hat Hat = Hat.None, FaceWear Face = FaceWear.None, Neckwear Neck = Neckwear.None)
+/// <summary>What the pet wears, one item per slot: on its head, on its face, around its neck and in its left hand.</summary>
+public readonly record struct Outfit(Hat Hat = Hat.None, FaceWear Face = FaceWear.None, Neckwear Neck = Neckwear.None,
+    HeldItem Hand = HeldItem.None)
 {
     public static Outfit None => default;
 }
@@ -35,6 +36,8 @@ public enum Hat
     Hermione, Ron, Snape, Hagrid, Draco, Bellatrix, SortingHat, McGonagall, Hedwig, Dobby,
     // Star Wars characters
     Luke, Leia, HanSolo, Yoda, Chewbacca, Rey, Finn, Poe, Emperor, R2D2, BB8, Grogu, Ewok,
+    // Gaming
+    GamingHeadset,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
 public enum FaceWear
@@ -42,6 +45,7 @@ public enum FaceWear
     None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy, WallE, Eve, Pumbaa,
     HarryPotter, Dumbledore, Luna, DeathEater, Voldemort,
     ObiWan, DarthVader, KyloRen, DarthMaul, Stormtrooper, BobaFett, Mandalorian, TiePilot, C3PO,
+    VrHeadset,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
 public enum Neckwear
@@ -58,6 +62,25 @@ public enum Neckwear
     Gryffindor, Slytherin, Ravenclaw, Hufflepuff,
     // Chewbacca's bandolier and a Jedi robe
     Bandolier, JediRobe,
+}
+/// <summary>What the pet holds in its left hand.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<HeldItem>))]
+public enum HeldItem
+{
+    None,
+    // Super Mario
+    SuperMushroom, FireFlower, SuperStar, Coin, GreenShell,
+    // Disney
+    FairyWand, PoisonApple, Trident, MickeyBalloon,
+    // Harry Potter
+    Wand, Nimbus2000, Snitch, HogwartsLetter,
+    // Star Wars
+    LightsaberBlue, LightsaberGreen, LightsaberRed, LightsaberPurple, Blaster,
+    // Gaming: controllers, handhelds, retro and more
+    NesController, SnesController, N64Controller, GameCubeController, JoyCons, XboxController, PlayStationController,
+    GameBoy, GameBoyAdvance, NintendoDS, Psp, Switch, SteamDeck,
+    AtariJoystick, MegaDriveController, ArcadeStick,
+    WiiRemote, Cartridge,
 }
 /// <summary>What the pet eats when it is fed.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<Snack>))]
@@ -286,21 +309,84 @@ public static class Sprite
     /// <summary>Whether this costume item belongs to a Star Wars character.</summary>
     public static bool IsStarWarsCostume(Outfit item) =>
         item.Hat is >= Hat.Luke and <= Hat.Ewok || item.Face is >= FaceWear.ObiWan and <= FaceWear.C3PO
-        || item.Neck is Neckwear.Bandolier or Neckwear.JediRobe;
+        || item.Neck is Neckwear.Bandolier or Neckwear.JediRobe || item.Hand is >= HeldItem.LightsaberBlue and <= HeldItem.Blaster;
+
+    /// <summary>Whether this item is something for gaming: a console, a controller, a headset or VR glasses.</summary>
+    public static bool IsGamingItem(Outfit item) =>
+        item.Hand >= HeldItem.NesController || item.Hat == Hat.GamingHeadset || item.Face == FaceWear.VrHeadset;
+
+    /// <summary>
+    /// Things to hold in the left hand, drawn from rows of palette letters (see <see cref="HeldColors"/>), placed
+    /// from the hand: Left and Top count from four pixels left of the body and three rows below its top, so the hand
+    /// is in columns 2 and 3, rows 1 and 2.
+    /// </summary>
+    private readonly record struct HeldGlyph(int Left, int Top, params string[] Rows);
+
+    private static readonly Dictionary<char, uint> HeldColors = new()
+    {
+        ['k'] = 0xFF1F1A17, ['w'] = 0xFFF4F1EA, ['l'] = 0xFFD8DCE4, ['g'] = 0xFFA6ABB8, ['G'] = 0xFF5A5E68,
+        ['r'] = 0xFFD8343C, ['R'] = 0xFF9A1E24, ['y'] = 0xFFF5C400, ['Y'] = 0xFFF2C14E, ['o'] = 0xFFC48A2C,
+        ['O'] = 0xFFE8862E, ['b'] = 0xFF3D6FD0, ['c'] = 0xFF5EC8F2, ['n'] = 0xFF3F8F3A, ['N'] = 0xFF2E6B2A,
+        ['p'] = 0xFF6A4FB0, ['P'] = 0xFFF27AB0, ['t'] = 0xFF7A5230, ['T'] = 0xFF4A3018, ['e'] = 0xFFF2E6C8,
+        ['s'] = 0xFFD9B45A, ['v'] = 0xFF9BBC0F, ['m'] = 0xFFA9285E,
+        // Lightsaber blades
+        ['1'] = 0xFF8FDCFF, ['2'] = 0xFF96F296, ['3'] = 0xFFFF6A6A, ['4'] = 0xFFCF96FF,
+    };
+
+    private static readonly Dictionary<HeldItem, HeldGlyph> HeldItems = new()
+    {
+        [HeldItem.SuperMushroom] = new(0, -2, ".rrrr.", "rwrrwr", "rrrrrr", ".ekke.", ".eeee."),
+        [HeldItem.FireFlower] = new(0, -4, ".OOOO.", "OywwyO", ".OOOO.", "n.nn.n", ".nnnn.", "..nn..", "..nn.."),
+        [HeldItem.SuperStar] = new(0, -4, "..Y..", ".YYY.", "YkYkY", ".YYY.", "Y...Y"),
+        [HeldItem.Coin] = new(1, -3, ".YY.", "YYoY", "YYoY", "YYoY", ".YY."),
+        [HeldItem.GreenShell] = new(0, -1, ".NnnN.", "nNnnNn", "wwwwww"),
+        [HeldItem.FairyWand] = new(1, -6, ".y.", "yYy", ".y.", ".w.", ".w.", ".w.", ".w.", ".w."),
+        [HeldItem.PoisonApple] = new(0, -2, "..tn.", ".rrr.", "rwrrr", "rrrrr", ".rrr."),
+        [HeldItem.Trident] = new(0, -6, "Y.Y.Y", "Y.Y.Y", "YYYYY", "..Y..", "..Y..", "..Y..", "..Y..", "..Y.."),
+        [HeldItem.MickeyBalloon] = new(0, -8, "kk..kk", "kkrrkk", ".rrrr.", ".rrrr.", "..rr..", "...l..", "...l..", "..l...", "..l..."),
+        [HeldItem.Wand] = new(2, -4, "w", "t", "t", "t", "T", "T"),
+        [HeldItem.Nimbus2000] = new(1, -4, ".T.", ".T.", ".T.", ".T.", ".T.", ".T.", ".T.", "sss", "sss", "s.s"),
+        [HeldItem.Snitch] = new(0, -3, "ww..ww", ".wYYw.", "..YY.."),
+        [HeldItem.HogwartsLetter] = new(0, 0, "eeeeee", "eTeeTe", "eeRRee", "eeeeee"),
+        [HeldItem.LightsaberBlue] = new(2, -7, "1", "1", "1", "1", "1", "1", "l", "k", "g", "G"),
+        [HeldItem.LightsaberGreen] = new(2, -7, "2", "2", "2", "2", "2", "2", "l", "k", "g", "G"),
+        [HeldItem.LightsaberRed] = new(2, -7, "3", "3", "3", "3", "3", "3", "l", "k", "g", "G"),
+        [HeldItem.LightsaberPurple] = new(2, -7, "4", "4", "4", "4", "4", "4", "l", "k", "g", "G"),
+        [HeldItem.Blaster] = new(0, 0, "kkkkkG", "...kk.", "...kk."),
+        [HeldItem.NesController] = new(0, 1, "llllll", "lklrlr", "llllll"),
+        [HeldItem.SnesController] = new(0, 1, ".llll.", "lkllyb", "llllnr", ".l..l."),
+        [HeldItem.N64Controller] = new(0, 1, "GGGGGG", "GkGnGy", ".G.G.G"),
+        [HeldItem.GameCubeController] = new(0, 1, ".pppp.", "pkppnp", "pp..pp"),
+        [HeldItem.JoyCons] = new(1, 0, "ccrr", "ckrr", "ccrk", "ccrr"),
+        [HeldItem.XboxController] = new(0, 1, ".GGGG.", "GkGnGy", "GGGGbr", ".G..G."),
+        [HeldItem.PlayStationController] = new(0, 1, ".kkkk.", "kgkkPn", "kkggbr", ".k..k."),
+        [HeldItem.GameBoy] = new(1, -1, "llll", "lvvl", "lvvl", "llll", "klml", "llll"),
+        [HeldItem.GameBoyAdvance] = new(0, 1, ".pppp.", "pkccpm", ".pppp."),
+        [HeldItem.NintendoDS] = new(1, -1, "llll", "lccl", "gggg", "lccl", "llll"),
+        [HeldItem.Psp] = new(0, 1, "kkkkkk", "gcccck", "kkkkkk"),
+        [HeldItem.Switch] = new(0, 1, "ckkkkr", "ckcckr", "ckkkkr"),
+        [HeldItem.SteamDeck] = new(0, 1, "GGGGGG", "kGccGk", "GGGGGG"),
+        [HeldItem.AtariJoystick] = new(0, -1, "..k..", "..k..", "rkkkk", "kkkkk"),
+        [HeldItem.MegaDriveController] = new(0, 1, ".kkkk.", "kgkggg", "kk..kk"),
+        [HeldItem.ArcadeStick] = new(0, -1, ".r....", ".k....", "kkkkkk", "kkbyrk"),
+        [HeldItem.WiiRemote] = new(2, -2, "ww", "wk", "ww", "wb", "ww", "ww"),
+        [HeldItem.Cartridge] = new(1, 0, "gggg", "gyyg", "gyyg", "GGGG"),
+    };
 
     /// <summary>Whether this costume item belongs to a Harry Potter character (or a Hogwarts house).</summary>
     public static bool IsWizardingCostume(Outfit item) =>
         item.Hat is >= Hat.Hermione and <= Hat.Dobby || item.Face is >= FaceWear.HarryPotter and <= FaceWear.Voldemort
-        || HouseScarves.ContainsKey(item.Neck);
+        || HouseScarves.ContainsKey(item.Neck) || item.Hand is >= HeldItem.Wand and <= HeldItem.HogwartsLetter;
 
     /// <summary>Whether this costume item belongs to a Disney character.</summary>
     public static bool IsDisneyCostume(Outfit item) =>
         item.Hat is >= Hat.MickeyEars and <= Hat.Timon || item.Face is FaceWear.WallE or FaceWear.Eve or FaceWear.Pumbaa
-        || item.Neck == Neckwear.Dale;
+        || item.Neck == Neckwear.Dale || item.Hand is >= HeldItem.FairyWand and <= HeldItem.MickeyBalloon;
 
     /// <summary>Whether this costume item belongs to a Super Mario character.</summary>
     public static bool IsMarioCostume(Outfit item) =>
-        item.Hat is >= Hat.Mario and <= Hat.Birdo || item.Face == FaceWear.ShyGuy || item.Neck == Neckwear.DonkeyKong;
+        item.Hat is >= Hat.Mario and <= Hat.Birdo || item.Face == FaceWear.ShyGuy || item.Neck == Neckwear.DonkeyKong
+        || item.Hand is >= HeldItem.SuperMushroom and <= HeldItem.GreenShell;
 
     /// <summary>Warm orange, the default body color.</summary>
     public const uint DefaultBodyColor = 0xFFD97757;
@@ -708,6 +794,12 @@ public static class Sprite
                     Glyph(c0 + 2, 0xFFFFE070, by + 2, ".XX....XX.");
                     Glyph(c0 + 5, 0xFF3A2A10, by + 5, "XXXX");
                     break;
+                // VR glasses: a white headset over the eyes with a dark front and a grey strap
+                case FaceWear.VrHeadset:
+                    Glyph(c0, 0xFF8A8E98, by + 2, "XXXXXXXXXXXXXX");
+                    Glyph(c0 + 1, 0xFFF4F4F4, by + 1, "XXXXXXXXXXXX", "XXXXXXXXXXXX", "XXXXXXXXXXXX");
+                    Glyph(c0 + 2, 0xFF2A2A30, by + 2, "XXXXXXXXXX");
+                    break;
                 // Harry's round black glasses, and the lightning scar on his forehead
                 case FaceWear.HarryPotter:
                     Glyph(c0 + 1, FrameColor, by + 1, ".XXX....XXX.", "X...XXXX...X", "X...X..X...X", ".XXX....XXX.");
@@ -996,6 +1088,17 @@ public static class Sprite
             case Hat.Timon:
                 Glyph(c0 + 4, 0xFFC2452D, by - 3, "X.X.X.", ".XXXX.", "XXXXXX");
                 break;
+            // A black gaming headset with glowing ear cups and a microphone reaching to the mouth
+            case Hat.GamingHeadset:
+                Glyph(c0 - 1, 0xFF1F1A17, by - 2, "...XXXXXXXXXX...", "..X..........X..", ".X............X.");
+                if (f.Squash == 0)
+                {
+                    Glyph(c0 - 1, 0xFF1F1A17, by + 1, "XX............XX", "XX............XX", "XX............XX");
+                    Glyph(c0 - 1, 0xFF3CF2A0, by + 2, "X..............X");
+                    Glyph(c0 + 1, 0xFF1F1A17, by + 4, "X...", ".XX.");
+                    Set(c0 + 4, by + 5, 0xFF3CF2A0);
+                }
+                break;
             // Luke's sandy hair, swept to one side
             case Hat.Luke:
                 Glyph(c0 - 1, 0xFFD9B66A, by - 2, "....XXXXXX......", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
@@ -1206,6 +1309,17 @@ public static class Sprite
                 Glyph(c0 - 1, NightcapShade, by - 1, "X..XXXXXXXXX"); // the gap keeps the hanging tip apart
                 Set(c0 - 1, by, FurWhite);
                 break;
+        }
+
+        // Something held in the left hand, at the hand: raised with the arm, a little lower while typing; put away for
+        // the microphone, the Halloween broom and on a squashed pet
+        if (f.Squash == 0 && f.Arms != Arms.Mic && f.Accessory != Accessory.WitchHat
+            && HeldItems.TryGetValue(f.Outfit.Hand, out var held))
+        {
+            int hx = bx - 2 + held.Left, hy = by + 3 + held.Top + f.Arms switch { Arms.Up or Arms.Wave => -3, Arms.TypeLeft => 1, _ => 0 };
+            for (int y = 0; y < held.Rows.Length; y++)
+                for (int x = 0; x < held.Rows[y].Length; x++)
+                    if (HeldColors.TryGetValue(held.Rows[y][x], out uint color)) Set(hx + x, hy + y, color);
         }
 
         // The sock's little monster peeks out of the cuff while nothing is worn on the head; it ducks down to its
