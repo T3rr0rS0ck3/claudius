@@ -251,7 +251,7 @@ public partial class InventoryWindow : Window
         foreach (var face in Enum.GetValues<FaceWear>())
             AddItem(FaceItems, Strings.FaceName(face), new Outfit(Face: face), o => o.Face == face, o => o with { Face = face });
         foreach (var neck in Enum.GetValues<Neckwear>())
-            AddItem(NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
+            AddItem(Sprite.IsFanScarf(neck) ? FanScarfItems : NeckItems, Strings.NeckName(neck), new Outfit(Neck: neck), o => o.Neck == neck, o => o with { Neck = neck });
     }
 
     /// <summary>
@@ -480,8 +480,8 @@ public partial class InventoryWindow : Window
         text.Children.Add(new TextBlock
         {
             Text = unlocked && _achievements.UnlockedAt(achievement.Id) is { } at
-                ? Strings.AchievementDone(at) + " · " + Strings.ItemName(achievement.Reward)
-                : Strings.AchievementReward(Strings.ItemName(achievement.Reward)),
+                ? Strings.AchievementDone(at) + " · " + Strings.RewardName(achievement)
+                : Strings.AchievementReward(Strings.RewardName(achievement)),
             FontSize = 11,
             Foreground = new SolidColorBrush(Color.FromRgb(0x77, 0x73, 0x6B)),
         });

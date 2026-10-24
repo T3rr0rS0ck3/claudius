@@ -11,14 +11,18 @@ namespace Claudius.Core;
 public enum AchievementId
 {
     FirstSession, Sessions10, Sessions100, Feed, Pat, Play, Tickle,
-    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration,
+    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan,
 }
 
 /// <summary>
 /// An achievement and the costume item it unlocks (an outfit with one slot set). <paramref name="Counter"/> and
 /// <paramref name="Target"/> are set for those reached by counting, e.g. 25 cookies.
 /// </summary>
-public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counter = null, int Target = 1);
+public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counter = null, int Target = 1)
+{
+    /// <summary>Whether reaching it makes this costume item wearable: its reward, and for the football fan every fan scarf.</summary>
+    public bool Unlocks(Outfit item) => item == Reward || Id == AchievementId.FootballFan && Sprite.IsFanScarf(item.Neck);
+}
 
 /// <summary>
 /// What the pet and its owner have done together, and which costumes that unlocked. Kept in achievements.json in
@@ -29,6 +33,8 @@ public sealed class Achievements
     public const string SessionsCounter = "Sessions";
     public const int ModelsNeeded = 3;
     public const int EmotesNeeded = 25;
+    /// <summary>Games of ball for all fan scarves.</summary>
+    public const int BallGamesNeeded = 1000;
 
     public static readonly Achievement[] All =
     [
@@ -38,6 +44,7 @@ public sealed class Achievements
         new(AchievementId.Feed, new(Hat.ChefHat), nameof(Emote.Feed), EmotesNeeded),
         new(AchievementId.Pat, new(Neck: Neckwear.Bell), nameof(Emote.Pat), EmotesNeeded),
         new(AchievementId.Play, new(Hat.PropellerCap), nameof(Emote.Play), EmotesNeeded),
+        new(AchievementId.FootballFan, new(Neck: Neckwear.Dortmund), nameof(Emote.Play), BallGamesNeeded),
         new(AchievementId.Tickle, new(Face: FaceWear.Moustache), nameof(Emote.Tickle), EmotesNeeded),
         new(AchievementId.NightOwl, new(Neck: Neckwear.Scarf)),
         new(AchievementId.BreakTaken, new(Hat.CowboyHat)),
@@ -91,7 +98,7 @@ public sealed class Achievements
 
     /// <summary>The achievement that unlocks this costume item, while it is still locked; null when it can be worn.</summary>
     public Achievement? LockedBy(Outfit item) =>
-        All.FirstOrDefault(a => a.Reward == item && !IsUnlocked(a.Id));
+        All.FirstOrDefault(a => a.Unlocks(item) && !IsUnlocked(a.Id));
 
     /// <summary>A session took place; each one is counted once, however often it reports.</summary>
     public void SessionSeen(string id)

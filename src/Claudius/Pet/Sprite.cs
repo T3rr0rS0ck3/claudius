@@ -24,7 +24,13 @@ public enum Hat { None, Crown, Flower, WizardHat, TopHat, CowboyHat, ChefHat, Ca
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
 public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch }
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
-public enum Neckwear { None, BowTie, Scarf, Bell }
+public enum Neckwear
+{
+    None, BowTie, Scarf, Bell,
+    // Fan scarves in the colors of the football clubs, by town
+    Augsburg, UnionBerlin, Bremen, Dortmund, Elversberg, Frankfurt, Freiburg, Schalke, Hamburg, Cologne, Leverkusen,
+    Mainz, Gladbach, Bayern, Paderborn, Stuttgart,
+}
 /// <summary>The AI model families the pet dresses up for; <see cref="Other"/> for unknown models and none.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<ModelFamily>))]
 public enum ModelFamily { Opus, Sonnet, Haiku, Fable, Other }
@@ -120,6 +126,38 @@ public static class Sprite
     private const uint CapShade = 0xFF2C539F;
     private const uint HelmetColor = 0xFFA6ABB8;
     private const uint HelmetShade = 0xFF737887;
+
+    /// <summary>
+    /// A fan scarf in a club's colors: its two rows around the neck and the end hanging down with its fringe,
+    /// each 'a', 'b' or 'c' a pixel in that color.
+    /// </summary>
+    private readonly record struct FanScarf(uint A, uint B, uint C, string Top, string Bottom, string End, string Fringe);
+
+    private const uint ClubWhite = 0xFFF4F4F4;
+    private const uint ClubBlack = 0xFF1C1C1E;
+
+    private static readonly Dictionary<Neckwear, FanScarf> FanScarves = new()
+    {
+        [Neckwear.Augsburg] = new(0xFFBA3733, 0xFF46714D, ClubWhite, "aacbbcaacbbcaa", "aacbbcaacbbcaa", "ac", "cc"),
+        [Neckwear.UnionBerlin] = new(0xFFEB1923, ClubWhite, 0, "aaaaaaaaaaaaaa", "bbbbbbbbbbbbbb", "aa", "bb"),
+        [Neckwear.Bremen] = new(0xFF1D9053, ClubWhite, 0, "aaabbbaaabbbaa", "aaabbbaaabbbaa", "aa", "bb"),
+        [Neckwear.Dortmund] = new(0xFFFDE100, ClubBlack, 0, "aaabbbaaabbbaa", "aaabbbaaabbbaa", "aa", "bb"),
+        [Neckwear.Elversberg] = new(ClubBlack, ClubWhite, 0, "aabbaabbaabbaa", "aabbaabbaabbaa", "aa", "bb"),
+        [Neckwear.Frankfurt] = new(ClubBlack, 0xFFE1000F, ClubWhite, "aabacaabacaaba", "aabacaabacaaba", "aa", "bb"),
+        [Neckwear.Freiburg] = new(0xFFD2001C, ClubWhite, ClubBlack, "aacaaacaaacaaa", "aacaaacaaacaaa", "aa", "bb"),
+        [Neckwear.Schalke] = new(0xFF004D9D, ClubWhite, 0, "aaabaaabaaabaa", "aaabaaabaaabaa", "aa", "bb"),
+        [Neckwear.Hamburg] = new(0xFF0A3F86, ClubWhite, ClubBlack, "aaaabbbccccaaa", "aaaabbbccccaaa", "cc", "bb"),
+        [Neckwear.Cologne] = new(0xFFED1C24, ClubWhite, 0, "bbbabbbabbbabb", "bbbabbbabbbabb", "bb", "aa"),
+        [Neckwear.Leverkusen] = new(0xFFE32221, ClubBlack, 0, "aaabbbaaabbbaa", "aaabbbaaabbbaa", "aa", "bb"),
+        [Neckwear.Mainz] = new(0xFFC3141E, ClubWhite, 0, "ababababababab", "bababababababa", "ab", "ba"),
+        [Neckwear.Gladbach] = new(ClubBlack, ClubWhite, 0xFF00A859, "aabcbaabcbaabc", "aabcbaabcbaabc", "aa", "bb"),
+        [Neckwear.Bayern] = new(0xFFDC052D, ClubWhite, 0, "aaabbbaaabbbaa", "aaabbbaaabbbaa", "aa", "bb"),
+        [Neckwear.Paderborn] = new(0xFF005CA9, ClubBlack, 0, "aaabbbaaabbbaa", "aaabbbaaabbbaa", "aa", "bb"),
+        [Neckwear.Stuttgart] = new(0xFFE32219, ClubWhite, 0, "bbbbbbbbbbbbbb", "aaaaaaaaaaaaaa", "bb", "aa"),
+    };
+
+    /// <summary>Whether this is one of the fan scarves in a football club's colors.</summary>
+    public static bool IsFanScarf(Neckwear neck) => FanScarves.ContainsKey(neck);
 
     /// <summary>Warm orange, the default body color.</summary>
     public const uint DefaultBodyColor = 0xFFD97757;
@@ -410,6 +448,11 @@ public static class Sprite
                     Glyph(c0 + 6, GoldColor, by + 8, "XX", "XX");
                     Glyph(c0 + 6, GoldShade, by + 9, "XX");
                     break;
+                // A fan scarf in a club's colors, one end hanging down between the legs
+                case var club when FanScarves.TryGetValue(club, out var scarf):
+                    Stripes(c0, by + 7, scarf, scarf.Top, scarf.Bottom);
+                    Stripes(c0 + 7, by + 9, scarf, scarf.End, scarf.Fringe);
+                    break;
             }
         }
         switch (f.Accessory != Accessory.None ? Hat.None : f.Outfit.Hat)
@@ -586,6 +629,14 @@ public static class Sprite
             for (int y = 0; y < rows.Length; y++)
                 for (int i = 0; i < rows[y].Length; i++)
                     if (rows[y][i] == 'X') Set(x + i, top + y, color);
+        }
+
+        // Rows of a fan scarf's pattern, a..c = its colors
+        void Stripes(int x, int top, FanScarf scarf, params string[] rows)
+        {
+            for (int y = 0; y < rows.Length; y++)
+                for (int i = 0; i < rows[y].Length; i++)
+                    Set(x + i, top + y, rows[y][i] switch { 'a' => scarf.A, 'b' => scarf.B, _ => scarf.C });
         }
 
         // ")" shaped arc, h pixels tall

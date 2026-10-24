@@ -272,6 +272,7 @@ public static class Strings
     public static string SlotHead => L("Head", "Kopf");
     public static string SlotFace => L("Face", "Gesicht");
     public static string SlotNeck => L("Neck", "Hals");
+    public static string SlotFanScarves => L("Fan scarves", "Fanschals");
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
@@ -309,11 +310,30 @@ public static class Strings
         Neckwear.BowTie => L("Bow tie", "Fliege"),
         Neckwear.Scarf => L("Scarf", "Schal"),
         Neckwear.Bell => L("Collar with bell", "Halsband mit Glöckchen"),
+        Neckwear.Augsburg => "FC Augsburg",
+        Neckwear.UnionBerlin => "1. FC Union Berlin",
+        Neckwear.Bremen => "SV Werder Bremen",
+        Neckwear.Dortmund => "Borussia Dortmund",
+        Neckwear.Elversberg => "SV Elversberg",
+        Neckwear.Frankfurt => "Eintracht Frankfurt",
+        Neckwear.Freiburg => "SC Freiburg",
+        Neckwear.Schalke => "FC Schalke 04",
+        Neckwear.Hamburg => "Hamburger SV",
+        Neckwear.Cologne => "1. FC Köln",
+        Neckwear.Leverkusen => "Bayer 04 Leverkusen",
+        Neckwear.Mainz => "1. FSV Mainz 05",
+        Neckwear.Gladbach => "Borussia Mönchengladbach",
+        Neckwear.Bayern => "FC Bayern München",
+        Neckwear.Paderborn => "SC Paderborn 07",
+        Neckwear.Stuttgart => "VfB Stuttgart",
         _ => Nothing,
     };
     public static string ItemName(Outfit item) =>
         item.Hat != Hat.None ? HatName(item.Hat) : item.Face != FaceWear.None ? FaceName(item.Face) : NeckName(item.Neck);
-    public static string TabAchievements => L("Achievements", "Erfolge");
+    /// <summary>What an achievement unlocks: its costume item, or all the fan scarves.</summary>
+    public static string RewardName(Achievement achievement) =>
+        achievement.Id == AchievementId.FootballFan ? SlotFanScarves : ItemName(achievement.Reward);
+    public static string TabAchievements =>L("Achievements", "Erfolge");
     public static string AchievementTitle(AchievementId id) => id switch
     {
         AchievementId.FirstSession => L("Hello, assistant!", "Hallo, Assistent!"),
@@ -328,6 +348,7 @@ public static class Strings
         AchievementId.ReaperEscaped => L("Cheated death", "Dem Sensenmann entwischt"),
         AchievementId.LimitReached => L("All the way", "Bis zum Anschlag"),
         AchievementId.ModelsTried => L("Connoisseur", "Modellkenner"),
+        AchievementId.FootballFan => L("A thousand friends", "Tausend Freunde"),
         _ => L("Party mood", "Feierlaune"),
     };
     public static string AchievementHint(AchievementId id) => id switch
@@ -345,6 +366,7 @@ public static class Strings
             "Räume eine Session mit /compact oder /clear auf, während der Sensenmann wartet."),
         AchievementId.LimitReached => L("Use up a limit once.", "Schöpfe einmal ein Limit aus."),
         AchievementId.ModelsTried => L("Work with three different AI models.", "Arbeite mit drei verschiedenen KI-Modellen."),
+        AchievementId.FootballFan => L("Play ball with Claudius 1000 times.", "Spiele 1000-mal Ball mit Claudius."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
     };
