@@ -97,12 +97,8 @@
                     <!-- The items, scrolled; as high as the rows down to the fan scarves (ItemRows_SizeChanged) -->
                     <ScrollViewer x:Name="ItemScroll" VerticalScrollBarVisibility="Auto" Padding="0,0,6,0" Margin="0,4,0,0">
                         <StackPanel x:Name="ItemRows" SizeChanged="ItemRows_SizeChanged">
-                            <TextBlock Text="{x:Static core:Strings.SlotHead}" Style="{StaticResource SlotLabel}" Margin="2,0,0,4" />
-                            <WrapPanel x:Name="HatItems" />
-                            <TextBlock Text="{x:Static core:Strings.SlotFace}" Style="{StaticResource SlotLabel}" />
-                            <WrapPanel x:Name="FaceItems" />
-                            <TextBlock Text="{x:Static core:Strings.SlotNeck}" Style="{StaticResource SlotLabel}" />
-                            <WrapPanel x:Name="NeckItems" />
+                            <TextBlock Text="{x:Static core:Strings.SlotStandard}" Style="{StaticResource SlotLabel}" Margin="2,0,0,4" />
+                            <WrapPanel x:Name="StandardItems" />
                             <TextBlock Text="{x:Static core:Strings.SlotFanScarves}" Style="{StaticResource SlotLabel}" />
                             <WrapPanel x:Name="FanScarfItems" />
                             <TextBlock Text="{x:Static core:Strings.SlotFootballHelmets}" Style="{StaticResource SlotLabel}" />
