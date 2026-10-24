@@ -80,6 +80,11 @@
                         <ComboBox x:Name="BirthdayDayBox" Width="56" SelectionChanged="Birthday_SelectionChanged" />
                         <ComboBox x:Name="BirthdayMonthBox" Width="120" Margin="6,0,0,0" SelectionChanged="Birthday_SelectionChanged" />
                     </StackPanel>
+                    <!-- What the pet eats when it is fed -->
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="{x:Static core:Strings.SnackLabel}" VerticalAlignment="Center" Margin="2,0,8,0" />
+                        <WrapPanel x:Name="SnackItems" />
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
 
@@ -106,6 +111,8 @@
                             <WrapPanel x:Name="MarioItems" />
                             <TextBlock Text="{x:Static core:Strings.SlotDisney}" Style="{StaticResource SlotLabel}" />
                             <WrapPanel x:Name="DisneyItems" />
+                            <TextBlock Text="{x:Static core:Strings.SlotWizarding}" Style="{StaticResource SlotLabel}" />
+                            <WrapPanel x:Name="WizardingItems" />
                         </StackPanel>
                     </ScrollViewer>
                     <TextBlock x:Name="LockText" Style="{StaticResource Hint}" FontSize="12" Margin="2,8,0,0" Visibility="Collapsed" />

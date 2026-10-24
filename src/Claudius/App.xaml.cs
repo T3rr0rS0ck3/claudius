@@ -101,8 +101,9 @@ public partial class App : Application
         _pet.Moved += SavePosition;
         _pet.Emoted += emote =>
         {
-            Say(emote == Emote.Feed && _pet.Unwell ? "FeedSick" : emote.ToString());
+            Say(emote != Emote.Feed ? emote.ToString() : _pet.Unwell ? "FeedSick" : Settings.Snack == Snack.Beans ? "FeedBeans" : "Feed");
             Achievements.Count(emote.ToString());
+            if (emote == Emote.Feed && Settings.Snack == Snack.Beans) Achievements.Count(Achievements.BeansCounter);
         };
         _pet.Splatted += () => Achievements.Count(Achievements.FallsCounter);
         _pet.Jumped += () => Achievements.Count(Achievements.JumpsCounter);

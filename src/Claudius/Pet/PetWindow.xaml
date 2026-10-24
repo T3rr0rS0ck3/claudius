@@ -87,7 +87,7 @@
                     HorizontalAlignment="Center" Margin="0,0,0,4" Visibility="Collapsed"
                     Panel.ZIndex="1" MouseLeave="Emotes_MouseLeave">
             <!-- Tooltips come from ApplyLanguage -->
-            <Button Style="{StaticResource EmoteButton}" Content="🍪" Tag="Feed" Click="Emote_Click" />
+            <Button x:Name="FeedButton" Style="{StaticResource EmoteButton}" Content="🍪" Tag="Feed" Click="Emote_Click" />
             <Button Style="{StaticResource EmoteButton}" Content="❤" Tag="Pat" Click="Emote_Click" />
             <Button Style="{StaticResource EmoteButton}" Content="⚽" Tag="Play" Click="Emote_Click" />
             <Button Style="{StaticResource EmoteButton}" Content="🪶" Tag="Tickle" Click="Emote_Click" />
