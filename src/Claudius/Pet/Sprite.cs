@@ -33,12 +33,15 @@ public enum Hat
     MickeyEars, Minnie, Donald, Goofy, Sorcerer, Elsa, SnowWhite, Ariel, DaisyDuck, Huey, Dewey, Louie, Chip, Simba, Timon,
     // Harry Potter characters
     Hermione, Ron, Snape, Hagrid, Draco, Bellatrix, SortingHat, McGonagall, Hedwig, Dobby,
+    // Star Wars characters
+    Luke, Leia, HanSolo, Yoda, Chewbacca, Rey, Finn, Poe, Emperor, R2D2, BB8, Grogu, Ewok,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
 public enum FaceWear
 {
     None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch, ShyGuy, WallE, Eve, Pumbaa,
     HarryPotter, Dumbledore, Luna, DeathEater, Voldemort,
+    ObiWan, DarthVader, KyloRen, DarthMaul, Stormtrooper, BobaFett, Mandalorian, TiePilot, C3PO,
 }
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
 public enum Neckwear
@@ -53,6 +56,8 @@ public enum Neckwear
     Dale,
     // The Hogwarts house scarves
     Gryffindor, Slytherin, Ravenclaw, Hufflepuff,
+    // Chewbacca's bandolier and a Jedi robe
+    Bandolier, JediRobe,
 }
 /// <summary>What the pet eats when it is fed.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<Snack>))]
@@ -274,6 +279,11 @@ public static class Sprite
         [Neckwear.Hufflepuff] = new(0xFFECB939, 0xFF372E29, 0, "aaababaaababaa", "aaababaaababaa", "aa", "bb"),
     };
 
+    /// <summary>Whether this costume item belongs to a Star Wars character.</summary>
+    public static bool IsStarWarsCostume(Outfit item) =>
+        item.Hat is >= Hat.Luke and <= Hat.Ewok || item.Face is >= FaceWear.ObiWan and <= FaceWear.C3PO
+        || item.Neck is Neckwear.Bandolier or Neckwear.JediRobe;
+
     /// <summary>Whether this costume item belongs to a Harry Potter character (or a Hogwarts house).</summary>
     public static bool IsWizardingCostume(Outfit item) =>
         item.Hat is >= Hat.Hermione and <= Hat.Dobby || item.Face is >= FaceWear.HarryPotter and <= FaceWear.Voldemort
@@ -487,7 +497,7 @@ public static class Sprite
         }
         // Behind sunglasses the eyes stay hidden, even where looking up or down would peek past the lenses
         if (f.Outfit.Face is not (FaceWear.Sunglasses or FaceWear.ShyGuy or FaceWear.WallE or FaceWear.Eve or FaceWear.Luna
-            or FaceWear.DeathEater or FaceWear.Voldemort))
+            or FaceWear.DeathEater or FaceWear.Voldemort or > FaceWear.ObiWan))
         {
             Eye(c0 + 3, -1);
             Eye(c0 + 10, 1);
@@ -575,6 +585,73 @@ public static class Sprite
                     Glyph(c0 + 5, EyeColor, by + 5, "X..X");
                     Glyph(c0 + 2, FurWhite, by + 3, "X........X", "X........X", ".X......X.");
                     break;
+                // Obi-Wan's short ginger beard and moustache
+                case FaceWear.ObiWan:
+                    Glyph(c0 + 2, 0xFFB07444, by + 4, "...XXXX...", "XX......XX", "XXX....XXX", "XXXXXXXXXX", ".XXXXXXXX.", "...XXXX...");
+                    Glyph(c0 + 2, 0xFF8A5530, by + 6, ".X......X.", "..X.XX.X..");
+                    break;
+                // Darth Vader's black helmet flaring out at the bottom, over a grey mask with dark lenses and a grille
+                case FaceWear.DarthVader:
+                    Glyph(c0 - 1, 0xFF16161A, by - 3, "....XXXXXXXX....", "..XXXXXXXXXXXX..", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX",
+                        "XXX..........XXX", "XXX..........XXX", "XXX..........XXX", "XXX..........XXX", "XXXX........XXXX", "XXXXX......XXXXX");
+                    Glyph(c0 - 1, 0xFF34343E, by - 2, "....XX..........", "...X............");
+                    Glyph(c0 + 2, 0xFF3A3A44, by + 1, "XXXXXXXXXX", "XXXXXXXXXX", "XXXXXXXXXX", ".XXXXXXXX.", "..XXXXXX..", "...XXXX...");
+                    Glyph(c0 + 2, 0xFF08080A, by + 2, ".XXX..XXX.", "..XX..XX..");
+                    Glyph(c0 + 2, 0xFF9AA0AC, by + 4, "....XX....", "...X..X...", "....XX....");
+                    break;
+                // Kylo Ren's black mask with the silver trim around its visor
+                case FaceWear.KyloRen:
+                    Glyph(c0 - 1, 0xFF16161A, by - 2, "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX",
+                        "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", ".XXXXXXXXXXXXXX.");
+                    Glyph(c0, 0xFFA6ABB8, by + 1, ".XXXXXXXXXXXX.", "X............X", ".XXXXX..XXXXX.", ".....X..X.....", ".....X..X.....", ".....XXXX.....");
+                    break;
+                // Darth Maul's face: red with black tattoos, yellow eyes and a ring of little horns
+                case FaceWear.DarthMaul:
+                    Glyph(c0, 0xFFC42222, by, "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX");
+                    Glyph(c0, 0xFF16161A, by, ".X.X..XX..X.X.", ".XXXX.XX.XXXX.", ".X..X....X..X.", ".XXXX....XXXX.", "......XX......", "..X..XXXX..X..", "...XXXXXXXX...");
+                    Glyph(c0 + 2, 0xFFF2C14E, by + 2, "XX......XX");
+                    Glyph(c0 + 2, 0xFFE8DCC0, by - 1, "X..X....X..X");
+                    break;
+                // A stormtrooper's white helmet with black eye lenses, a frown and a grey grille
+                case FaceWear.Stormtrooper:
+                    Glyph(c0 - 1, 0xFFF0F0F2, by - 2, "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX",
+                        "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", ".XXXXXXXXXXXXXX.");
+                    Glyph(c0 - 1, 0xFFC4C8D0, by + 1, "X..............X", "X..............X", "X..............X");
+                    Glyph(c0 + 1, 0xFF16161A, by + 2, ".XXX....XXX.", "..XXX..XXX..", "...X....X...", "....XXXX....");
+                    Glyph(c0 + 1, 0xFF8A8E98, by + 6, "....X..X....");
+                    break;
+                // Boba Fett's and the Mandalorian's helmets: a T-shaped black visor in a green or a silver helmet
+                case FaceWear.BobaFett or FaceWear.Mandalorian:
+                {
+                    bool boba = f.Outfit.Face == FaceWear.BobaFett;
+                    uint shell = boba ? 0xFF4F7A4A : 0xFFB8BCC6, edge = boba ? 0xFF3A5A36 : 0xFF8A8E98;
+                    Glyph(c0 - 1, shell, by - 2, "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX",
+                        "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", ".XXXXXXXXXXXXXX.");
+                    Glyph(c0 - 1, edge, by + 1, "XX............XX", "XX............XX", "XX............XX", "XX............XX", "XX............XX");
+                    Glyph(c0 + 1, 0xFF0E0E12, by + 2, "XXXXXXXXXXXX", "XXXXXXXXXXXX", ".....XX.....", ".....XX.....", ".....XX.....");
+                    if (boba)
+                    {
+                        Glyph(c0 + 5, 0xFFB03020, by - 1, "X.....", "XX....", ".X....");
+                        Glyph(c0 + 14, 0xFF8A8E98, by - 3, "X", "X", "X", "X");
+                        Glyph(c0 + 1, 0xFFE0B040, by + 5, "XX........XX");
+                    }
+                    break;
+                }
+                // A TIE pilot's black helmet with big grey lenses and breathing tubes
+                case FaceWear.TiePilot:
+                    Glyph(c0 - 1, 0xFF16161A, by - 2, "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX",
+                        "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", ".XXXXXXXXXXXXXX.");
+                    Glyph(c0 + 1, 0xFF6A6E7A, by + 1, "XXXX....XXXX", ".XXX....XXX.", "..XX....XX..");
+                    Glyph(c0 + 5, 0xFF8A8E98, by + 4, "XXXX", "X..X", "X..X");
+                    Glyph(c0 + 6, 0xFF6A6E7A, by - 2, "XX", "XX");
+                    break;
+                // C-3PO's golden face with round glowing eyes and a slot for a mouth
+                case FaceWear.C3PO:
+                    Glyph(c0, 0xFFD8A830, by, "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX");
+                    Glyph(c0, 0xFFA87A18, by, "X............X", "..............", ".X..X....X..X.", "..XX......XX..", "......XX......", "..............", "X....XXXX....X");
+                    Glyph(c0 + 2, 0xFFFFE070, by + 2, ".XX....XX.");
+                    Glyph(c0 + 5, 0xFF3A2A10, by + 5, "XXXX");
+                    break;
                 // Harry's round black glasses, and the lightning scar on his forehead
                 case FaceWear.HarryPotter:
                     Glyph(c0 + 1, FrameColor, by + 1, ".XXX....XXX.", "X...XXXX...X", "X...X..X...X", ".XXX....XXX.");
@@ -641,6 +718,17 @@ public static class Sprite
                     Glyph(c0, SantaRed, by + 7, "XXXXXXXXXXXXXX", "XXXXXXXXXXXXXX");
                     Glyph(c0, 0xFFF5C400, by + 7, ".X........X...", "...X....X....X");
                     Glyph(c0 + 5, FurWhite, by + 7, "X..X", ".XX.");
+                    break;
+                // Chewbacca's bandolier: a brown strap with silver boxes, slung across the belly
+                case Neckwear.Bandolier:
+                    Glyph(c0, 0xFF5A3A20, by + 5, "XX............", "XXXX..........", "..XXXXXXXX....", "......XXXXXXXX");
+                    Glyph(c0, 0xFFB8BCC6, by + 6, ".X............", "....X..X......", "........X..X..");
+                    break;
+                // A Jedi robe: a brown cloak over a light tunic crossing at the front
+                case Neckwear.JediRobe:
+                    Glyph(c0, 0xFF6A4A2E, by + 6, "XXX........XXX", "XXXX......XXXX", "XXXXX....XXXXX");
+                    Glyph(c0 + 3, 0xFFD8C8A0, by + 6, "XX......XX", ".XX....XX.", "..XX..XX..");
+                    Glyph(c0, 0xFF8A6A44, by + 8, "......XX......");
                     break;
                 // A fan scarf in a club's colors, one end hanging down between the legs
                 case var club when FanScarves.TryGetValue(club, out var scarf) || HouseScarves.TryGetValue(club, out scarf):
@@ -851,6 +939,99 @@ public static class Sprite
             // Timon's red tuft of hair, sticking up
             case Hat.Timon:
                 Glyph(c0 + 4, 0xFFC2452D, by - 3, "X.X.X.", ".XXXX.", "XXXXXX");
+                break;
+            // Luke's sandy hair, swept to one side
+            case Hat.Luke:
+                Glyph(c0 - 1, 0xFFD9B66A, by - 2, "....XXXXXX......", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                if (f.Squash == 0) Glyph(c0 - 1, 0xFFD9B66A, by + 1, "XX............XX");
+                break;
+            // Leia's hair with a big bun over each ear
+            case Hat.Leia:
+                Glyph(c0 - 1, 0xFF4A2C1A, by - 1, "..XXXXXXXXXXXX..", "XXXXXXXXXXXXXXXX");
+                Glyph(c0 - 4, 0xFF4A2C1A, by - 2, ".XXX.", "XXXXX", "XXXXX", "XXXXX", ".XXX.");
+                Glyph(c0 + 13, 0xFF4A2C1A, by - 2, ".XXX.", "XXXXX", "XXXXX", "XXXXX", ".XXX.");
+                Glyph(c0 - 4, 0xFF7A4A2E, by - 1, ".XX..", "X..X.", ".XX..");
+                Glyph(c0 + 13, 0xFF7A4A2E, by - 1, "..XX.", ".X..X", "..XX.");
+                break;
+            // Han Solo's brown hair with a parting
+            case Hat.HanSolo:
+                Glyph(c0 - 1, 0xFF5A3A22, by - 2, "..XXXXXX.XXXXX..", ".XXXXXXX.XXXXXX.", "XXXXXXXXXXXXXXXX");
+                if (f.Squash == 0) Glyph(c0 - 1, 0xFF5A3A22, by + 1, "XX............XX");
+                break;
+            // Yoda's long green ears and a few white wisps of hair
+            case Hat.Yoda:
+                Glyph(c0 + 3, 0xFFE8E8EC, by - 2, "X.X..X.X", ".X..X..X");
+                if (f.Squash == 0)
+                {
+                    Glyph(c0 - 4, 0xFF8DB86A, by, "XX..", "XXXX", ".XXX");
+                    Glyph(c0 + 14, 0xFF8DB86A, by, "..XX", "XXXX", "XXX.");
+                    Glyph(c0 - 4, 0xFFB8D49A, by + 1, ".XX.");
+                    Glyph(c0 + 14, 0xFFB8D49A, by + 1, ".XX.");
+                }
+                break;
+            // Chewbacca's shaggy brown fur all around the face
+            case Hat.Chewbacca:
+            {
+                uint fur = 0xFF7A5230, dark = 0xFF5A3A20;
+                Glyph(c0 - 1, fur, by - 2, ".X.XX.XXXX.XX.X.", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                Glyph(c0 - 1, dark, by - 1, "..X..X....X..X..");
+                for (int i = 1; i <= 7 && f.Squash == 0; i++)
+                    Glyph(c0 - 1, i % 2 == 0 ? dark : fur, by + i, i == 7 ? "X..............X" : "XX............XX");
+                break;
+            }
+            // Rey's brown hair with three little buns on top
+            case Hat.Rey:
+                Glyph(c0 + 5, 0xFF6A4A2A, by - 5, ".XX.", "XXXX", ".XX.", "XXXX");
+                Glyph(c0 - 1, 0xFF6A4A2A, by - 1, ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                Glyph(c0 + 5, 0xFF4A3018, by - 4, "X..X", ".XX.", "X..X");
+                break;
+            // Finn's short black curls
+            case Hat.Finn:
+                Glyph(c0, 0xFF1C1612, by - 2, "..X.X.X.X.X.X.", ".XXXXXXXXXXXX.", "XXXXXXXXXXXXXX");
+                break;
+            // Poe's orange pilot helmet with a white stripe and ear flaps
+            case Hat.Poe:
+                Glyph(c0 + 1, 0xFFE8742A, by - 3, "...XXXXXX...", ".XXXXXXXXXX.", "XXXXXXXXXXXX");
+                Glyph(c0 - 1, 0xFFE8742A, by, "XXXXXXXXXXXXXXXX");
+                Glyph(c0 + 6, FurWhite, by - 3, "XX", "XX", "XX");
+                Glyph(c0 + 2, 0xFFC42222, by - 1, "X........X");
+                if (f.Squash == 0) Glyph(c0 - 1, 0xFFC05A1C, by + 1, "XX............XX", "XX............XX");
+                break;
+            // The Emperor's black hood, pointed on top and hanging down past the face
+            case Hat.Emperor:
+                Glyph(c0 - 1, 0xFF1A1820, by - 3, "......XXXX......", "...XXXXXXXXXX...", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX");
+                for (int i = 1; i <= 7 && f.Squash == 0; i++) Glyph(c0 - 1, 0xFF1A1820, by + i, "XXX..........XXX");
+                if (f.Squash == 0) Glyph(c0 - 1, 0xFF2E2A36, by + 1, "..X..........X..", "..X..........X..");
+                break;
+            // R2-D2's silver dome with blue panels and his big black eye
+            case Hat.R2D2:
+                Glyph(c0 + 3, 0xFFD8DCE4, by - 4, "..XXXX..", ".XXXXXX.", "XXXXXXXX", "XXXXXXXX");
+                Glyph(c0 + 3, 0xFF2E5BBA, by - 4, "........", "..X..X..", "X......X", "XX.XX.XX");
+                Glyph(c0 + 5, EyeColor, by - 3, "XX");
+                Set(c0 + 8, by - 3, 0xFFD8343C);
+                break;
+            // BB-8, the round little droid, rolling around on the head
+            case Hat.BB8:
+                Glyph(c0 + 4, FurWhite, by - 5, ".XXXX.", ".XXXX.", "XXXXXX", "XXXXXX", ".XXXX.");
+                Glyph(c0 + 4, 0xFFE8862E, by - 5, "..XX..", "......", "X....X", "..XX..", ".X..X.");
+                Glyph(c0 + 5, EyeColor, by - 5, "X...");
+                Set(c0 + 5, by - 6, 0xFF8A8E98);
+                break;
+            // Grogu's big green ears, sticking out wide to the sides
+            case Hat.Grogu:
+                if (f.Squash == 0)
+                {
+                    Glyph(c0 - 4, 0xFF9CC07A, by + 1, "XXXX", ".XXX", "..XX");
+                    Glyph(c0 + 14, 0xFF9CC07A, by + 1, "XXXX", "XXX.", "XX..");
+                    Glyph(c0 - 4, 0xFFE0A8A0, by + 1, ".XX.", "..X.");
+                    Glyph(c0 + 14, 0xFFE0A8A0, by + 1, ".XX.", ".X..");
+                }
+                break;
+            // An Ewok's brown leather hood with little round ears
+            case Hat.Ewok:
+                Glyph(c0 - 1, 0xFF8A5A34, by - 3, ".XX..........XX.", ".XXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX");
+                Glyph(c0 - 1, 0xFF6A4224, by - 3, "..X..........X..", "................", "................", "X..X..X..X..X..X");
+                for (int i = 1; i <= 5 && f.Squash == 0; i++) Glyph(c0 - 1, 0xFF8A5A34, by + i, "XX............XX");
                 break;
             // Hermione's and Bellatrix's big bushy hair, brown or wild black
             case Hat.Hermione or Hat.Bellatrix:

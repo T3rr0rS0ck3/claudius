@@ -30,7 +30,7 @@ until the limit resets.
   above it and it hops up to grab it three times, then bursts into tears (can be turned off)
 - 🎨 **Your color** — pick any color for the pet in the inventory; the usage overlay, menus and speech bubbles use it as accent color
 - 👑 **A wardrobe per model** — out of the box a crown for Opus, sunglasses for Sonnet, a little flower for Haiku and a wizard's hat for Fable; in the inventory (right-click → **Inventory…**) you dress each model yourself from hats, glasses, a moustache, a bow tie, a scarf and more (can be turned off)
-- 🏆 **Achievements** — 18 things to do together, from the first session to 25 cookies or a night in bed; each one unlocks a costume for the wardrobe, and the pet cheers when it happens. Tracked only on your computer
+- 🏆 **Achievements** — 19 things to do together, from the first session to 25 cookies or a night in bed; each one unlocks a costume for the wardrobe, and the pet cheers when it happens. Tracked only on your computer
 - 🎃 **Seasonal headwear** — a witch's hat and a broom in October, a Santa hat until Christmas, bunny ears at Easter and a party hat
   on New Year's Eve and your birthday; they take the place of the model's headwear (can be turned off)
 - 🌙 **Night mode** — between 23:00 and 06:00 (adjustable) the pet wears a nightcap and says good night; a bed turns up on the
