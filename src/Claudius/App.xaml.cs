@@ -104,6 +104,7 @@ public partial class App : Application
             Say(emote == Emote.Feed && _pet.Unwell ? "FeedSick" : emote.ToString());
             Achievements.Count(emote.ToString());
         };
+        _pet.Splatted += () => Achievements.Count(Achievements.FallsCounter);
         _pet.PetImage.ContextMenu = BuildContextMenu();
         _pet.Show();
 

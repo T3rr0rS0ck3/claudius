@@ -20,7 +20,14 @@ public readonly record struct Outfit(Hat Hat = Hat.None, FaceWear Face = FaceWea
     public static Outfit None => default;
 }
 [JsonConverter(typeof(JsonStringEnumConverter<Hat>))]
-public enum Hat { None, Crown, Flower, WizardHat, TopHat, CowboyHat, ChefHat, Cap, Headphones, HardHat, VikingHelmet, PropellerCap, Halo }
+public enum Hat
+{
+    None, Crown, Flower, WizardHat, TopHat, CowboyHat, ChefHat, Cap, Headphones, HardHat, VikingHelmet, PropellerCap, Halo,
+    // Football helmets in the colors of the NFL teams
+    Cardinals, Falcons, Ravens, Bills, Panthers, Bears, Bengals, Browns, Cowboys, Broncos, Lions, Packers, Texans, Colts,
+    Jaguars, Chiefs, Raiders, Chargers, Rams, Dolphins, Vikings, Patriots, Saints, Giants, Jets, Eagles, Steelers,
+    FortyNiners, Seahawks, Buccaneers, Titans, Commanders,
+}
 [JsonConverter(typeof(JsonStringEnumConverter<FaceWear>))]
 public enum FaceWear { None, Sunglasses, NerdGlasses, Monocle, Moustache, EyePatch }
 [JsonConverter(typeof(JsonStringEnumConverter<Neckwear>))]
@@ -158,6 +165,48 @@ public static class Sprite
 
     /// <summary>Whether this is one of the fan scarves in a football club's colors.</summary>
     public static bool IsFanScarf(Neckwear neck) => FanScarves.ContainsKey(neck);
+
+    /// <summary>A football helmet in a team's colors: its shell, the stripe down the middle and the face mask.</summary>
+    private readonly record struct FootballHelmet(uint Shell, uint Stripe, uint Mask);
+
+    private static readonly Dictionary<Hat, FootballHelmet> FootballHelmets = new()
+    {
+        [Hat.Cardinals] = new(ClubWhite, 0xFF97233F, ClubBlack),
+        [Hat.Falcons] = new(ClubBlack, 0xFFA71930, ClubBlack),
+        [Hat.Ravens] = new(ClubBlack, 0xFF4B2C8C, ClubBlack),
+        [Hat.Bills] = new(ClubWhite, 0xFFC60C30, 0xFF00338D),
+        [Hat.Panthers] = new(0xFFA5ACAF, 0xFF0085CA, ClubBlack),
+        [Hat.Bears] = new(0xFF0B162A, 0xFFC83803, 0xFF0B162A),
+        [Hat.Bengals] = new(0xFFFB4F14, ClubBlack, ClubBlack),
+        [Hat.Browns] = new(0xFFFF3C00, 0xFF311D00, 0xFF311D00),
+        [Hat.Cowboys] = new(0xFFB0B7BC, 0xFF041E42, 0xFF041E42),
+        [Hat.Broncos] = new(0xFF002244, 0xFFFB4F14, 0xFF002244),
+        [Hat.Lions] = new(0xFFB0B7BC, 0xFF0076B6, 0xFF0076B6),
+        [Hat.Packers] = new(0xFFFFB612, 0xFF203731, 0xFF203731),
+        [Hat.Texans] = new(0xFF03202F, 0xFFA71930, 0xFF03202F),
+        [Hat.Colts] = new(ClubWhite, 0xFF002C5F, 0xFF002C5F),
+        [Hat.Jaguars] = new(ClubBlack, 0xFF006778, ClubBlack),
+        [Hat.Chiefs] = new(0xFFE31837, 0xFFE31837, ClubWhite),
+        [Hat.Raiders] = new(0xFFA5ACAF, ClubBlack, ClubBlack),
+        [Hat.Chargers] = new(ClubWhite, 0xFF0080C6, 0xFFFFC20E),
+        [Hat.Rams] = new(0xFF003594, 0xFFFFA300, 0xFF003594),
+        [Hat.Dolphins] = new(ClubWhite, 0xFF008E97, 0xFF008E97),
+        [Hat.Vikings] = new(0xFF4F2683, 0xFFFFC62F, 0xFF4F2683),
+        [Hat.Patriots] = new(0xFFB0B7BC, 0xFFC60C30, 0xFF002244),
+        [Hat.Saints] = new(0xFFD3BC8D, ClubBlack, ClubBlack),
+        [Hat.Giants] = new(0xFF0B2265, 0xFFA71930, 0xFFA5ACAF),
+        [Hat.Jets] = new(0xFF125740, ClubWhite, 0xFF125740),
+        [Hat.Eagles] = new(0xFF004C54, 0xFFA5ACAF, ClubBlack),
+        [Hat.Steelers] = new(ClubBlack, 0xFFFFB612, ClubBlack),
+        [Hat.FortyNiners] = new(0xFFB3995D, 0xFFAA0000, 0xFFAA0000),
+        [Hat.Seahawks] = new(0xFF002244, 0xFF69BE28, 0xFF002244),
+        [Hat.Buccaneers] = new(0xFF34302B, 0xFFD50A0A, ClubBlack),
+        [Hat.Titans] = new(0xFF0C2340, 0xFF4B92DB, 0xFF0C2340),
+        [Hat.Commanders] = new(0xFF5A1414, 0xFFFFB612, 0xFF5A1414),
+    };
+
+    /// <summary>Whether this is one of the football helmets in an NFL team's colors.</summary>
+    public static bool IsFootballHelmet(Hat hat) => FootballHelmets.ContainsKey(hat);
 
     /// <summary>Warm orange, the default body color.</summary>
     public const uint DefaultBodyColor = 0xFFD97757;
@@ -528,6 +577,20 @@ public static class Sprite
             // A golden halo floating above the head
             case Hat.Halo:
                 Glyph(c0, GoldColor, by - 4, ".XXXX.", "X....X", ".XXXX.");
+                break;
+            // A football helmet in a team's colors around the whole head: the shell with a stripe down the middle,
+            // ear flaps down the sides and a face mask bar below the eyes (just the shell on a squashed pet)
+            case var team when FootballHelmets.TryGetValue(team, out var helmet):
+                Glyph(c0 + 4, helmet.Shell, by - 2, "XXXXXX");
+                Glyph(c0 + 1, helmet.Shell, by - 1, "XXXXXXXXXXXX");
+                Glyph(c0 - 1, helmet.Shell, by, "XXXXXXXXXXXXXXXX");
+                Glyph(c0 + 6, helmet.Stripe, by - 2, "XX", "XX", "XX");
+                if (f.Squash == 0)
+                {
+                    uint flap = Blend(helmet.Shell, 0xFF000000, 0.22);
+                    Glyph(c0 - 1, flap, by + 1, "XX............XX", "XX............XX", "XX............XX");
+                    Glyph(c0, helmet.Mask, by + 4, "XXXXXXXXXXXXXX");
+                }
                 break;
         }
 

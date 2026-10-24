@@ -11,7 +11,7 @@ namespace Claudius.Core;
 public enum AchievementId
 {
     FirstSession, Sessions10, Sessions100, Feed, Pat, Play, Tickle,
-    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan,
+    NightOwl, BreakTaken, ReaperEscaped, LimitReached, ModelsTried, Celebration, FootballFan, HardLandings,
 }
 
 /// <summary>
@@ -20,8 +20,13 @@ public enum AchievementId
 /// </summary>
 public sealed record Achievement(AchievementId Id, Outfit Reward, string? Counter = null, int Target = 1)
 {
-    /// <summary>Whether reaching it makes this costume item wearable: its reward, and for the football fan every fan scarf.</summary>
-    public bool Unlocks(Outfit item) => item == Reward || Id == AchievementId.FootballFan && Sprite.IsFanScarf(item.Neck);
+    /// <summary>
+    /// Whether reaching it makes this costume item wearable: its reward, for the football fan every fan scarf and
+    /// for the hard landings every football helmet.
+    /// </summary>
+    public bool Unlocks(Outfit item) => item == Reward
+        || Id == AchievementId.FootballFan && Sprite.IsFanScarf(item.Neck)
+        || Id == AchievementId.HardLandings && Sprite.IsFootballHelmet(item.Hat);
 }
 
 /// <summary>
@@ -35,6 +40,10 @@ public sealed class Achievements
     public const int EmotesNeeded = 25;
     /// <summary>Games of ball for all fan scarves.</summary>
     public const int BallGamesNeeded = 1000;
+    /// <summary>Counts the long falls that end in a splat.</summary>
+    public const string FallsCounter = "Falls";
+    /// <summary>Long falls for all football helmets.</summary>
+    public const int FallsNeeded = 100;
 
     public static readonly Achievement[] All =
     [
@@ -52,6 +61,7 @@ public sealed class Achievements
         new(AchievementId.LimitReached, new(Face: FaceWear.EyePatch)),
         new(AchievementId.ModelsTried, new(Face: FaceWear.Monocle), Target: ModelsNeeded),
         new(AchievementId.Celebration, new(Hat.TopHat)),
+        new(AchievementId.HardLandings, new(Hat.Packers), FallsCounter, FallsNeeded),
     ];
 
     /// <summary>How many session ids are remembered so that each session is counted once.</summary>

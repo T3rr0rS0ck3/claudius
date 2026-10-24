@@ -273,6 +273,7 @@ public static class Strings
     public static string SlotFace => L("Face", "Gesicht");
     public static string SlotNeck => L("Neck", "Hals");
     public static string SlotFanScarves => L("Fan scarves", "Fanschals");
+    public static string SlotFootballHelmets => L("Football helmets", "Footballhelme");
     public static string Nothing => L("Nothing", "Nichts");
     public static string ResetOutfit => L("Default outfit", "Standard-Outfit");
     public static string WardrobeHint => L(
@@ -294,6 +295,38 @@ public static class Strings
         Hat.VikingHelmet => L("Viking helmet", "Wikingerhelm"),
         Hat.PropellerCap => L("Propeller cap", "Propellermütze"),
         Hat.Halo => L("Halo", "Heiligenschein"),
+        Hat.Cardinals => "Arizona Cardinals",
+        Hat.Falcons => "Atlanta Falcons",
+        Hat.Ravens => "Baltimore Ravens",
+        Hat.Bills => "Buffalo Bills",
+        Hat.Panthers => "Carolina Panthers",
+        Hat.Bears => "Chicago Bears",
+        Hat.Bengals => "Cincinnati Bengals",
+        Hat.Browns => "Cleveland Browns",
+        Hat.Cowboys => "Dallas Cowboys",
+        Hat.Broncos => "Denver Broncos",
+        Hat.Lions => "Detroit Lions",
+        Hat.Packers => "Green Bay Packers",
+        Hat.Texans => "Houston Texans",
+        Hat.Colts => "Indianapolis Colts",
+        Hat.Jaguars => "Jacksonville Jaguars",
+        Hat.Chiefs => "Kansas City Chiefs",
+        Hat.Raiders => "Las Vegas Raiders",
+        Hat.Chargers => "Los Angeles Chargers",
+        Hat.Rams => "Los Angeles Rams",
+        Hat.Dolphins => "Miami Dolphins",
+        Hat.Vikings => "Minnesota Vikings",
+        Hat.Patriots => "New England Patriots",
+        Hat.Saints => "New Orleans Saints",
+        Hat.Giants => "New York Giants",
+        Hat.Jets => "New York Jets",
+        Hat.Eagles => "Philadelphia Eagles",
+        Hat.Steelers => "Pittsburgh Steelers",
+        Hat.FortyNiners => "San Francisco 49ers",
+        Hat.Seahawks => "Seattle Seahawks",
+        Hat.Buccaneers => "Tampa Bay Buccaneers",
+        Hat.Titans => "Tennessee Titans",
+        Hat.Commanders => "Washington Commanders",
         _ => Nothing,
     };
     public static string FaceName(FaceWear face) => face switch
@@ -330,10 +363,14 @@ public static class Strings
     };
     public static string ItemName(Outfit item) =>
         item.Hat != Hat.None ? HatName(item.Hat) : item.Face != FaceWear.None ? FaceName(item.Face) : NeckName(item.Neck);
-    /// <summary>What an achievement unlocks: its costume item, or all the fan scarves.</summary>
-    public static string RewardName(Achievement achievement) =>
-        achievement.Id == AchievementId.FootballFan ? SlotFanScarves : ItemName(achievement.Reward);
-    public static string TabAchievements =>L("Achievements", "Erfolge");
+    /// <summary>What an achievement unlocks: its costume item, or all the fan scarves or football helmets.</summary>
+    public static string RewardName(Achievement achievement) => achievement.Id switch
+    {
+        AchievementId.FootballFan => SlotFanScarves,
+        AchievementId.HardLandings => SlotFootballHelmets,
+        _ => ItemName(achievement.Reward),
+    };
+    public static string TabAchievements => L("Achievements", "Erfolge");
     public static string AchievementTitle(AchievementId id) => id switch
     {
         AchievementId.FirstSession => L("Hello, assistant!", "Hallo, Assistent!"),
@@ -349,6 +386,7 @@ public static class Strings
         AchievementId.LimitReached => L("All the way", "Bis zum Anschlag"),
         AchievementId.ModelsTried => L("Connoisseur", "Modellkenner"),
         AchievementId.FootballFan => L("A thousand friends", "Tausend Freunde"),
+        AchievementId.HardLandings => L("Tough cookie", "Hart im Nehmen"),
         _ => L("Party mood", "Feierlaune"),
     };
     public static string AchievementHint(AchievementId id) => id switch
@@ -367,6 +405,8 @@ public static class Strings
         AchievementId.LimitReached => L("Use up a limit once.", "Schöpfe einmal ein Limit aus."),
         AchievementId.ModelsTried => L("Work with three different AI models.", "Arbeite mit drei verschiedenen KI-Modellen."),
         AchievementId.FootballFan => L("Play ball with Claudius 1000 times.", "Spiele 1000-mal Ball mit Claudius."),
+        AchievementId.HardLandings => L("Let Claudius fall from high up 100 times, until it goes splat.",
+            "Lass Claudius 100-mal so tief fallen, dass es platscht."),
         _ => L("Celebrate a holiday or your birthday with Claudius (seasonal headwear).",
             "Feiere einen Feiertag oder deinen Geburtstag mit Claudius (saisonale Kopfbedeckung)."),
     };
