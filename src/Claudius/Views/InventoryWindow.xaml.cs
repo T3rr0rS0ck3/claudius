@@ -294,6 +294,13 @@ public partial class InventoryWindow : Window
 
     private void ResetOutfit_Click(object sender, RoutedEventArgs e) => Dress(Sprite.DefaultOutfit(_dressing));
 
+    /// <summary>The items scroll below the fan scarves, so the window keeps a sensible height and its buttons in view.</summary>
+    private void ItemRows_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        double height = FanScarfItems.TranslatePoint(new Point(0, FanScarfItems.ActualHeight), ItemRows).Y;
+        if (height > 0 && (double.IsNaN(ItemScroll.Height) || Math.Abs(ItemScroll.Height - height) > 0.5)) ItemScroll.Height = height;
+    }
+
     private const string NoChoice = "–";
 
     private void ShowWardrobeOptions()
