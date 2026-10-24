@@ -262,6 +262,8 @@ public static class Strings
     public static string OtherModels => L("Others", "Andere");
     public static string OtherModelsTip => L("Unknown models, and before a session has reported its model.",
         "Unbekannte Modelle, und solange noch keine Session ihr Modell gemeldet hat.");
+    public static string GroupAllModels => L("FOR ALL MODELS", "FÜR ALLE MODELLE");
+    public static string GroupOutfitPerModel => L("OUTFIT PER MODEL", "OUTFIT PRO MODELL");
     public static string SlotHead => L("Head", "Kopf");
     public static string SlotFace => L("Face", "Gesicht");
     public static string SlotNeck => L("Neck", "Hals");
