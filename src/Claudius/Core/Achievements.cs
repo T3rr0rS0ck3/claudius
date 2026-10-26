@@ -75,7 +75,7 @@ public sealed class Achievements
         new(AchievementId.Feed, new(Hat.ChefHat), nameof(Emote.Feed), EmotesNeeded),
         new(AchievementId.Pat, new(Neck: Neckwear.Bell), nameof(Emote.Pat), EmotesNeeded),
         new(AchievementId.Play, new(Hat.PropellerCap), nameof(Emote.Play), EmotesNeeded),
-        new(AchievementId.FootballFan, new(Neck: Neckwear.Dortmund), nameof(Emote.Play), BallGamesNeeded),
+        new(AchievementId.FootballFan, new(Neck: Neckwear.Schalke), nameof(Emote.Play), BallGamesNeeded),
         new(AchievementId.Tickle, new(Face: FaceWear.Moustache), nameof(Emote.Tickle), EmotesNeeded),
         new(AchievementId.NightOwl, new(Neck: Neckwear.Scarf)),
         new(AchievementId.BreakTaken, new(Hat.CowboyHat)),
@@ -102,6 +102,8 @@ public sealed class Achievements
 
     /// <summary>Raised once per achievement, when it is reached.</summary>
     public event Action<Achievement>? Unlocked;
+    /// <summary>Raised whenever something was counted or reached, e.g. for progress shown on screen.</summary>
+    public event Action? Changed;
 
     public static Achievements Load()
     {
@@ -188,6 +190,7 @@ public sealed class Achievements
         {
             Log.Write("Erfolge konnten nicht gespeichert werden: " + ex.Message);
         }
+        Changed?.Invoke();
     }
 
     private sealed class Data
