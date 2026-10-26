@@ -554,6 +554,13 @@ public partial class App : Application
         Evaluate(initial: true);
     }
 
+    /// <summary>Shows the pet's settings while they are being changed in the settings, without saving them.</summary>
+    public void PreviewPetSettings()
+    {
+        _pet.ApplySettings(Settings);
+        Evaluate(initial: true);
+    }
+
     /// <summary>Menus that stay around are built again in the new language; windows pick it up when opened.</summary>
     private void ApplyLanguage()
     {

@@ -22,6 +22,63 @@ public partial class SettingsWindow : Window
     /// <summary>The tab shown when the settings are opened again.</summary>
     private static int _lastTab;
 
+    /// <summary>The pet's settings as they were when the window opened: put back when it is closed without saving.</summary>
+    private readonly PetLook _before;
+    private bool _saved;
+
+    /// <summary>The settings the pet shows right away while they are changed here.</summary>
+    private readonly record struct PetLook(double Scale, bool AlwaysOnTop, bool Animations, bool WalkAround,
+        bool CrossMonitors, bool ChaseCursor, bool Emotes, bool NightMode, string NightStart, string NightEnd, bool GhostDrag);
+
+    private static PetLook LookOf(AppSettings s) => new(s.PetScale, s.AlwaysOnTop, s.Animations, s.WalkAround,
+        s.CrossMonitors, s.ChaseCursor, s.Emotes, s.NightMode, s.NightStart, s.NightEnd, s.GhostDrag);
+
+    private PetLook LookOfControls() => new(ScaleSlider.Value, AlwaysOnTopBox.IsChecked == true,
+        AnimationsBox.IsChecked == true, WalkAroundBox.IsChecked == true, CrossMonitorsBox.IsChecked == true,
+        ChaseCursorBox.IsChecked == true, EmotesBox.IsChecked == true, NightModeBox.IsChecked == true,
+        (string)NightStartBox.SelectedItem, (string)NightEndBox.SelectedItem, GhostDragBox.IsChecked == true);
+
+    private void SetLook(PetLook look)
+    {
+        _settings.PetScale = look.Scale;
+        _settings.AlwaysOnTop = look.AlwaysOnTop;
+        _settings.Animations = look.Animations;
+        _settings.WalkAround = look.WalkAround;
+        _settings.CrossMonitors = look.CrossMonitors;
+        _settings.ChaseCursor = look.ChaseCursor;
+        _settings.Emotes = look.Emotes;
+        _settings.NightMode = look.NightMode;
+        _settings.NightStart = look.NightStart;
+        _settings.NightEnd = look.NightEnd;
+        _settings.GhostDrag = look.GhostDrag;
+    }
+
+    /// <summary>Shows a changed size, animation or night setting on the pet right away; saved only with Save.</summary>
+    private void PreviewPet()
+    {
+        SetLook(LookOfControls());
+        _app.PreviewPetSettings();
+    }
+
+    private void WatchPetControls()
+    {
+        ScaleSlider.ValueChanged += (_, _) => PreviewPet();
+        foreach (var box in new[] { AlwaysOnTopBox, AnimationsBox, WalkAroundBox, CrossMonitorsBox, ChaseCursorBox,
+                                    EmotesBox, NightModeBox, GhostDragBox })
+        {
+            box.Checked += (_, _) => PreviewPet();
+            box.Unchecked += (_, _) => PreviewPet();
+        }
+        NightStartBox.SelectionChanged += (_, _) => PreviewPet();
+        NightEndBox.SelectionChanged += (_, _) => PreviewPet();
+        Closed += (_, _) =>
+        {
+            if (_saved || LookOf(_settings) == _before) return;
+            SetLook(_before);
+            _app.PreviewPetSettings();
+        };
+    }
+
     /// <summary>Tabs in the look of the inventory's, each showing some of the groups.</summary>
     private void BuildTabs()
     {
@@ -123,6 +180,8 @@ public partial class SettingsWindow : Window
         AssistantStatusText.Text = assistant != null ? Strings.AssistantFound(assistant) : "⚠ " + Strings.AssistantNotFound;
 
         RefreshSetupStatus();
+        _before = LookOf(settings);
+        WatchPetControls();
     }
 
     // Each language in its own name.
@@ -298,6 +357,7 @@ public partial class SettingsWindow : Window
             _settings.VoiceChat = VoiceBox.IsChecked == true;
 
             _app.ApplySettings(save: true);
+            _saved = true;
             Close();
         }
         catch (FormatException ex)
