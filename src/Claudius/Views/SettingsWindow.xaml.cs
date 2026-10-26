@@ -14,7 +14,8 @@ namespace Claudius.Views;
 
 public partial class SettingsWindow : Window
 {
-    private readonly AppSettings _settings;
+    /// <summary>The app's settings as they are now: a hand edit of settings.json loads them again as a new object.</summary>
+    private AppSettings _settings => _app.Settings;
     private readonly App _app;
     private readonly List<(Border Tab, GroupBox[] Groups)> _tabs = [];
 
@@ -73,7 +74,6 @@ public partial class SettingsWindow : Window
         MaxHeight = SystemParameters.WorkArea.Height - 20;
         PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.Escape) Close(); };
         _app = app;
-        _settings = settings;
         BuildTabs();
 
         ScaleSlider.Value = settings.PetScale;

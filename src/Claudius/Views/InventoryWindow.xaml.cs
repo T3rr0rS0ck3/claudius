@@ -42,7 +42,8 @@ public partial class InventoryWindow : Window
     private static int _lastTab;
 
     private readonly App _app;
-    private readonly AppSettings _settings;
+    /// <summary>The app's settings as they are now: a hand edit of settings.json loads them again as a new object.</summary>
+    private AppSettings _settings => _app.Settings;
     private readonly List<Border> _tabs = [];
     private readonly Dictionary<ModelFamily, Border> _tiles = new();
     private readonly Dictionary<ModelFamily, Border> _chips = new();
@@ -66,13 +67,12 @@ public partial class InventoryWindow : Window
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) Close(); };
         PreviewKeyDown += (_, e) => KonamiKey(e.Key);
         _app = app;
-        _settings = settings;
         _achievements = app.Achievements;
         _dressing = running;
-        // Reached while the inventory is open: unlock the item right away.
-        Action<Achievement> unlocked = _ => Dispatcher.BeginInvoke(() => { ShowWardrobe(); ShowAchievements(); });
-        _achievements.Unlocked += unlocked;
-        Closed += (_, _) => _achievements.Unlocked -= unlocked;
+        // Counted or reached while the inventory is open: show the progress and unlock the item right away.
+        Action changed = () => Dispatcher.BeginInvoke(() => { ShowWardrobe(); ShowAchievements(); });
+        _achievements.Changed += changed;
+        Closed += (_, _) => _achievements.Changed -= changed;
 
         string[] tabNames = [Strings.TabModel, Strings.TabWardrobe, Strings.TabColor, Strings.TabAchievements];
         for (int i = 0; i < tabNames.Length; i++)
