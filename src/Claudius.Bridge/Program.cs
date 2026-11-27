@@ -136,19 +136,12 @@ static void RememberContext(string? id, double? context)
 // The app's UI language; English unless settings.json says German (saved before the choice existed: German too).
 static bool German()
 {
-    try
-    {
-        if (!File.Exists(DataPaths.SettingsFile)) return false;
-        using var doc = JsonDocument.Parse(File.ReadAllText(DataPaths.SettingsFile),
-            new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
-        return !doc.RootElement.TryGetProperty("Language", out var language)
+    using var doc = SafeFile.Read(DataPaths.SettingsFile, text => JsonDocument.Parse(text,
+        new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip }));
+    return doc != null
+           && (!doc.RootElement.TryGetProperty("Language", out var language)
                || language.ValueKind != JsonValueKind.String
-               || language.GetString() == "de";
-    }
-    catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
-    {
-        return false;
-    }
+               || language.GetString() == "de");
 }
 
 static void RunHook()

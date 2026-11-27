@@ -107,16 +107,10 @@ public sealed class Achievements
 
     public static Achievements Load()
     {
-        var achievements = new Achievements();
-        try
+        var achievements = new Achievements
         {
-            if (File.Exists(FilePath))
-                achievements._data = JsonSerializer.Deserialize<Data>(File.ReadAllText(FilePath), JsonOptions) ?? new();
-        }
-        catch (Exception ex) when (ex is JsonException or IOException)
-        {
-            Log.Write("Erfolge konnten nicht gelesen werden: " + ex.Message);
-        }
+            _data = SafeFile.Read(FilePath, text => JsonSerializer.Deserialize<Data>(text, JsonOptions), Log.Write) ?? new(),
+        };
         achievements._data.Counters ??= [];
         achievements._data.Unlocked ??= [];
         achievements._data.SeenSessions ??= [];
@@ -183,10 +177,9 @@ public sealed class Achievements
     {
         try
         {
-            Directory.CreateDirectory(DataPaths.DataDir);
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(_data, JsonOptions), new UTF8Encoding(false));
+            SafeFile.WriteAllText(FilePath, JsonSerializer.Serialize(_data, JsonOptions));
         }
-        catch (IOException ex)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Log.Write("Erfolge konnten nicht gespeichert werden: " + ex.Message);
         }
