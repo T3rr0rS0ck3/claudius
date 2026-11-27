@@ -16,6 +16,7 @@
     <Compile Include="..\Shared\UsageData.cs" Link="Shared\UsageData.cs" />
     <Compile Include="..\Shared\SessionData.cs" Link="Shared\SessionData.cs" />
     <Compile Include="..\Shared\AssistantCli.cs" Link="Shared\AssistantCli.cs" />
+    <Compile Include="..\Shared\SafeFile.cs" Link="Shared\SafeFile.cs" />
   </ItemGroup>
 
 </Project>

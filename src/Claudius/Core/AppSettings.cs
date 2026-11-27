@@ -223,36 +223,22 @@ public sealed class AppSettings
 
     public static AppSettings Load()
     {
-        AppSettings settings;
-        try
+        var settings = SafeFile.Read(DataPaths.SettingsFile, text =>
         {
-            if (File.Exists(DataPaths.SettingsFile))
-            {
-                var json = JsonNode.Parse(File.ReadAllText(DataPaths.SettingsFile), documentOptions: ReadOptions) as JsonObject;
-                if (json != null) Legacy.RenameSettings(json);
-                settings = json?.Deserialize<AppSettings>(JsonOptions) ?? new();
-                settings.Language ??= Strings.German; // saved before the language could be chosen
-            }
-            else
-            {
-                settings = new();
-            }
-        }
-        catch (Exception ex) when (ex is JsonException or IOException)
-        {
-            Log.Write("Einstellungen konnten nicht gelesen werden, verwende Standardwerte: " + ex.Message);
-            try { File.Copy(DataPaths.SettingsFile, DataPaths.SettingsFile + ".broken", true); } catch { }
-            settings = new();
-        }
+            if (JsonNode.Parse(text, documentOptions: ReadOptions) is not JsonObject json) return null;
+            Legacy.RenameSettings(json);
+            var loaded = json.Deserialize<AppSettings>(JsonOptions);
+            if (loaded != null) loaded.Language ??= Strings.German; // saved before the language could be chosen
+            return loaded;
+        }, Log.Write);
+        if (settings == null && (File.Exists(DataPaths.SettingsFile) || File.Exists(SafeFile.BackupPath(DataPaths.SettingsFile))))
+            Log.Write("Einstellungen konnten nicht gelesen werden, verwende Standardwerte.");
+        settings ??= new();
         settings.Normalize();
         return settings;
     }
 
-    public void Save()
-    {
-        Directory.CreateDirectory(DataPaths.DataDir);
-        File.WriteAllText(DataPaths.SettingsFile, JsonSerializer.Serialize(this, JsonOptions), new UTF8Encoding(false));
-    }
+    public void Save() => SafeFile.WriteAllText(DataPaths.SettingsFile, JsonSerializer.Serialize(this, JsonOptions));
 
     private void Normalize()
     {
